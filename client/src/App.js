@@ -5,6 +5,7 @@ import Projects from './Components/Projects';
 import AddProject from './Components/AddProject';
 import Todos from './Components/Todos';
 import './App.css';
+import UserRegistrationForm from './Components/UserRegistrationForm/UserRegistrationForm';
 
 class App extends Component {
   constructor() {
@@ -19,7 +20,7 @@ class App extends Component {
     $.ajax({
       url: 'https://jsonplaceholder.typicode.com/todos',
       dataType: 'json',
-      chache: false,
+      cache: false,
       success: function(data) {
         this.setState({todos: data}, function() {
           console.log(this.state);
@@ -73,11 +74,15 @@ class App extends Component {
 
   render() {
     return (
+      // <div className="App">
+      //     <AddProject addProject={this.handleAddProject.bind(this)} />
+      //     <Projects projects={this.state.projects} onDelete={this.handleDeleteProject.bind(this)} />
+      //     <hr />
+      //     <Todos todos={this.state.todos} />
+      // </div>
+
       <div className="App">
-          <AddProject addProject={this.handleAddProject.bind(this)} />
-          <Projects projects={this.state.projects} onDelete={this.handleDeleteProject.bind(this,)} />
-          <hr />
-          <Todos todos={this.state.todos} />
+        <UserRegistrationForm />
       </div>
     );
   }
