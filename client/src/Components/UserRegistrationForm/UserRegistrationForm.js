@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { Button, InputLabel, Grid, Checkbox, Select, MenuItem, FormControl, Typography, TextField, FormControlLabel } from "@material-ui/core";
+import { Button, InputLabel, Grid, Checkbox, Select, MenuItem, FormControl, Typography, TextField } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
     formControl: {
         margin: theme.spacing.unit,
-        minWidth: 200,
+        minWidth: 200
     },
     selectEmpty: {
         marginTop: theme.spacing.unit * 2
@@ -26,8 +26,24 @@ class UserRegistrationForm extends Component {
         acceptTermsOfService: false
     };
 
+    studyProgrammes = [
+        {id: 1, programmecode: 'MGLU1-7', name: 'Grunnskolelærerutdanning 1.–7. trinn', length: 5},
+        {id: 2, programmecode: 'LTMAGMA1', name: 'Matematikkdidaktikk 1.–7. trinn', length: 3}
+    ]
+    years = [];
+
+    constructor() {
+        super();
+
+        const amountOfYears = 5;
+        const currentYear = new Date().getFullYear();
+        for(let i = 0; i < amountOfYears; i++) {
+            this.years.push(currentYear-i);
+        }        
+    }
+
     handleChange = event => {
-        if (event.target.value != '') {
+        if (event.target.name !== 'wantNewsletter' && event.target.name !== 'acceptTermsOfService') {
             console.log('value updated');
             this.setState({ [event.target.name]: event.target.value });
         } else {
@@ -96,7 +112,12 @@ class UserRegistrationForm extends Component {
                                     }}
                                     className={classes.selectEmpty}
                                 >
-                                    <MenuItem value={'MGLU1-7'}>MGLU1-7 - Grunnskolelærerutdanning 1.–7. trinn</MenuItem>
+                                    {
+                                        this.studyProgrammes.map(
+                                            sp => <MenuItem key={sp.id} value={sp.id}>{sp.programmecode}</MenuItem>
+                                        )
+                                    }
+                                    
                                 </Select>
                             </FormControl>
                         </Grid>
@@ -112,9 +133,9 @@ class UserRegistrationForm extends Component {
                                     }}
                                     className={classes.selectEmpty}
                                 >
-                                    <MenuItem value={2018}>2018</MenuItem>
-                                    <MenuItem value={2017}>2017</MenuItem>
-                                    <MenuItem value={2016}>2016</MenuItem>
+                                    {
+                                        this.years.map(year => <MenuItem key={year} value={year}>{year}</MenuItem>)
+                                    }
                                 </Select>
                             </FormControl>
                         </Grid>
@@ -126,6 +147,7 @@ class UserRegistrationForm extends Component {
                                 className={classes.formControl}
                                 onChange={this.handleChange}
                                 margin="normal"
+                                helperText="Ikke påkrevd"
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
