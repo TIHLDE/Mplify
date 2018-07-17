@@ -1,14 +1,14 @@
 import React, { Component } from "react";
-import { Button, Input, InputLabel, Grid, Checkbox, Select, MenuItem, FormControl, Typography } from "@material-ui/core";
+import { Button, InputLabel, Grid, Checkbox, Select, MenuItem, FormControl, Typography, TextField, FormControlLabel } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
     formControl: {
         margin: theme.spacing.unit,
-        minWidth: 180,
+        minWidth: 200,
     },
     selectEmpty: {
-        marginTop: theme.spacing.unit * 2,
+        marginTop: theme.spacing.unit * 2
     },
 });
 
@@ -27,7 +27,13 @@ class UserRegistrationForm extends Component {
     };
 
     handleChange = event => {
-        this.setState({ [event.target.name]: event.target.value });
+        if (event.target.value != '') {
+            console.log('value updated');
+            this.setState({ [event.target.name]: event.target.value });
+        } else {
+            console.log('checkbox updated');
+            this.setState({ [event.target.name]: event.target.checked });
+        }
     };
 
     render() {
@@ -38,33 +44,49 @@ class UserRegistrationForm extends Component {
                 <Typography variant="title">Registrering</Typography>
                 <form>
                     <Grid container spacing={8}>
-                        <Grid item xs={6}>
-                            <FormControl className={classes.formControl} >
-                                <InputLabel>Fornavn:</InputLabel>
-                                <Input />
-                            </FormControl>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                id="first_name"
+                                name="firstName"
+                                label="Fornavn:"
+                                className={classes.formControl}
+                                onChange={this.handleChange}
+                                margin="normal"
+                            />
                         </Grid>
-                        <Grid item xs={6}>
-                            <FormControl className={classes.formControl} >
-                                <InputLabel>Etternavn:</InputLabel>
-                                <Input />
-                            </FormControl>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                id="last_name"
+                                name="lastName"
+                                label="Etternavn:"
+                                className={classes.formControl}
+                                onChange={this.handleChange}
+                                margin="normal"
+                            />
                         </Grid>
-                        <Grid item xs={6}>
-                            <FormControl className={classes.formControl} >
-                                <InputLabel>Student-epost:</InputLabel>
-                                <Input />
-                            </FormControl>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                id="student_email"
+                                name="studentEmail"
+                                label="Student-epost:"
+                                className={classes.formControl}
+                                onChange={this.handleChange}
+                                margin="normal"
+                            />
                         </Grid>
-                        <Grid item xs={6}>
-                            <FormControl className={classes.formControl} >
-                                <InputLabel>Privat epost:</InputLabel>
-                                <Input />
-                            </FormControl>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                id="private_email"
+                                name="privateEmail"
+                                label="Privat epost:"
+                                className={classes.formControl}
+                                onChange={this.handleChange}
+                                margin="normal"
+                            />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={12} sm={6}>
                             <FormControl className={classes.formControl} >
-                                <InputLabel htmlFor="study-programme">Studieprogram</InputLabel>
+                                <InputLabel htmlFor="study-programme">Studieprogram:</InputLabel>
                                 <Select
                                     value={this.state.studyProgramme}
                                     onChange={this.handleChange}
@@ -74,15 +96,13 @@ class UserRegistrationForm extends Component {
                                     }}
                                     className={classes.selectEmpty}
                                 >
-                                    <MenuItem value={0}>MGLU1-7 - Grunnskolelærerutdanning 1.–7. trinn</MenuItem>
+                                    <MenuItem value={'MGLU1-7'}>MGLU1-7 - Grunnskolelærerutdanning 1.–7. trinn</MenuItem>
                                 </Select>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={12} sm={6}>
                             <FormControl className={classes.formControl} >
-                                <InputLabel htmlFor="year-of-admission">
-                                    Opptaksår
-                        </InputLabel>
+                                <InputLabel htmlFor="year-of-admission">Opptaksår:</InputLabel>
                                 <Select
                                     value={this.state.yearOfAdmission}
                                     onChange={this.handleChange}
@@ -99,26 +119,39 @@ class UserRegistrationForm extends Component {
                             </FormControl>
                         </Grid>
                         <Grid item xs={12}>
-                            <FormControl className={classes.formControl} >
-                                <InputLabel>Vipps transaksjonskode:</InputLabel>
-                                <Input />
-                            </FormControl>
+                            <TextField
+                                id="vipps_transaction_code"
+                                name="vippsTransactionCode"
+                                label="Vipps transaksjonskode:"
+                                className={classes.formControl}
+                                onChange={this.handleChange}
+                                margin="normal"
+                            />
                         </Grid>
-                        <Grid item xs={6}>
-                            <div>
-                                <InputLabel>Nyhetsbrev:</InputLabel>
-                                <Checkbox />
-                            </div>
+                        <Grid item xs={12} sm={6}>
+                            <InputLabel>Nyhetsbrev:</InputLabel>
+                            <Checkbox name="wantNewsletter" onChange={this.handleChange} />
                         </Grid>
-                        <Grid item xs={6}>
-                            <div>
-                                <InputLabel>Terms of service:</InputLabel>
-                                <Checkbox />
-                            </div>
+                        <Grid item xs={12} sm={6}>
+                            <InputLabel>Terms of service:</InputLabel>
+                            <Checkbox name="acceptTermsOfService" onChange={this.handleChange} />
                         </Grid>
                         <Grid item xs={12}>
                             <FormControl className={classes.formControl} >
-                                <Button variant="contained" color="primary">
+                                <Button 
+                                    size="large"
+                                    variant="contained"
+                                    color="primary"
+                                    disabled={
+                                        !this.state.acceptTermsOfService
+                                        || this.state.firstName === ''
+                                        || this.state.lastName === ''
+                                        || this.state.studentEmail === ''
+                                        || this.state.privateEmail === ''
+                                        || this.state.studyProgramme === ''
+                                        || this.state.yearOfAdmission === ''
+                                    }
+                                >
                                     Registrer
                                 </Button>
                             </FormControl>
