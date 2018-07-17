@@ -20,8 +20,8 @@ loop = asyncio.get_event_loop()
 if __name__ == '__main__':
     init(loop)
 
-    app.add_routes([web.get('/api/user/{name}', get_member()),
-                    web.get('/api/allusers', get_all_members()),
-                    web.post('/api/login', login())])
+    app.add_routes([web.get('/api/user/{name}', get_member),
+                    web.get('/api/allusers', get_all_members),
+                    web.post('/api/login', login)])
 
     web.run_app(app)

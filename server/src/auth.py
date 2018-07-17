@@ -1,10 +1,13 @@
 from aiohttp import web
 from functools import wraps
 
+from members import mysql_connect
+
 sessions = {}
 
 
-def login(request):
+async def login(request):
+    conn, cur = await mysql_connect()
     pass
 
 
