@@ -2,7 +2,8 @@ from aiohttp import web
 import asyncio
 import os
 
-import server.src.members
+from auth import login
+from members import get_all_members, get_member, init
 
 
 def get_environ_sfe(name, default=None):
@@ -17,9 +18,10 @@ app = web.Application()
 loop = asyncio.get_event_loop()
 
 if __name__ == '__main__':
-    server.src.members.init(loop)
+    init(loop)
 
-    app.add_routes([web.get('/api/user/{name}', server.src.members.get_member),
-                    web.get('/api/allusers', server.src.members.get_all_members)])
+    app.add_routes([web.get('/api/user/{name}', get_member()),
+                    web.get('/api/allusers', get_all_members()),
+                    web.post('/api/login', login())])
 
     web.run_app(app)

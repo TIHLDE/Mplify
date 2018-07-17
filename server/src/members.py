@@ -2,7 +2,7 @@ import aiomysql
 import json
 from aiohttp import web
 
-import server.src.app
+from app import get_environ_sfe
 
 DB_PASSWORD = ''
 DB_USER = ''
@@ -13,9 +13,9 @@ loop = None
 def init(loo):
     global DB_PASSWORD, DB_USER, DB_NAME
     global loop
-    DB_PASSWORD = server.src.app.get_environ_sfe('DB_PASSWORD')
-    DB_USER = server.src.app.get_environ_sfe('DB_USER')
-    DB_NAME = server.src.app.get_environ_sfe('DB_NAME')
+    DB_PASSWORD =get_environ_sfe('DB_PASSWORD')
+    DB_USER = get_environ_sfe('DB_USER')
+    DB_NAME = get_environ_sfe('DB_NAME')
     loop = loo
 
 
