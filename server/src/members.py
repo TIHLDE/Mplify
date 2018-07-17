@@ -1,8 +1,14 @@
-import aiomysql
+import binascii
+import hashlib
+import os
+import time
+
+
 import json
 from aiohttp import web
 
-from app import get_environ_sfe
+from db import mysql_connect
+from auth import requires_auth
 
 DB_PASSWORD = ''
 DB_USER = ''
@@ -10,26 +16,7 @@ DB_NAME = ''
 loop = None
 
 
-def init(loo):
-    global DB_PASSWORD, DB_USER, DB_NAME
-    global loop
-    DB_PASSWORD =get_environ_sfe('DB_PASSWORD')
-    DB_USER = get_environ_sfe('DB_USER')
-    DB_NAME = get_environ_sfe('DB_NAME')
-    loop = loo
-
-
-async def mysql_connect():
-    """ Returns a Connection-instance,
-     and Cursor-instance from same connection
-    """
-    conn = await aiomysql.connect(host='tihlde.org', port=3306,
-                                  user=DB_USER, password=DB_PASSWORD,
-                                  db=DB_NAME, loop=loop, cursorclass=aiomysql.DictCursor)
-    cur = await conn.cursor()
-    return conn, cur
-
-
+@requires_auth
 async def get_member(request):
     (conn, cur) = await mysql_connect()
 
@@ -69,3 +56,34 @@ async def get_all_members(request):
     finally:
         await cur.close()
         conn.close()
+
+
+def generate_token():
+    return binascii.hexlify(os.urandom(64)).decode()
+
+"""
+def create_session(username):
+    try:
+        print('hei')
+    finally:
+        print('hei')
+
+    token = generate_token()
+    reset_sessions[token] = {
+        'username': username,
+        'expires': time.time() + TTL
+    }
+    return token
+"""
+
+def hash_str(to_hash: str, salt, iterations):
+    """
+    Generates a hash from the given string with the specified salt and
+    iterations.
+    :param to_hash: The string to hash
+    :param salt: Salt to use in the hash function
+    :param iterations: number of iterations to use in the hash function
+    :return:
+    """
+    return hashlib.pbkdf2_hmac('sha512', to_hash.encode(), salt, iterations,
+                               128)

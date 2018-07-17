@@ -1,7 +1,7 @@
 from aiohttp import web
 from functools import wraps
 
-from members import mysql_connect
+from db import mysql_connect
 
 sessions = {}
 

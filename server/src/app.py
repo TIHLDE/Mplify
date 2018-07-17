@@ -16,7 +16,8 @@ loop = asyncio.get_event_loop()
 
 if __name__ == '__main__':
     from auth import login
-    from members import get_all_members, get_member, init
+    from members import get_all_members, get_member
+    from db import init
 
     init(loop)
 
