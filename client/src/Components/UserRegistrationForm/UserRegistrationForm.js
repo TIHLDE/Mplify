@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, InputLabel, Grid, Paper, Checkbox, Select, MenuItem, FormControl, Typography, TextField } from "@material-ui/core";
+import { Button, InputLabel, Grid, Paper, Checkbox, Select, MenuItem, FormControl, Typography, TextField, FormHelperText } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
@@ -7,6 +7,7 @@ const styles = theme => ({
         textAlign: "center"
     },
     formControl: {
+        textAlign: "left",
         margin: theme.spacing.unit,
         minWidth: 200
     },
@@ -21,10 +22,7 @@ const styles = theme => ({
 
 class UserRegistrationForm extends Component {
 
-    studyProgrammes = [
-        { id: 1, programmecode: 'MGLU1-7', name: 'Grunnskolelærerutdanning 1.–7. trinn', length: 5 },
-        { id: 2, programmecode: 'LTMAGMA1', name: 'Matematikkdidaktikk 1.–7. trinn', length: 3 }
-    ]
+    studyProgrammes = []
     years = [];
 
     studentEmailError = false;
@@ -37,29 +35,29 @@ class UserRegistrationForm extends Component {
             lastName: '',
             studentEmail: '',
             privateEmail: '',
-            studyProgramme: '',
+            studyProgramme: {id: 0, programmeCode: '', name: '', length: 0},
             yearOfAdmission: '',
             vippsTransactionCode: '',
             wantNewsletter: false,
             acceptTermsOfService: false
         };
 
-        const amountOfYears = 5;
-        const currentYear = new Date().getFullYear();
-        for (let i = 0; i < amountOfYears; i++) {
-            this.years.push(currentYear - i);
-        }
+        this.populateStudyProgrammeEntries();
+        this.populateYearOfAdmissionYears();
     }
 
     handleChange = event => {
-        if (event.target.name !== 'wantNewsletter' && event.target.name !== 'acceptTermsOfService') {
-            console.log('value updated');
-            this.setState({ [event.target.name]: event.target.value });
-        } else {
-            console.log('checkbox updated');
-            this.setState({ [event.target.name]: event.target.checked });
-        }
+        this.setState({ [event.target.name]: event.target.value });
     };
+
+    handleCheckboxChange = event => {
+        this.setState({ [event.target.name]: event.target.checked });
+    }
+
+    handleStudyProgrammeChange = event => {
+        const studyProgramme = this.studyProgrammes.find(e => e.id === event.target.value);
+        this.setState({ [event.target.name]: studyProgramme });
+    }
 
     handleSubmit = event => {
         this.studentEmailError = !this.isNtnuEmail(this.state.studentEmail);
@@ -68,6 +66,19 @@ class UserRegistrationForm extends Component {
         
         this.forceUpdate();
         event.preventDefault();
+    }
+
+    populateStudyProgrammeEntries() {
+        this.studyProgrammes.push({ id: 1, programmeCode: 'MGLU1-7', name: 'Grunnskolelærerutdanning 1.–7. trinn', length: 5 });
+        this.studyProgrammes.push({ id: 2, programmeCode: 'LTMAGMA1', name: 'Matematikkdidaktikk 1.–7. trinn', length: 3 });
+    }
+
+    populateYearOfAdmissionYears() {
+        const amountOfYears = 5;
+        const currentYear = new Date().getFullYear();
+        for (let i = 0; i < amountOfYears; i++) {
+            this.years.push(currentYear - i);
+        }
     }
 
     isNtnuEmail(email) {
@@ -134,8 +145,8 @@ class UserRegistrationForm extends Component {
                                 <FormControl className={classes.formControl} >
                                     <InputLabel htmlFor="study-programme">Studieprogram:</InputLabel>
                                     <Select
-                                        value={this.state.studyProgramme}
-                                        onChange={this.handleChange}
+                                        value={this.state.studyProgramme.id}
+                                        onChange={this.handleStudyProgrammeChange}
                                         inputProps={{
                                             name: 'studyProgramme',
                                             id: 'study-programme',
@@ -144,11 +155,18 @@ class UserRegistrationForm extends Component {
                                     >
                                         {
                                             this.studyProgrammes.map(
-                                                sp => <MenuItem key={sp.id} value={sp.id}>{sp.programmecode}</MenuItem>
+                                                sp => <MenuItem key={sp.id} value={sp.id}>{sp.programmeCode}</MenuItem>
                                             )
                                         }
-
                                     </Select>
+                                    <FormHelperText>{this.state.studyProgramme.name}</FormHelperText>
+                                    <FormHelperText>
+                                        {
+                                            this.state.studyProgramme.length > 0 
+                                            ? 'Lengde: ' + this.state.studyProgramme.length + ' år' 
+                                            : ''
+                                        }
+                                    </FormHelperText>
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -183,11 +201,11 @@ class UserRegistrationForm extends Component {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <InputLabel>Nyhetsbrev:</InputLabel>
-                                <Checkbox name="wantNewsletter" onChange={this.handleChange} />
+                                <Checkbox name="wantNewsletter" onChange={this.handleCheckboxChange} />
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <InputLabel>Terms of service:</InputLabel>
-                                <Checkbox name="acceptTermsOfService" onChange={this.handleChange} />
+                                <Checkbox name="acceptTermsOfService" onChange={this.handleCheckboxChange} />
                             </Grid>
                             <Grid item xs={12}>
                                 <FormControl className={classes.formControl} >
