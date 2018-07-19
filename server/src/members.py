@@ -26,14 +26,15 @@ async def get_member(request):
         request -- http-request object
         search_string -- retrieved from '/api/user/{name}'
         
-    NOT FINISHED: Needs to incorporate admin-authentication method
     """
 
     try:
         name = str(request.match_info['name'])
         await cur.execute("SELECT * FROM user WHERE  first_name = %s OR last_name = %s", (name, name))
         r = await cur.fetchall()
-        return web.json_response(json.dumps(r, default=str))
+        return web.Response(status=200,
+                            text=json.dumps(r, default=str),
+                            content_type='application/json')
 
     finally:
         await cur.close()
@@ -46,13 +47,15 @@ async def get_all_members(request):
 
     """ Returns all members 
 
-    NOT FINISHED: Needs to incorporate admin-authentication method
+    
     """
 
     try:
         await cur.execute("SELECT * FROM user")
         r = await cur.fetchall()
-        return web.json_response(json.dumps(r, default=str))
+        return web.Response(status=200,
+                            text=json.dumps(r, default=str),
+                            content_type='application/json')
 
     finally:
         await cur.close()

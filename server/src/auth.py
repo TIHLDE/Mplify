@@ -44,9 +44,6 @@ async def login(request):
         conn.close()
 
 
-
-
-
 # -- web util funcs
 def bad_creds_response():
     """
@@ -89,6 +86,21 @@ def create_session(username):
         'expires': time.time() + TTL
     }
     return token
+
+
+def delete_session(token):
+    sessions.pop(token, None)
+
+
+def retrieve_session(token):
+    if token in sessions:
+        if time.time() > sessions[token]["expires"]:
+            delete_session(token)
+            return None
+
+        return sessions[token]
+
+    return None
 
 
 def hash_str(to_hash: str, salt, iterations):
