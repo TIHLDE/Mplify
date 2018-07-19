@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import uuid from 'uuid';
 import $ from 'jquery';
-import Projects from './Components/Projects';
-import AddProject from './Components/AddProject';
-import Todos from './Components/Todos';
+// import Projects from './Components/Projects';
+// import AddProject from './Components/AddProject';
+// import Todos from './Components/Todos';
 import './App.css';
 import UserRegistrationForm from './Components/UserRegistrationForm/UserRegistrationForm';
 
@@ -23,7 +23,7 @@ class App extends Component {
       cache: false,
       success: function(data) {
         this.setState({todos: data}, function() {
-          console.log(this.state);
+          // console.log(this.state);
         })
       }.bind(this),
       error: function(xhr, status, err) {
