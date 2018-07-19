@@ -15,6 +15,12 @@ ITERATIONS = 30000
 
 
 async def login(request):
+    """
+    Validates login-credentials and creates session if successful
+    :param request:
+    :return: Valid token if successful login, 401 http response if unsuccessful.
+    """
+
     try:
         bod = await request.json()
         if not bod['username'] or not bod['password']:
