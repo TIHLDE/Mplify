@@ -1,14 +1,50 @@
+import binascii
+import hashlib
+import os
+import time
+import json
+
 from aiohttp import web
 from functools import wraps
 
 from db import mysql_connect
 
 sessions = {}
+TTL = 900
+ITERATIONS = 30000
 
 
 async def login(request):
-    conn, cur = await mysql_connect()
-    pass
+    try:
+        bod = await request.json()
+        if not bod['username'] or not bod['password']:
+            return bad_creds_response()
+
+        post_usr = bod['username']
+        post_passwd = bod['password']
+
+        conn, cur = await mysql_connect()
+        await cur.execute("SELECT * FROM login WHERE username = %s", post_usr)
+        r = await cur.fetchone()
+        if r is None:
+            return bad_creds_response()
+
+        passwd_hash = hash_str(post_passwd, r['salt'], ITERATIONS)
+        if passwd_hash == r['hash']:
+            token = create_session(post_usr)
+            return web.Response(status=200,
+                                text=json.dumps({
+                                    'token': token
+                                }),
+                                content_type='application/json')
+        else:
+            return bad_creds_response()
+    finally:
+        await cur.close()
+        conn.close()
+
+
+
 
 
 # -- web util funcs
@@ -40,3 +76,29 @@ def requires_auth(func):
         return wrapper
 
     return decorator(func) if func else decorator
+
+
+def generate_token():
+    return binascii.hexlify(os.urandom(64)).decode()
+
+
+def create_session(username):
+    token = generate_token()
+    sessions[token] = {
+        'username': username,
+        'expires': time.time() + TTL
+    }
+    return token
+
+
+def hash_str(to_hash: str, salt, iterations):
+    """
+    Generates a hash from the given string with the specified salt and
+    iterations.
+    :param to_hash: The string to hash
+    :param salt: Salt to use in the hash function
+    :param iterations: number of iterations to use in the hash function
+    :return:
+    """
+    return hashlib.pbkdf2_hmac('sha512', to_hash.encode(), salt, iterations,
+                               128)

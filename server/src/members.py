@@ -40,6 +40,7 @@ async def get_member(request):
         conn.close()
 
 
+@requires_auth
 async def get_all_members(request):
     (conn, cur) = await mysql_connect()
 
@@ -56,34 +57,3 @@ async def get_all_members(request):
     finally:
         await cur.close()
         conn.close()
-
-
-def generate_token():
-    return binascii.hexlify(os.urandom(64)).decode()
-
-"""
-def create_session(username):
-    try:
-        print('hei')
-    finally:
-        print('hei')
-
-    token = generate_token()
-    reset_sessions[token] = {
-        'username': username,
-        'expires': time.time() + TTL
-    }
-    return token
-"""
-
-def hash_str(to_hash: str, salt, iterations):
-    """
-    Generates a hash from the given string with the specified salt and
-    iterations.
-    :param to_hash: The string to hash
-    :param salt: Salt to use in the hash function
-    :param iterations: number of iterations to use in the hash function
-    :return:
-    """
-    return hashlib.pbkdf2_hmac('sha512', to_hash.encode(), salt, iterations,
-                               128)
