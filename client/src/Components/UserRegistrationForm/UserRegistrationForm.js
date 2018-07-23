@@ -36,9 +36,9 @@ class UserRegistrationForm extends Component {
             lastName: '',
             studentEmail: '',
             privateEmail: '',
-            studyProgramme: { id: 0, programmeCode: '', name: '', length: 0 },
+            studyProgramme: { id: -1, programmeCode: '', name: '', length: 0 },
             yearOfAdmission: '',
-            vippsTransactionId: 0,
+            vippsTransactionId: -1,
             wantNewsletter: false,
             acceptTermsOfService: false
         };
@@ -170,7 +170,7 @@ class UserRegistrationForm extends Component {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <FormControl className={classes.formControl} >
-                                    <InputLabel htmlFor="study-programme" shrink={this.state.studyProgramme.id !== 0}>Studieprogram:</InputLabel>
+                                    <InputLabel htmlFor="study-programme" shrink={this.state.studyProgramme.id !== -1}>Studieprogram:</InputLabel>
                                     <Select
                                         value={this.state.studyProgramme.id}
                                         onChange={this.handleStudyProgrammeChange}
@@ -246,7 +246,7 @@ class UserRegistrationForm extends Component {
                                             || this.state.lastName === ''
                                             || this.state.studentEmail === ''
                                             || this.state.privateEmail === ''
-                                            || this.state.studyProgramme.id === 0
+                                            || this.state.studyProgramme.id === -1
                                             || this.state.yearOfAdmission === ''
                                         }
                                         type="submit"
