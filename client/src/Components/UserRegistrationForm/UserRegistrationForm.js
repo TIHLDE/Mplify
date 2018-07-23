@@ -210,6 +210,7 @@ class UserRegistrationForm extends Component {
                                         this.years.map(year => <MenuItem key={year} value={year}>{year}</MenuItem>)
                                     }
                                 </Select>
+                                <FormHelperText>Året du begynte på studiet</FormHelperText>
                             </FormControl>
                         </Grid>
                         <Grid item xs={12}>
