@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Button, InputLabel, Grid, Paper, Checkbox, Select, MenuItem, FormControl, Typography, TextField, FormHelperText } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
+import { UserData } from "../../Models/UserData";
 
 const styles = theme => ({
     root: {
@@ -35,7 +36,7 @@ class UserRegistrationForm extends Component {
             lastName: '',
             studentEmail: '',
             privateEmail: '',
-            studyProgramme: {id: 0, programmeCode: '', name: '', length: 0},
+            studyProgramme: { id: 0, programmeCode: '', name: '', length: 0 },
             yearOfAdmission: '',
             vippsTransactionCode: '',
             wantNewsletter: false,
@@ -60,12 +61,38 @@ class UserRegistrationForm extends Component {
     }
 
     handleSubmit = event => {
-        this.studentEmailError = !this.isNtnuEmail(this.state.studentEmail);
-        
-        console.log(event);
-        
-        this.forceUpdate();
         event.preventDefault();
+        this.studentEmailError = !this.isNtnuEmail(this.state.studentEmail);
+
+        if (!this.studentEmailError) {
+            const data = new UserData();
+            data.firstName = this.state.firstName;
+            data.lastName = this.state.lastName;
+            data.studentEmail = this.state.studentEmail;
+            data.privateEmail = this.state.privateEmail;
+            data.yearOfAdmission = this.state.yearOfAdmission;
+            data.newsletter = this.state.wantNewsletter;
+            data.vippsTransactionCode = this.state.vippsTransactionCode;
+            data.studyProgrammeId = this.state.studyProgramme.id;
+            console.log(data);
+
+            (async () => {
+                const rawResponse = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const content = await rawResponse.json();
+
+                console.log(content);
+            })();
+
+        } else {
+            this.forceUpdate();
+        }
     }
 
     populateStudyProgrammeEntries() {
@@ -162,9 +189,9 @@ class UserRegistrationForm extends Component {
                                     <FormHelperText>{this.state.studyProgramme.name}</FormHelperText>
                                     <FormHelperText>
                                         {
-                                            this.state.studyProgramme.length > 0 
-                                            ? 'Lengde: ' + this.state.studyProgramme.length + ' år' 
-                                            : ''
+                                            this.state.studyProgramme.length > 0
+                                                ? 'Lengde: ' + this.state.studyProgramme.length + ' år'
+                                                : ''
                                         }
                                     </FormHelperText>
                                 </FormControl>
