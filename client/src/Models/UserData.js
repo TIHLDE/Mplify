@@ -5,6 +5,6 @@ export class UserData {
     privateEmail;
     yearOfAdmission;
     newsletter;
-    vippsTransactionCode;
+    vippsTransactionId;
     studyProgrammeId;
 }

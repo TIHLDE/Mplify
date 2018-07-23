@@ -38,7 +38,7 @@ class UserRegistrationForm extends Component {
             privateEmail: '',
             studyProgramme: { id: 0, programmeCode: '', name: '', length: 0 },
             yearOfAdmission: '',
-            vippsTransactionCode: '',
+            vippsTransactionId: 0,
             wantNewsletter: false,
             acceptTermsOfService: false
         };
@@ -72,7 +72,7 @@ class UserRegistrationForm extends Component {
             data.privateEmail = this.state.privateEmail;
             data.yearOfAdmission = this.state.yearOfAdmission;
             data.newsletter = this.state.wantNewsletter;
-            data.vippsTransactionCode = this.state.vippsTransactionCode;
+            data.vippsTransactionId = this.state.vippsTransactionId;
             data.studyProgrammeId = this.state.studyProgramme.id;
             console.log(data);
 
@@ -96,8 +96,8 @@ class UserRegistrationForm extends Component {
     }
 
     populateStudyProgrammeEntries() {
-        this.studyProgrammes.push({ id: 1, programmeCode: 'MGLU1-7', name: 'Grunnskolelærerutdanning 1.–7. trinn', length: 5 });
-        this.studyProgrammes.push({ id: 2, programmeCode: 'LTMAGMA1', name: 'Matematikkdidaktikk 1.–7. trinn', length: 3 });
+        this.studyProgrammes.push({ id: 1, programmeid: 'MGLU1-7', name: 'Grunnskolelærerutdanning 1.–7. trinn', length: 5 });
+        this.studyProgrammes.push({ id: 2, programmeid: 'LTMAGMA1', name: 'Matematikkdidaktikk 1.–7. trinn', length: 3 });
     }
 
     populateYearOfAdmissionYears() {
@@ -170,7 +170,7 @@ class UserRegistrationForm extends Component {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <FormControl className={classes.formControl} >
-                                    <InputLabel htmlFor="study-programme">Studieprogram:</InputLabel>
+                                    <InputLabel htmlFor="study-programme" shrink={this.state.studyProgramme.id !== 0}>Studieprogram:</InputLabel>
                                     <Select
                                         value={this.state.studyProgramme.id}
                                         onChange={this.handleStudyProgrammeChange}
@@ -182,7 +182,7 @@ class UserRegistrationForm extends Component {
                                     >
                                         {
                                             this.studyProgrammes.map(
-                                                sp => <MenuItem key={sp.id} value={sp.id}>{sp.programmeCode}</MenuItem>
+                                                sp => <MenuItem key={sp.id} value={sp.id}>{sp.programmeid}</MenuItem>
                                             )
                                         }
                                     </Select>
@@ -216,10 +216,10 @@ class UserRegistrationForm extends Component {
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
-                                    id="vipps_transaction_code"
-                                    name="vippsTransactionCode"
-                                    type="text"
-                                    label="Vipps transaksjonskode:"
+                                    id="vipps_transaction_id"
+                                    name="vippsTransactionId"
+                                    type="number"
+                                    label="Vipps transaksjons-id:"
                                     className={classes.formControl}
                                     onChange={this.handleChange}
                                     margin="normal"
@@ -246,7 +246,7 @@ class UserRegistrationForm extends Component {
                                             || this.state.lastName === ''
                                             || this.state.studentEmail === ''
                                             || this.state.privateEmail === ''
-                                            || this.state.studyProgramme === ''
+                                            || this.state.studyProgramme.id === 0
                                             || this.state.yearOfAdmission === ''
                                         }
                                         type="submit"
