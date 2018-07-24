@@ -1,4 +1,4 @@
-import { Paper, Typography } from '@material-ui/core';
+import { Paper, Typography, Button } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
 import UserDataTable from './UserDataTable/UserDataTable';
@@ -27,6 +27,7 @@ class AdminSection extends Component {
                 <Paper className={classes.paper}>
                     <Typography variant="headline" component="h3">Admin-panel</Typography>
                     <hr />
+                    <p>Bulkaktivering med Vipps-csv | Laste opp Terms of Service | Eksportere nyhetsbrevliste | Eksportere epostliste</p>
                 </Paper>
                 <br />
                 <UserDataTable />

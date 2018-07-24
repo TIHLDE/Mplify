@@ -24,6 +24,14 @@ const styles = theme => ({
   }
 });
 
+const Child = ({ match }) => (
+  <div>
+    <h3>Kode: {match.params.code}</h3>
+    <p>Her kjører vi en spørring som sjekker om det finnes et element i databasen som matcher koden og brukernavnet.</p>
+    <p>Kanskje vi burde sjekke opp mot NTNU om brukeren er tilknyttet instituttet.</p>
+  </div>
+);
+
 class App extends Component {
   constructor() {
     super();
@@ -109,11 +117,14 @@ class App extends Component {
               <Grid item xs={2}>
                 <div className={classes.root}>
                   <Paper className={classes.paper}>
-                    <Typography variant="headline" component="h3">[DEV] Velg brukertype</Typography>
+                    <Typography variant="headline" component="h3">[DEV] Velg scenario</Typography>
                     <hr />
                     <ul className={classes.navigation}>
                       <li>
-                        <Link to="/">Ny medlem</Link>
+                        <Link to="/">Ny registrering</Link>
+                      </li>
+                      <li>
+                        <Link to="/confirm/asdf1234_brukernavn">Bekrefte epost</Link>
                       </li>
                       <li>
                         <Link to="/admin">Admin</Link>
@@ -127,6 +138,7 @@ class App extends Component {
             </Grid>
             <br />
             <Route path="/" exact component={UserRegistrationForm} />
+            <Route path="/confirm/:code" exact component={Child} />
             <Route path="/admin" exact component={AdminSection} />
           </div>
         </Router>
