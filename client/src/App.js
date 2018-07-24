@@ -81,14 +81,14 @@ class App extends Component {
   handleAddProject(project) {
     let projects = this.state.projects;
     projects.push(project);
-    this.setState({ prjects: projects });
+    this.setState({ projects: projects });
   }
 
   handleDeleteProject(id) {
     let projects = this.state.projects;
     let index = projects.findIndex(x => x.id === id);
     projects.splice(index, 1);
-    this.setState({ prjects: projects });
+    this.setState({ projects: projects });
   }
 
   render() {
@@ -104,30 +104,31 @@ class App extends Component {
 
       <div className="App">
         <Router>
-          <Grid container spacing={8}>
-            <Grid item xs={2}>
-              <div className={classes.root}>
-                <Paper className={classes.paper}>
-                  <Typography variant="headline" component="h3">Navigasjon</Typography>
-                  <hr />
-                  <ul className={classes.navigation}>
-                    <li>
-                      <Link to="/">Registrering</Link>
-                    </li>
-                    <li>
-                      <Link to="/admin">Admin</Link>
-                    </li>
-                  </ul>
-                </Paper>
-              </div>
+          <div>
+            <Grid container spacing={8}>
+              <Grid item xs={2}>
+                <div className={classes.root}>
+                  <Paper className={classes.paper}>
+                    <Typography variant="headline" component="h3">[DEV] Velg brukertype</Typography>
+                    <hr />
+                    <ul className={classes.navigation}>
+                      <li>
+                        <Link to="/">Ny medlem</Link>
+                      </li>
+                      <li>
+                        <Link to="/admin">Admin</Link>
+                      </li>
+                    </ul>
+                  </Paper>
+                </div>
+              </Grid>
+              <Grid item xs={10}>
+              </Grid>
             </Grid>
-            <Grid item xs={10}>
-              <Paper className={classes.paper}>
-                <Route path="/" exact component={UserRegistrationForm} />
-                <Route path="/admin" exact component={AdminSection} />
-              </Paper>
-            </Grid>
-          </Grid>
+            <br />
+            <Route path="/" exact component={UserRegistrationForm} />
+            <Route path="/admin" exact component={AdminSection} />
+          </div>
         </Router>
       </div>
     );

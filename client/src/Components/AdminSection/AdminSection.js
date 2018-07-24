@@ -1,12 +1,16 @@
-import { Typography } from '@material-ui/core';
+import { Paper, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
-import UserRegistrationForm from '../UserRegistrationForm/UserRegistrationForm';
+import UserDataTable from './UserDataTable/UserDataTable';
 
 const styles = theme => ({
     root: {
         textAlign: "center"
-    }
+    },
+    paper: {
+        paddingTop: theme.spacing.unit * 2,
+        paddingBottom: theme.spacing.unit * 2,
+    },
 });
 
 class AdminSection extends Component {
@@ -15,26 +19,17 @@ class AdminSection extends Component {
         this.state = {};
     }
 
-    componentWillMount() {
-        console.log('Admin section will mount');
-    }
-
-    componentDidMount() {
-        console.log('Admin section did mount');
-    }
-
     render() {
         const { classes } = this.props;
 
         return (
-            <div className="App">
-                <div className={classes.root}>
+            <div className={classes.root}>
+                <Paper className={classes.paper}>
                     <Typography variant="headline" component="h3">Admin-panel</Typography>
                     <hr />
-                    <UserRegistrationForm />
-                    <hr />
-                    <Typography variant="headline" component="h3">Her kommer liste over brukere</Typography>
-                </div>
+                </Paper>
+                <br />
+                <UserDataTable />
             </div>
         );
     }
