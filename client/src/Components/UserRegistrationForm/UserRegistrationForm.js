@@ -1,11 +1,15 @@
-import React, { Component } from "react";
-import { Button, InputLabel, Grid, Paper, Checkbox, Select, MenuItem, FormControl, Typography, TextField, FormHelperText } from "@material-ui/core";
+import { Button, Checkbox, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField, Typography, Paper } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
+import React, { Component } from "react";
 import { UserData } from "../../Models/UserData";
 
 const styles = theme => ({
     root: {
         textAlign: "center"
+    },
+    paper: {
+        paddingTop: theme.spacing.unit * 2,
+        paddingBottom: theme.spacing.unit * 2,
     },
     formControl: {
         textAlign: "left",
@@ -14,10 +18,6 @@ const styles = theme => ({
     },
     selectEmpty: {
         marginTop: theme.spacing.unit * 2
-    },
-    paper: {
-        paddingTop: theme.spacing.unit * 2,
-        paddingBottom: theme.spacing.unit * 2,
     }
 });
 
@@ -36,9 +36,9 @@ class UserRegistrationForm extends Component {
             lastName: '',
             studentEmail: '',
             privateEmail: '',
-            studyProgramme: { id: 0, programmeCode: '', name: '', length: 0 },
+            studyProgramme: { id: -1, programmeCode: '', name: '', length: 0 },
             yearOfAdmission: '',
-            vippsTransactionId: 0,
+            vippsTransactionId: -1,
             wantNewsletter: false,
             acceptTermsOfService: false
         };
@@ -77,14 +77,17 @@ class UserRegistrationForm extends Component {
             console.log(data);
 
             (async () => {
-                const rawResponse = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
+                const rawResponse = await fetch(
+                    'http//localhost:8080/api/register',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    }
+                );
                 const content = await rawResponse.json();
 
                 console.log(content);
@@ -170,7 +173,7 @@ class UserRegistrationForm extends Component {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <FormControl className={classes.formControl} >
-                                    <InputLabel htmlFor="study-programme" shrink={this.state.studyProgramme.id !== 0}>Studieprogram:</InputLabel>
+                                    <InputLabel htmlFor="study-programme" shrink={this.state.studyProgramme.id !== -1}>Studieprogram:</InputLabel>
                                     <Select
                                         value={this.state.studyProgramme.id}
                                         onChange={this.handleStudyProgrammeChange}
@@ -212,6 +215,7 @@ class UserRegistrationForm extends Component {
                                             this.years.map(year => <MenuItem key={year} value={year}>{year}</MenuItem>)
                                         }
                                     </Select>
+                                    <FormHelperText>Året du begynte på studiet</FormHelperText>
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12}>
@@ -246,7 +250,7 @@ class UserRegistrationForm extends Component {
                                             || this.state.lastName === ''
                                             || this.state.studentEmail === ''
                                             || this.state.privateEmail === ''
-                                            || this.state.studyProgramme.id === 0
+                                            || this.state.studyProgramme.id === -1
                                             || this.state.yearOfAdmission === ''
                                         }
                                         type="submit"
