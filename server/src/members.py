@@ -249,7 +249,7 @@ async def get_email(request):
 
 async def verify_email(request):
     """
-
+    Verifies member's student Email through unique URI containing verification code and  student-email addresse.
     :param request: aiohttp.web.Request object
     :return:aiohttp.web.Response object with status 200 if okay, 500 if not
     """
@@ -272,6 +272,43 @@ async def verify_email(request):
         print(e)
         return web.Response(status=500,
                             text='{"error": "Something went wrong when trying to verify email"',
+                            content_type='application/json')
+
+    finally:
+        await cur.close()
+        conn.close()
+
+
+@requires_auth
+async def toggle_active(request):
+    """
+    Activates or deactivates a member
+    :param request: aiohttp.web.Request json ("userId": int, "activate": int)
+    :return: aiohttp.web.Response object. status 200 if update ok, 400 if incorrect parameters.
+    """
+    try:
+        (conn, cur) = await mysql_connect()
+        bod = await request.json()
+        if not all(keys in bod for keys in ("userId", "active")):
+            return web.Response(status=400,
+                                text='{"error": "Something went wrong when trying to activate member. '
+                                     'Post parameters are missing."',
+                                content_type='application/json')
+
+        await cur.execute("UPDATE user SET active = %s WHERE user_id = %s", (bod['active'], bod['userId']))
+        await conn.commit()
+
+        status = "activated" if not bod['active'] == "0" else "deactivated"
+        msg = '"msg": "Member {}'.format(status)
+        return web.Response(status=200,
+                            text=json.dumps(msg),
+                            content_type='application/json')
+
+    except MySQLError as e:
+        print("error")
+        print(e)
+        return web.Response(status=500,
+                            text='{"error": "Something went wrong when trying to activate member"',
                             content_type='application/json')
 
     finally:
