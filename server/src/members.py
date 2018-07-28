@@ -1,6 +1,7 @@
 import json
 import hashlib
 import random
+import csv
 from datetime import date
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -284,7 +285,7 @@ async def toggle_active(request):
     """
     Activates or deactivates a member
     :param request: aiohttp.web.Request json ("userId": int, "activate": int)
-    :return: aiohttp.web.Response object. status 200 if update ok, 400 if incorrect parameters.
+    :return aiohttp.web.Response: status 200 if update ok, 400 if incorrect parameters.
     """
     try:
         (conn, cur) = await mysql_connect()
@@ -309,6 +310,43 @@ async def toggle_active(request):
         print(e)
         return web.Response(status=500,
                             text='{"error": "Something went wrong when trying to activate member"',
+                            content_type='application/json')
+
+    finally:
+        await cur.close()
+        conn.close()
+
+
+@requires_auth
+async def vipps_csv_activate(request):
+    """
+    Sets attribute 'active' to 1 in database for all members with matching vipps_transaction_id and correct
+    amount paid, found in CSV file received.
+    :param request: Contains CSV file in multipart/form-data
+    :return Response: status 200 if ok, 500 if not
+    """
+    try:
+        (conn, cur) = await mysql_connect()
+        bod = await request.text()
+        lines = bod.splitlines()
+        vipps_ids = []
+        for l in lines:
+            split = l.split(',')
+            if all(keys in split for keys in ("TransactionInfo", "Studentforeningen SALT", "350.00")):
+                vipps_ids.append(split[4])
+        format_strings = ','.join(['%s'] * len(vipps_ids))
+
+        await cur.execute("UPDATE user SET active = 1 WHERE vipps_transaction_id IN (%s)"
+                          % format_strings, tuple(vipps_ids))
+        await conn.commit()
+        return web.Response(status=200,
+                            text='{"msg": "Members with valid transaction ID activated."}',
+                            content_type='application/json')
+
+    except MySQLError as e:
+        print(e)
+        return web.Response(status=500,
+                            text='{"error": "%s"}' % e,
                             content_type='application/json')
 
     finally:
