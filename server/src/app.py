@@ -19,9 +19,11 @@ if __name__ == '__main__':
     from auth import login
     from members import get_all_members, get_member, register_member, get_email, get_newsletter_email, verify_email, \
         toggle_active, vipps_csv_activate
-    from db import init
+    from db import init as init_db
+    from members import init as init_members
 
-    init(loop)
+    init_db(loop)
+    init_members()
 
     cors = aiohttp_cors.setup(app)
 

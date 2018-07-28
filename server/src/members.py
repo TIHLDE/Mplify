@@ -1,7 +1,6 @@
 import json
 import hashlib
 import random
-import csv
 from datetime import date
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -14,10 +13,17 @@ from db import mysql_connect
 from auth import requires_auth
 from app import get_environ_sfe
 
-DB_PASSWORD = ''
-DB_USER = ''
-DB_NAME = ''
+EMAIL_PASSWORD = ''
+EMAIL_USER = ''
+EMAIL_HOST = ''
 loop = None
+
+
+def init():
+    global EMAIL_PASSWORD, EMAIL_USER, EMAIL_HOST
+    EMAIL_PASSWORD = get_environ_sfe("EMAIL_PASSWORD")
+    EMAIL_USER = get_environ_sfe("EMAIL_USER")
+    EMAIL_HOST = get_environ_sfe("EMAIL_HOST")
 
 
 async def register_member(request):
@@ -28,6 +34,7 @@ async def register_member(request):
      - create verification-code generator
 
     """
+
     try:
         (conn, cur) = await mysql_connect()
         bod = await request.json()
@@ -80,7 +87,7 @@ async def register_member(request):
         conn.close()
 
 
-def send_email(recipient, subject, body, sender='orjanbv@tihlde.org', smtp_host=get_environ_sfe("EMAIL_HOST")):
+def send_email(recipient, subject, body, sender='orjanbv@tihlde.org'):
     """
     Sends an email with the given data to the given recipient.
     :param recipient: Recipient email address
@@ -100,10 +107,10 @@ def send_email(recipient, subject, body, sender='orjanbv@tihlde.org', smtp_host=
     msg.attach(MIMEText(body, 'plain', 'utf-8'))
     text = msg.as_string()
     try:
-        smtp_obj = smtplib.SMTP('tihlde.org', port=587)
+        smtp_obj = smtplib.SMTP(EMAIL_HOST, port=587)
         smtp_obj.ehlo()
         smtp_obj.starttls()
-        smtp_obj.login(user=get_environ_sfe("EMAIL_USER"), password=get_environ_sfe("EMAIL_PASSWORD"))
+        smtp_obj.login(user=EMAIL_USER, password=EMAIL_PASSWORD)
 
         smtp_obj.sendmail(sender, recipient, text)
         return "Email sent"
@@ -140,7 +147,7 @@ def generate_verification_code():
 async def get_member(request):
     """
     Returns all members with 'first_name' or 'last_name' equal to search_string from end of url
-    :param request: http-request object
+    :param request: Information about first name or last name of person(s) to return, given in URL
     :return: All members qualifying for the search_string
 
     """
@@ -174,7 +181,7 @@ async def get_member(request):
 async def get_all_members(request):
     """
     Returns all members from database
-    :param request: aiohttp.web.Request object
+    :param request:
     :return: All members from database
     """
 
@@ -201,8 +208,8 @@ async def get_all_members(request):
 async def get_newsletter_email(request):
     """
     Returns all member student emails wanting newsletter-email
-    :param request: aiohttp.web.Request object
-    :return: A json list of all emailaddresses wanting newsletter mail
+    :param request:
+    :return: A json list of all email addresses wanting newsletter mail
     """
     try:
         (conn, cur) = await mysql_connect()
@@ -251,21 +258,21 @@ async def get_email(request):
 async def verify_email(request):
     """
     Verifies member's student Email through unique URI containing verification code and  student-email addresse.
-    :param request: aiohttp.web.Request object
-    :return:aiohttp.web.Response object with status 200 if okay, 500 if not
+    :param request: Contains information about verification code and student email
+    :return Response: status 200 if okay, 500 if not
     """
+
     try:
         (conn, cur) = await mysql_connect()
 
         verification_code, stud_email = str(request.match_info['info']).split('_')
-        print(verification_code)
-        print(stud_email)
+
         await cur.execute("UPDATE user SET verified_student_email = 1 "
                           "WHERE student_email = %s AND email_verification_code = %s", (stud_email, verification_code))
 
         await conn.commit()
         return web.Response(status=200,
-                            text='{"msg": "Email verified}"}',
+                            text='{"msg": "Email verified"}',
                             content_type='application/json')
 
     except MySQLError as e:
@@ -284,9 +291,10 @@ async def verify_email(request):
 async def toggle_active(request):
     """
     Activates or deactivates a member
-    :param request: aiohttp.web.Request json ("userId": int, "activate": int)
-    :return aiohttp.web.Response: status 200 if update ok, 400 if incorrect parameters.
+    :param request: Specifies 'userId' and whether to activate or deactivate.
+    :return aiohttp.web.Response: status 200 if update ok, 400 if incorrect parameters, 500 if internal error.
     """
+
     try:
         (conn, cur) = await mysql_connect()
         bod = await request.json()
@@ -325,6 +333,7 @@ async def vipps_csv_activate(request):
     :param request: Contains CSV file in multipart/form-data
     :return Response: status 200 if ok, 500 if not
     """
+
     try:
         (conn, cur) = await mysql_connect()
         bod = await request.text()
