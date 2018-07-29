@@ -31,9 +31,8 @@ async def register_member(request):
     TODO
      - create function for validating email-address against
        NTNU-ldap ('@stud.ntnu.no' & department)
-     - create verification-code generator
-
-    """
+     - Set correct link-address for production
+     """
 
     try:
         (conn, cur) = await mysql_connect()
@@ -53,8 +52,8 @@ async def register_member(request):
             study_programme_id = bod['studyProgrammeId']
 
             await cur.execute("INSERT INTO user(first_name, last_name, student_email, private_email, year_of_admission,"
-                              " active, email_verification_code, verified_student_email, newsletter, vipps_transaction_id"
-                              ", study_programme_id) "
+                              " active, email_verification_code, verified_student_email,"
+                              " newsletter, vipps_transaction_id, study_programme_id) "
                               "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                               [first_name, last_name, student_email, private_email, year_of_admission, active,
                                email_verification_code, verified_email, newsletter,
@@ -69,11 +68,15 @@ async def register_member(request):
                             'For å bekrefte brukeren din, klikk på følgende lenke:\n' \
                             '{0}\n\n' \
                             'Mvh.\nSALT'.format(link)
-            print(send_email(student_email, "Epostbekreftelse for SALT-medlem", email_content))
-
-            return web.Response(status=200,
-                                text='{"msg": "Member has been added to database, and verification email has been sent.}"}',
-                                content_type='application/json')
+            success, msg = send_email(student_email, "Epostbekreftelse for SALT-medlem", email_content)
+            if success:
+                return web.Response(status=200,
+                                    text='{"msg": "%s"}' % msg,
+                                    content_type='application/json')
+            else:
+                return web.Response(status=500,
+                                    text='{"error": "%s"}' % msg,
+                                    content_type='application/json')
         else:
             return web.Response(status=401,
                                 text='{"msg": "Invalid input."}',
@@ -85,62 +88,6 @@ async def register_member(request):
     finally:
         await cur.close()
         conn.close()
-
-
-def send_email(recipient, subject, body, sender='orjanbv@tihlde.org'):
-    """
-    Sends an email with the given data to the given recipient.
-    :param recipient: Recipient email address
-    :param subject: Subject of the email
-    :param body: Body of the email
-    :param sender: Email address of the sender
-    :param smtp_host: Host to send the email with. Standard is 'localhost'
-    :return: None if successful. Error-msg if not.
-
-    TODO:
-        - Configure correct smtp-host and sender
-    """
-    msg = MIMEMultipart()
-    msg['From'] = sender
-    msg['To'] = recipient
-    msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'plain', 'utf-8'))
-    text = msg.as_string()
-    try:
-        smtp_obj = smtplib.SMTP(EMAIL_HOST, port=587)
-        smtp_obj.ehlo()
-        smtp_obj.starttls()
-        smtp_obj.login(user=EMAIL_USER, password=EMAIL_PASSWORD)
-
-        smtp_obj.sendmail(sender, recipient, text)
-        return "Email sent"
-
-    except smtplib.SMTPException as error:
-        return 'Error: unable to send email to "{0}". Error-msg:\n{1}'.format(recipient, error)
-
-
-def input_ok(bod):
-    keys = ['firstName', 'lastName', 'studentEmail', 'privateEmail', 'yearOfAdmission',
-             'newsletter', 'vippsTransactionId', 'studyProgrammeId']
-    for k in keys:
-        if k not in bod:
-            print('{!r} is not in body.'.format(k))
-            return False
-
-    s_email = bod['studentEmail'].lower()
-    d = date.today().year
-    if not (len(s_email) > 13 and s_email[len(s_email)-13:] == '@stud.ntnu.no' and
-            d - 6 < int(bod['yearOfAdmission']) <= d and len(bod['vippsTransactionId']) == 10):
-        print("Failure 2")
-        return False
-
-    return True
-
-
-def generate_verification_code():
-    m = hashlib.md5()
-    m.update(str(random.randint).encode())
-    return m.hexdigest()
 
 
 @requires_auth
@@ -361,3 +308,94 @@ async def vipps_csv_activate(request):
     finally:
         await cur.close()
         conn.close()
+
+
+@requires_auth
+async def delete_member(request):
+    """
+    Deletes a member from database specified by 'userId'
+    :param request: Contains 'userId' value of the member to delete from db
+    :return: status 200 if  ok, status 500 if not
+    """
+
+    try:
+        (conn, cur) = await mysql_connect()
+
+        bod = await request.json()
+        if "userId" in bod:
+            userId = bod["userId"]
+
+            await cur.execute("DELETE FROM user WHERE user_id = %s", userId)
+            await conn.commit()
+            return web.Response(status=200,
+                                text='{"msg": "Member with userId: %s has been deleted."}' % userId,
+                                content_type='application/json')
+
+    except MySQLError as e:
+        print(e)
+        return web.Response(status=500,
+                            text='{"error": "%s"}' % e,
+                            content_type='application/json')
+
+    finally:
+        await cur.close()
+        conn.close()
+
+
+# - Web util funcs
+
+
+def generate_verification_code():
+    m = hashlib.md5()
+    m.update(str(random.randint).encode())
+    return m.hexdigest()
+
+
+def input_ok(bod):
+    keys = ['firstName', 'lastName', 'studentEmail', 'privateEmail', 'yearOfAdmission',
+             'newsletter', 'vippsTransactionId', 'studyProgrammeId']
+    for k in keys:
+        if k not in bod:
+            print('{!r} is not in body.'.format(k))
+            return False
+
+    s_email = bod['studentEmail'].lower()
+    d = date.today().year
+    if not (len(s_email) > 13 and s_email[len(s_email)-13:] == '@stud.ntnu.no' and
+            d - 6 < int(bod['yearOfAdmission']) <= d):
+        print("Failure 2")
+        return False
+
+    return True
+
+
+def send_email(recipient, subject, body, sender='orjanbv@tihlde.org'):
+    """
+    Sends an email with the given data to the given recipient.
+    :param recipient: Recipient email address
+    :param subject: Subject of the email
+    :param body: Body of the email
+    :param sender: Email address of the sender
+    :param smtp_host: Host to send the email with. Standard is 'localhost'
+    :return: None if successful. Error-msg if not.
+
+    TODO:
+        - Configure correct smtp-host and sender
+    """
+    msg = MIMEMultipart()
+    msg['From'] = sender
+    msg['To'] = recipient
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain', 'utf-8'))
+    text = msg.as_string()
+    try:
+        smtp_obj = smtplib.SMTP(EMAIL_HOST, port=587)
+        smtp_obj.ehlo()
+        smtp_obj.starttls()
+        smtp_obj.login(user=EMAIL_USER, password=EMAIL_PASSWORD)
+
+        smtp_obj.sendmail(sender, recipient, text)
+        return True, "Email sent"
+
+    except smtplib.SMTPException as error:
+        return False, 'Unable to send verification email to "{0}". Error-msg:\n{1}'.format(recipient, error)

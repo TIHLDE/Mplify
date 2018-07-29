@@ -10,7 +10,7 @@ from functools import wraps
 from db import mysql_connect
 
 sessions = {}
-TTL = 900
+TTL = 900   # 15 minutes
 ITERATIONS = 30000
 
 
@@ -35,8 +35,8 @@ async def login(request):
         if r is None:
             return bad_creds_response()
 
-        passwd_hash = hash_str(post_passwd, r['salt'], ITERATIONS)
-        if passwd_hash == r['hash']:
+        password_hash = hash_str(post_passwd, r['salt'], ITERATIONS)
+        if password_hash == r['hash']:
             token = create_session(post_usr)
             return web.Response(status=200,
                                 text=json.dumps({

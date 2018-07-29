@@ -18,7 +18,7 @@ loop = asyncio.get_event_loop()
 if __name__ == '__main__':
     from auth import login
     from members import get_all_members, get_member, register_member, get_email, get_newsletter_email, verify_email, \
-        toggle_active, vipps_csv_activate
+        toggle_active, vipps_csv_activate, delete_member
     from db import init as init_db
     from members import init as init_members
 
@@ -45,6 +45,7 @@ if __name__ == '__main__':
                     web.get('/api/confirm/{info}', verify_email),
                     web.post('/api/login', login),
                     web.post('/api/toggle_active', toggle_active),
-                    web.post('/api/csv_activate', vipps_csv_activate)])
+                    web.post('/api/csv_activate', vipps_csv_activate),
+                    web.delete('/api/delete_member', delete_member)])
 
     web.run_app(app)
