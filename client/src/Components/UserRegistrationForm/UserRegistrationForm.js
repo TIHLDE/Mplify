@@ -38,7 +38,7 @@ class UserRegistrationForm extends Component {
             privateEmail: '',
             studyProgramme: { id: -1, programmeCode: '', name: '', length: 0 },
             yearOfAdmission: '',
-            vippsTransactionId: -1,
+            vippsTransactionId: '',
             wantNewsletter: false,
             acceptTermsOfService: false
         };
@@ -63,7 +63,7 @@ class UserRegistrationForm extends Component {
     handleSubmit = event => {
         event.preventDefault();
         this.studentEmailError = !this.isNtnuEmail(this.state.studentEmail);
-
+        this.forceUpdate();
         if (!this.studentEmailError) {
             const data = new UserData();
             data.firstName = this.state.firstName;
@@ -78,7 +78,7 @@ class UserRegistrationForm extends Component {
 
             (async () => {
                 const rawResponse = await fetch(
-                    'http//localhost:8080/api/register',
+                    'http://localhost:8080/api/register',
                     {
                         method: 'POST',
                         headers: {
@@ -89,12 +89,9 @@ class UserRegistrationForm extends Component {
                     }
                 );
                 const content = await rawResponse.json();
-
                 console.log(content);
             })();
 
-        } else {
-            this.forceUpdate();
         }
     }
 
@@ -222,7 +219,7 @@ class UserRegistrationForm extends Component {
                                 <TextField
                                     id="vipps_transaction_id"
                                     name="vippsTransactionId"
-                                    type="number"
+                                    type="text"
                                     label="Vipps transaksjons-id:"
                                     className={classes.formControl}
                                     onChange={this.handleChange}

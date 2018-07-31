@@ -4,6 +4,7 @@ import Delete from '@material-ui/icons/Delete';
 import Edit from '@material-ui/icons/Edit';
 import MUIDataTable from 'mui-datatables';
 import React, { Component } from 'react';
+import { isUndefined } from 'util';
 
 const styles = theme => ({
     root: {
@@ -22,15 +23,34 @@ class UserDataTable extends Component {
         super();
         //TODO: Hente members og studyProgrammes fra database
         this.state = {
-            members: [
-                { id: 1, firstName: 'Gard', lastName: 'Steinsvik', studentEmail: 'gardste@stud.ntnu.no', privateEmail: 'gardsteinsvik@gmail.com', yearOfAdmission: 2015, active: 0, newsletter: 0, vippsTransactionId: null, studyProgrammeId: 2 },
-                { id: 2, firstName: 'Gard', lastName: 'Steinsvik', studentEmail: 'gardste@stud.ntnu.no', privateEmail: 'gardsteinsvik@gmail.com', yearOfAdmission: 2015, active: 0, newsletter: 1, vippsTransactionId: 1234, studyProgrammeId: 1 }
-            ],
+            // members: [
+            //     { id: 1, firstName: 'Gard', lastName: 'Steinsvik', studentEmail: 'gardste@stud.ntnu.no', privateEmail: 'gardsteinsvik@gmail.com', yearOfAdmission: 2015, active: 0, newsletter: 0, vippsTransactionId: null, studyProgrammeId: 2 },
+            //     { id: 2, firstName: 'Gard', lastName: 'Steinsvik', studentEmail: 'gardste@stud.ntnu.no', privateEmail: 'gardsteinsvik@gmail.com', yearOfAdmission: 2015, active: 0, newsletter: 1, vippsTransactionId: 1234, studyProgrammeId: 1 }
+            // ],
+            members: [],
             studyProgrammes: [
                 { id: 1, programmeid: 'MGLU1-7', name: 'Grunnskolelærerutdanning 1.–7. trinn', length: 5 },
                 { id: 2, programmeid: 'LTMAGMA1', name: 'Matematikkdidaktikk 1.–7. trinn', length: 3 }
             ]
         };
+    }
+
+    componentDidMount() {
+        fetch('http://localhost:8080/api/allusers')
+            .then((resp) => resp.json())
+            .then(
+                (data) => {
+                    console.log(this.state);
+                    console.log(data);
+                    // data.forEach(member => this.state.members.push(member));
+                    
+                }
+            )
+            .catch(
+                (error) => {
+                    console.log(error);
+                }
+            );
     }
 
     handleEditClick = (id) => {
