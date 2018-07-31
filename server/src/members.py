@@ -48,7 +48,7 @@ async def register_member(request):
             email_verification_code = generate_verification_code()
             newsletter = bod['newsletter']
             trans_id = bod['vippsTransactionId']
-            vipps_transaction_id = trans_id if not trans_id == 0 and len(trans_id) > 0 else None
+            vipps_transaction_id = trans_id if trans_id != '0' else None
             study_programme_id = bod['studyProgrammeId']
 
             await cur.execute("INSERT INTO user(first_name, last_name, student_email, private_email, year_of_admission,"
@@ -358,6 +358,10 @@ def input_ok(bod):
         if k not in bod:
             print('{!r} is not in body.'.format(k))
             return False
+    trans_id = bod['vippsTransactionId']
+    print(type(trans_id))
+    if len(trans_id) != 10 and trans_id != '0':
+        return False
 
     s_email = bod['studentEmail'].lower()
     d = date.today().year
