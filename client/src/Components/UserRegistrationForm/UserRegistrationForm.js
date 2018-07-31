@@ -97,9 +97,9 @@ class UserRegistrationForm extends Component {
             data.studyProgrammeId = this.state.studyProgramme.id;
 
             this.postData('http://localhost:8080/api/register', data)
-                .then(data => {
-                    console.log(data);
-                    if (data.ok) {
+                .then(response => {
+                    console.log(response);
+                    if (response.ok) {
                         this.setState({redirect: true});
                     } else {
                         this.setState({submitting: false});

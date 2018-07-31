@@ -21,7 +21,6 @@ class UserDataTable extends Component {
 
     constructor() {
         super();
-        //TODO: Hente members og studyProgrammes fra database
         this.state = {
             studyProgrammes: [],
             members: []
@@ -29,7 +28,6 @@ class UserDataTable extends Component {
     }
 
     componentWillMount() {
-
         this.getData('http://localhost:8080/api/get_all_studyprograms')
             .then(data => {
                 const studyProgrammeList = [];

@@ -1,0 +1,94 @@
+import { Paper, Typography } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
+import React, { Component } from 'react';
+
+const styles = theme => ({
+    root: {
+        textAlign: "center"
+    },
+    paper: {
+        paddingTop: theme.spacing.unit * 2,
+        paddingBottom: theme.spacing.unit * 2,
+    },
+});
+
+class ConfirmEmailPage extends Component {
+    constructor() {
+        super();
+        this.state = {
+            processing: true,
+            verified: false
+        };
+    }
+
+    componentWillMount() {
+        const payload = { emailVerificationCode: this.props.match.params.code };
+
+        this.postData('http://localhost:8080/api/confirm_email', payload)
+            .then(response => {
+                if (response.ok) {
+                    this.setState({ verified: true, processing: false });
+                } else {
+                    this.setState({ verified: false, processing: false });
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                this.setState({ verified: false, processing: false });
+            });
+    }
+
+    async postData(endpoint, payload) {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        };
+        const res = await fetch(endpoint, options);
+        return res;
+    }
+
+    renderContent = () => {
+        const { classes } = this.props;
+        if (this.state.processing) {
+            return (
+                <Paper className={classes.paper}>
+                    <Typography variant="headline" component="h3">Behandler forespørsel...</Typography>
+                    <hr />
+                    <p>Vent et lite øyeblikk, dette burde ikke ta lang tid.</p>
+                </Paper>
+            );
+        } else if (this.state.verified) {
+            return (
+                <Paper className={classes.paper}>
+                    <Typography variant="headline" component="h3">Eposten din er nå bekreftet!</Typography>
+                    <hr />
+                    <p>Du har nå fullført registreringen.</p>
+                </Paper>
+            );
+        } else {
+            return (
+                <Paper className={classes.paper}>
+                    <Typography variant="headline" component="h3">Lenken er ikke gyldig.</Typography>
+                    <hr />
+                    <p>Dette kan skyldes at koden er ugyldig, eller at eposten din allerede har blitt aktivert.</p>
+                </Paper>
+            );
+        }
+    }
+
+    render() {
+        const { classes } = this.props;
+
+        return (
+            <div className={classes.root}>
+                {this.renderContent()}
+            </div>
+        );
+    }
+}
+
+export default withStyles(styles)(ConfirmEmailPage);
