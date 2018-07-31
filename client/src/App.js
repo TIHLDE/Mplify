@@ -10,6 +10,7 @@ import { Grid, Paper, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import AdminSection from './Components/AdminSection/AdminSection';
+import AwaitingConfirmationPage from './Components/AwaitingConfirmationPage/AwaitingConfirmationPage';
 
 const styles = theme => ({
   root: {
@@ -124,6 +125,9 @@ class App extends Component {
                         <Link to="/">Ny registrering</Link>
                       </li>
                       <li>
+                        <Link to="/awaiting-confirmation">Ferdig med registrering</Link>
+                      </li>
+                      <li>
                         <Link to="/confirm/asdf1234_brukernavn">Bekrefte epost</Link>
                       </li>
                       <li>
@@ -138,6 +142,7 @@ class App extends Component {
             </Grid>
             <br />
             <Route path="/" exact component={UserRegistrationForm} />
+            <Route path="/awaiting-confirmation" exact component={AwaitingConfirmationPage} />
             <Route path="/confirm/:code" exact component={Child} />
             <Route path="/admin" exact component={AdminSection} />
           </div>
