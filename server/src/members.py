@@ -339,6 +339,28 @@ async def delete_member(request):
         conn.close()
 
 
+async def get_all_studyprograms(request):
+
+
+    try:
+        (conn, cur) = await mysql_connect()
+
+        await cur.execute("SELECT * FROM study_programme WHERE active = 1")
+        r = await cur.fetchall()
+        return web.Response(status=200,
+                            text=json.dumps(r, default=str, ),
+                            content_type='application/json')
+
+    except MySQLError as e:
+        print(e)
+        return web.Response(status=500,
+                            text='{"error": "%s"}' % e,
+                            content_type='application/json')
+
+    finally:
+        await cur.close()
+        conn.close()
+
 # - Web util funcs
 
 
