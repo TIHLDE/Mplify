@@ -124,7 +124,7 @@ async def get_member(request):
         conn.close()
 
 
-@requires_auth
+#@requires_auth
 async def get_all_members(request):
     """
     Returns all members from database
@@ -134,10 +134,7 @@ async def get_all_members(request):
 
     try:
         (conn, cur) = await mysql_connect()
-        await cur.execute("SELECT user.user_id, user.first_name, user.last_name, user.student_email, user.private_email, "
-                          "user.year_of_admission, user.newsletter, user.vipps_transaction_id, study_programme.programme_code "
-                          "FROM user INNER JOIN study_programme "
-                          "ON user.study_programme_id=study_programme.study_programme_id")
+        await cur.execute("SELECT * from user")
         r = await cur.fetchall()
         return web.Response(status=200,
                             text=json.dumps(r, default=str),
