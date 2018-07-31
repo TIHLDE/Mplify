@@ -27,6 +27,7 @@ class UserRegistrationForm extends Component {
     years = [];
 
     studentEmailError = false;
+    vippsFormatError = false;
 
     constructor() {
         super();
@@ -63,8 +64,11 @@ class UserRegistrationForm extends Component {
     handleSubmit = event => {
         event.preventDefault();
         this.studentEmailError = !this.isNtnuEmail(this.state.studentEmail);
+        
+        this.vippsFormatError = (this.state.vippsTransactionId.length !== 0 && this.state.vippsTransactionId.length !== 10) || (this.state.vippsTransactionId.length !== 0 && !this.isNumber(this.state.vippsTransactionId));
+
         this.forceUpdate();
-        if (!this.studentEmailError) {
+        if (!this.studentEmailError && !this.vippsFormatError) {
             const data = new UserData();
             data.firstName = this.state.firstName;
             data.lastName = this.state.lastName;
@@ -74,7 +78,7 @@ class UserRegistrationForm extends Component {
             data.newsletter = this.state.wantNewsletter;
             data.vippsTransactionId = this.state.vippsTransactionId;
             data.studyProgrammeId = this.state.studyProgramme.id;
-            console.log(dat5a);
+            console.log(data);
 
             (async () => {
                 const rawResponse = await fetch(
@@ -111,6 +115,10 @@ class UserRegistrationForm extends Component {
     isNtnuEmail(email) {
         const ntnuStudentEmail = '@stud.ntnu.no';
         return email.trim().substr(email.length - ntnuStudentEmail.length, ntnuStudentEmail.length) === ntnuStudentEmail;
+    }
+
+    isNumber(string) {
+        return string.match(/^[0-9]+$/) != null;
     }
 
     render() {
@@ -224,7 +232,8 @@ class UserRegistrationForm extends Component {
                                     className={classes.formControl}
                                     onChange={this.handleChange}
                                     margin="normal"
-                                    helperText="Ikke påkrevd"
+                                    helperText={this.vippsFormatError ? "Må bestå av 10 siffer" : "Ikke påkrevd"}
+                                    error={this.vippsFormatError}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6}>

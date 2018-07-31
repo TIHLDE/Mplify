@@ -23,18 +23,32 @@ class UserDataTable extends Component {
         super();
         //TODO: Hente members og studyProgrammes fra database
         this.state = {
-            members: [],
-            studyProgrammes: [
-                { id: 1, programmeid: 'MGLU1-7', name: 'Grunnskolelærerutdanning 1.–7. trinn', length: 5 },
-                { id: 2, programmeid: 'LTMAGMA1', name: 'Matematikkdidaktikk 1.–7. trinn', length: 3 }
-            ]
+            studyProgrammes: [],
+            members: []
         };
     }
 
     componentWillMount() {
+
+        this.getData('http://localhost:8080/api/get_all_studyprograms')
+            .then(data => {
+                const studyProgrammeList = [];
+                data.forEach(studyProgramme => studyProgrammeList.push(studyProgramme));
+                this.setState({ studyProgrammes: studyProgrammeList }, function () {
+                    this.fetchMembers();
+                })
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    fetchMembers() {
         this.getData('http://localhost:8080/api/allusers')
             .then(data => {
-                data.forEach(member => this.state.members.push(member));
+                const memberList = [];
+                data.forEach(member => memberList.push(member));
+                this.setState({ members: memberList }, function () {})
             })
             .catch(error => {
                 console.log(error);
@@ -66,8 +80,8 @@ class UserDataTable extends Component {
         const deleteButton = <IconButton className={classes.button} color="secondary" onClick={this.handleDeleteClick.bind(this, m.user_id)}><Delete /></IconButton>;
         const actions = <div className={classes.buttonContainer}>{editButton}{deleteButton}</div>
         const active = m.active ? 'Ja' : 'Nei';
-        const studyProgramme = this.state.studyProgrammes.find(sp => sp.id === m.study_programme_id);
-        const studyProgrammeName = studyProgramme != null ? studyProgramme.programmeid : '';
+        const studyProgramme = this.state.studyProgrammes.find(sp => sp.study_programme_id === m.study_programme_id);
+        const studyProgrammeName = studyProgramme != null ? studyProgramme.programme_code : '';
         const newsletter = m.newsletter ? 'Ja' : 'Nei';
         const vippsTransactionId = m.vipps_transaction_id == null ? '' : m.vipps_transaction_id;
         return [actions, active, m.user_id, m.first_name, m.last_name, m.student_email, m.private_email, m.year_of_admission, studyProgrammeName, newsletter, vippsTransactionId];
