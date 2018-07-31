@@ -27,6 +27,7 @@ class UserRegistrationForm extends Component {
     years = [];
 
     studentEmailError = false;
+    vippsFormatError = false;
 
     constructor() {
         super();
@@ -63,6 +64,8 @@ class UserRegistrationForm extends Component {
     handleSubmit = event => {
         event.preventDefault();
         this.studentEmailError = !this.isNtnuEmail(this.state.studentEmail);
+        this.vippsFormatError = this.state.vippsTransactionId.length !== 0 || this.state.vippsTransactionId.length !== 10;
+
         this.forceUpdate();
         if (!this.studentEmailError) {
             const data = new UserData();
@@ -74,7 +77,7 @@ class UserRegistrationForm extends Component {
             data.newsletter = this.state.wantNewsletter;
             data.vippsTransactionId = this.state.vippsTransactionId;
             data.studyProgrammeId = this.state.studyProgramme.id;
-            console.log(dat5a);
+            console.log(data);
 
             (async () => {
                 const rawResponse = await fetch(
