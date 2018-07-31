@@ -74,7 +74,7 @@ class UserRegistrationForm extends Component {
             data.newsletter = this.state.wantNewsletter;
             data.vippsTransactionId = this.state.vippsTransactionId;
             data.studyProgrammeId = this.state.studyProgramme.id;
-            console.log(data);
+            console.log(dat5a);
 
             (async () => {
                 const rawResponse = await fetch(
