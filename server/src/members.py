@@ -68,7 +68,9 @@ async def register_member(request):
                             'For å bekrefte brukeren din, klikk på følgende lenke:\n' \
                             '{0}\n\n' \
                             'Mvh.\nSALT'.format(link)
-            success, msg = send_email(student_email, "Epostbekreftelse for SALT-medlem", email_content)
+            # success, msg = send_email(student_email, "Epostbekreftelse for SALT-medlem", email_content)
+            success = True
+            msg = ""
             if success:
                 return web.Response(status=200,
                                     text='{"msg": "%s"}' % msg,
@@ -124,7 +126,7 @@ async def get_member(request):
         conn.close()
 
 
-#@requires_auth
+# @requires_auth
 async def get_all_members(request):
     """
     Returns all members from database

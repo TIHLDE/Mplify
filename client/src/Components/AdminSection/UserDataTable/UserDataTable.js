@@ -18,19 +18,38 @@ const styles = theme => ({
 });
 
 class UserDataTable extends Component {
+
     constructor() {
         super();
         //TODO: Hente members og studyProgrammes fra database
         this.state = {
-            members: [
-                { id: 1, firstName: 'Gard', lastName: 'Steinsvik', studentEmail: 'gardste@stud.ntnu.no', privateEmail: 'gardsteinsvik@gmail.com', yearOfAdmission: 2015, active: 0, newsletter: 0, vippsTransactionId: null, studyProgrammeId: 2 },
-                { id: 2, firstName: 'Gard', lastName: 'Steinsvik', studentEmail: 'gardste@stud.ntnu.no', privateEmail: 'gardsteinsvik@gmail.com', yearOfAdmission: 2015, active: 0, newsletter: 1, vippsTransactionId: 1234, studyProgrammeId: 1 }
-            ],
+            members: [],
             studyProgrammes: [
                 { id: 1, programmeid: 'MGLU1-7', name: 'Grunnskolelærerutdanning 1.–7. trinn', length: 5 },
                 { id: 2, programmeid: 'LTMAGMA1', name: 'Matematikkdidaktikk 1.–7. trinn', length: 3 }
             ]
         };
+    }
+
+    componentWillMount() {
+        this.getData('http://localhost:8080/api/allusers')
+            .then(data => {
+                data.forEach(member => this.state.members.push(member));
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    async getData(endpoint) {
+        const res = await fetch(endpoint);
+
+        if (!res.ok) {
+            throw new Error(res.status); // 404
+        }
+
+        const data = await res.json();
+        return data;
     }
 
     handleEditClick = (id) => {
@@ -43,15 +62,15 @@ class UserDataTable extends Component {
 
     formatTableRow(m) {
         const { classes } = this.props;
-        const editButton = <IconButton className={classes.button} color="primary" onClick={this.handleEditClick.bind(this, m.id)}><Edit /></IconButton>;
-        const deleteButton = <IconButton className={classes.button} color="secondary" onClick={this.handleDeleteClick.bind(this, m.id)}><Delete /></IconButton>;
+        const editButton = <IconButton className={classes.button} color="primary" onClick={this.handleEditClick.bind(this, m.user_id)}><Edit /></IconButton>;
+        const deleteButton = <IconButton className={classes.button} color="secondary" onClick={this.handleDeleteClick.bind(this, m.user_id)}><Delete /></IconButton>;
         const actions = <div className={classes.buttonContainer}>{editButton}{deleteButton}</div>
         const active = m.active ? 'Ja' : 'Nei';
-        const studyProgramme = this.state.studyProgrammes.find(sp => sp.id === m.studyProgrammeId);
+        const studyProgramme = this.state.studyProgrammes.find(sp => sp.id === m.study_programme_id);
         const studyProgrammeName = studyProgramme != null ? studyProgramme.programmeid : '';
         const newsletter = m.newsletter ? 'Ja' : 'Nei';
-        const vippsTransactionId = m.vippsTransactionId == null ? '' : m.vippsTransactionId;
-        return [actions, active, m.id, m.firstName, m.lastName, m.studentEmail, m.privateEmail, m.yearOfAdmission, studyProgrammeName, newsletter, vippsTransactionId];
+        const vippsTransactionId = m.vipps_transaction_id == null ? '' : m.vipps_transaction_id;
+        return [actions, active, m.user_id, m.first_name, m.last_name, m.student_email, m.private_email, m.year_of_admission, studyProgrammeName, newsletter, vippsTransactionId];
     }
 
     render() {
