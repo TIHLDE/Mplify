@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
     cors = aiohttp_cors.setup(app)
 
-    register_resource = cors.add(app.router.add_resource("/api/register"))
+    """register_resource = cors.add(app.router.add_resource("/api/register"))
     route = cors.add(
         register_resource.add_route("POST", register_member), {
             "*": aiohttp_cors.ResourceOptions(
@@ -37,6 +37,7 @@ if __name__ == '__main__':
             )
         }
     )
+    """
 
     app.add_routes([web.get('/api/user/{name}', get_member),
                     web.get('/api/allusers', get_all_members),
@@ -44,8 +45,22 @@ if __name__ == '__main__':
                     web.get('/api/get_newsletter_email', get_newsletter_email),
                     web.get('/api/confirm/{info}', verify_email),
                     web.post('/api/login', login),
+                    web.post('/api/register', register_member),
                     web.post('/api/toggle_active', toggle_active),
                     web.post('/api/csv_activate', vipps_csv_activate),
                     web.delete('/api/delete_member', delete_member)])
+
+    # Configure default CORS settings.
+    cors = aiohttp_cors.setup(app, defaults={
+        "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+        )
+    })
+
+    # Configure CORS on all routes.
+    for route in list(app.router.routes()):
+        cors.add(route)
 
     web.run_app(app)
