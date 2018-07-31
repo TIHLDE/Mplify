@@ -43,7 +43,7 @@ if __name__ == '__main__':
                     web.get('/api/allusers', get_all_members),
                     web.get('/api/get_email', get_email),
                     web.get('/api/get_newsletter_email', get_newsletter_email),
-                    web.get('/api/confirm/{info}', verify_email),
+                    web.post('/api/confirm_email', verify_email),
                     web.get('/api/get_all_studyprograms', get_all_studyprograms),
                     web.post('/api/login', login),
                     web.post('/api/register', register_member),

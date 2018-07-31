@@ -210,16 +210,27 @@ async def verify_email(request):
 
     try:
         (conn, cur) = await mysql_connect()
-
-        verification_code, stud_email = str(request.match_info['info']).split('_')
+        bod = await request.json()
+        if "emailVerificationCode" not in bod:
+            return web.Response(status=401,
+                                text='{"msg": "No verification code sent."}',
+                                content_type='application/json')
+        verification_code = bod['emailVerificationCode']
 
         await cur.execute("UPDATE user SET verified_student_email = 1 "
-                          "WHERE student_email = %s AND email_verification_code = %s", (stud_email, verification_code))
+                          "WHERE email_verification_code = %s", verification_code)
 
         await conn.commit()
-        return web.Response(status=200,
-                            text='{"msg": "Email verified"}',
-                            content_type='application/json')
+        r = cur.rowcount
+        print(r)
+        if r == 1:
+            return web.Response(status=200,
+                                text='{"msg": "Email verified"}',
+                                content_type='application/json')
+        else:
+            return web.Response(status=401,
+                                text='{"error": "The verifictaion code was invalid"}',
+                                content_type='application/json')
 
     except MySQLError as e:
         print("error")
