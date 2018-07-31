@@ -2,6 +2,7 @@ import { Button, Checkbox, FormControl, FormHelperText, Grid, InputLabel, MenuIt
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from "react";
 import { UserData } from "../../Models/UserData";
+import { Redirect } from 'react-router-dom';
 
 const styles = theme => ({
     root: {
@@ -41,11 +42,26 @@ class UserRegistrationForm extends Component {
             yearOfAdmission: '',
             vippsTransactionId: '',
             wantNewsletter: false,
-            acceptTermsOfService: false
+            acceptTermsOfService: false,
+
+            submitting: false,
+            redirect: false,
         };
 
         this.populateStudyProgrammeEntries();
         this.populateYearOfAdmissionYears();
+    }
+
+    setRedirect = () => {
+        this.setState({
+            redirect: true
+        })
+    }
+
+    renderRedirect = () => {
+        if (this.state.redirect) {
+            return <Redirect to='/awaiting-confirmation' />
+        }
     }
 
     handleChange = event => {
@@ -63,8 +79,9 @@ class UserRegistrationForm extends Component {
 
     handleSubmit = event => {
         event.preventDefault();
+        this.setState({submitting: true});
+
         this.studentEmailError = !this.isNtnuEmail(this.state.studentEmail);
-        
         this.vippsFormatError = (this.state.vippsTransactionId.length !== 0 && this.state.vippsTransactionId.length !== 10) || (this.state.vippsTransactionId.length !== 0 && !this.isNumber(this.state.vippsTransactionId));
 
         this.forceUpdate();
@@ -78,24 +95,19 @@ class UserRegistrationForm extends Component {
             data.newsletter = this.state.wantNewsletter;
             data.vippsTransactionId = this.state.vippsTransactionId;
             data.studyProgrammeId = this.state.studyProgramme.id;
-            console.log(data);
 
-            (async () => {
-                const rawResponse = await fetch(
-                    'http://localhost:8080/api/register',
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
+            this.postData('http://localhost:8080/api/register', data)
+                .then(data => {
+                    console.log(data);
+                    if (data.ok) {
+                        this.setState({redirect: true});
+                    } else {
+                        this.setState({submitting: false});
                     }
-                );
-                const content = await rawResponse.json();
-                console.log(content);
-            })();
-
+                })
+                .catch(error => {
+                    console.log(error);
+                })
         }
     }
 
@@ -119,6 +131,19 @@ class UserRegistrationForm extends Component {
 
     isNumber(string) {
         return string.match(/^[0-9]+$/) != null;
+    }
+
+    async postData(endpoint, payload) {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        };
+        const res = await fetch(endpoint, options);
+        return res;
     }
 
     render() {
@@ -251,7 +276,8 @@ class UserRegistrationForm extends Component {
                                         variant="contained"
                                         color="primary"
                                         disabled={
-                                            !this.state.acceptTermsOfService
+                                            this.state.submitting
+                                            || !this.state.acceptTermsOfService
                                             || this.state.firstName === ''
                                             || this.state.lastName === ''
                                             || this.state.studentEmail === ''
@@ -262,7 +288,9 @@ class UserRegistrationForm extends Component {
                                         type="submit"
                                     >
                                         Registrer
-                                </Button>
+                                    </Button>
+                                    <FormHelperText>{this.state.submitting ? 'Sender data...' : ''}</FormHelperText>
+                                    {this.renderRedirect()}
                                 </FormControl>
                             </Grid>
                         </Grid>
