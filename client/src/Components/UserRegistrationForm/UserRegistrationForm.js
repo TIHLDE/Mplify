@@ -24,7 +24,6 @@ const styles = theme => ({
 
 class UserRegistrationForm extends Component {
 
-    studyProgrammes = []
     years = [];
 
     studentEmailError = false;
@@ -38,16 +37,20 @@ class UserRegistrationForm extends Component {
             lastName: '',
             studentEmail: '',
             privateEmail: '',
-            studyProgramme: { id: -1, programmeCode: '', name: '', length: 0 },
+            studyProgramme: { study_programme_id: -1, programme_code: '', name: '', length: 0 },
             yearOfAdmission: '',
             vippsTransactionId: '',
             wantNewsletter: false,
             acceptTermsOfService: false,
 
+            studyProgrammes: [],
+
             submitting: false,
             redirect: false,
-        };
+        };        
+    }
 
+    componentWillMount() {
         this.populateStudyProgrammeEntries();
         this.populateYearOfAdmissionYears();
     }
@@ -73,7 +76,7 @@ class UserRegistrationForm extends Component {
     }
 
     handleStudyProgrammeChange = event => {
-        const studyProgramme = this.studyProgrammes.find(e => e.id === event.target.value);
+        const studyProgramme = this.state.studyProgrammes.find(e => e.study_programme_id === event.target.value);
         this.setState({ [event.target.name]: studyProgramme });
     }
 
@@ -94,7 +97,7 @@ class UserRegistrationForm extends Component {
             data.yearOfAdmission = this.state.yearOfAdmission;
             data.newsletter = this.state.wantNewsletter;
             data.vippsTransactionId = this.state.vippsTransactionId;
-            data.studyProgrammeId = this.state.studyProgramme.id;
+            data.studyProgrammeId = this.state.studyProgramme.study_programme_id;
 
             this.postData('http://localhost:8080/api/register', data)
                 .then(response => {
@@ -109,11 +112,19 @@ class UserRegistrationForm extends Component {
                     console.log(error);
                 })
         }
+        this.setState({submitting: false});
     }
 
     populateStudyProgrammeEntries() {
-        this.studyProgrammes.push({ id: 1, programmeid: 'MGLU1-7', name: 'Grunnskolelærerutdanning 1.–7. trinn', length: 5 });
-        this.studyProgrammes.push({ id: 2, programmeid: 'LTMAGMA1', name: 'Matematikkdidaktikk 1.–7. trinn', length: 3 });
+        this.getData('http://localhost:8080/api/get_all_studyprograms')
+            .then(data => {
+                const studyProgrammeList = [];                
+                data.forEach(studyProgramme => studyProgrammeList.push(studyProgramme));
+                this.setState({ studyProgrammes: studyProgrammeList });
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     populateYearOfAdmissionYears() {
@@ -133,6 +144,17 @@ class UserRegistrationForm extends Component {
         return string.match(/^[0-9]+$/) != null;
     }
 
+    async getData(endpoint) {
+        const res = await fetch(endpoint);
+
+        if (!res.ok) {
+            throw new Error(res.status); // 404
+        }
+
+        const data = await res.json();
+        return data;
+    }
+
     async postData(endpoint, payload) {
         const options = {
             method: 'POST',
@@ -148,7 +170,7 @@ class UserRegistrationForm extends Component {
 
     render() {
         const { classes } = this.props;
-
+        
         return (
             <div className={classes.root}>
                 <Paper className={classes.paper}>
@@ -203,9 +225,9 @@ class UserRegistrationForm extends Component {
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <FormControl className={classes.formControl} >
-                                    <InputLabel htmlFor="study-programme" shrink={this.state.studyProgramme.id !== -1}>Studieprogram:</InputLabel>
+                                    <InputLabel htmlFor="study-programme" shrink={this.state.studyProgramme.study_programme_id !== -1}>Studieprogram:</InputLabel>
                                     <Select
-                                        value={this.state.studyProgramme.id}
+                                        value={this.state.studyProgramme.study_programme_id}
                                         onChange={this.handleStudyProgrammeChange}
                                         inputProps={{
                                             name: 'studyProgramme',
@@ -214,8 +236,8 @@ class UserRegistrationForm extends Component {
                                         className={classes.selectEmpty}
                                     >
                                         {
-                                            this.studyProgrammes.map(
-                                                sp => <MenuItem key={sp.id} value={sp.id}>{sp.programmeid}</MenuItem>
+                                            this.state.studyProgrammes.map(
+                                                sp => <MenuItem key={sp.study_programme_id} value={sp.study_programme_id}>{sp.programme_code}</MenuItem>
                                             )
                                         }
                                     </Select>
@@ -282,7 +304,7 @@ class UserRegistrationForm extends Component {
                                             || this.state.lastName === ''
                                             || this.state.studentEmail === ''
                                             || this.state.privateEmail === ''
-                                            || this.state.studyProgramme.id === -1
+                                            || this.state.studyProgramme.study_programme_id === -1
                                             || this.state.yearOfAdmission === ''
                                         }
                                         type="submit"
