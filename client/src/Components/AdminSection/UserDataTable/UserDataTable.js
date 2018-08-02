@@ -1,4 +1,4 @@
-import { IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core';
+import { IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Switch, FormControlLabel } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import Delete from '@material-ui/icons/Delete';
 import Edit from '@material-ui/icons/Edit';
@@ -27,12 +27,47 @@ class UserDataTable extends Component {
 
     columns = [
         { name: 'Handlinger', options: { filter: false, display: true, sort: false } },
-        { name: 'Aktiv', options: { filter: true, display: true } },
+        {
+            name: 'Aktiv',
+            options: {
+                filter: true,
+                display: true,
+                customRender: (value, tableMeta, updateValue) => {
+                    return (
+                        <FormControlLabel
+                            label={value ? "Ja" : "Nei"}
+                            value={value ? "Ja" : "Nei"}
+                            control={
+                                <Switch color="primary" checked={value ? true : false} value={value ? "Ja" : "Nei"} />
+                            }
+                            onChange={event => {
+                                const idIndex = this.columns.findIndex(c => c.name === 'ID');
+                                const member = this.state.members.find(m => m.user_id === tableMeta.tableData[tableMeta.rowIndex].data[idIndex]);
+                                this.handleActivationDialogOpen(member);
+                            }}
+                        />
+                    );
+
+                }
+            }
+        },
         { name: 'ID', options: { filter: false, display: false } },
         { name: 'Fornavn', options: { filter: false, display: true } },
         { name: 'Etternavn', options: { filter: false, display: true } },
-        { name: 'Stud.epost', options: { filter: false, display: true, sort: false } },
-        { name: 'Priv.epost', options: { filter: false, display: true } },
+        { name: 'Stud.epost', options: { filter: false, display: true } },
+        {
+            name: 'Bekreftet epost',
+            options: {
+                filter: true,
+                display: true,
+                customRender: (value, tableMeta, updateValue) => {
+                    return value === "Ja"
+                        ? <Tooltip title="Bekreftet"><Done /></Tooltip>
+                        : <Tooltip title="Ikke bekreftet"><Clear /></Tooltip>
+                }
+            }
+        },
+        { name: 'Priv.epost', options: { filter: false, display: false } },
         { name: 'Studiestart', options: { filter: true, display: false } },
         { name: 'Linje', options: { filter: true, display: true } },
         { name: 'Nyhetsbrev', options: { filter: true, display: false } },
@@ -110,7 +145,7 @@ class UserDataTable extends Component {
             .then(data => {
                 const memberList = [];
                 data.forEach(member => memberList.unshift(member));
-                this.setState({ members: memberList }, function () { });
+                this.setState({ members: memberList}, function () { });
             })
             .catch(error => {
                 console.log(error);
@@ -165,20 +200,17 @@ class UserDataTable extends Component {
     formatTableRow(m) {
         const { classes } = this.props;
 
-        const activateButton = <Tooltip title="Aktiver"><IconButton className={classes.button} color="primary" onClick={this.handleActivationDialogOpen.bind(this, m)}><Done /></IconButton></Tooltip>;
-        const deactivateButton = <Tooltip title="Deaktiver"><IconButton className={classes.button} color="secondary" onClick={this.handleActivationDialogOpen.bind(this, m)}><Clear /></IconButton></Tooltip>;
         const editButton = <Tooltip title="Rediger"><IconButton className={classes.button} color="primary" onClick={this.handleEditClick.bind(this, m)}><Edit /></IconButton></Tooltip>;
         const deleteButton = <Tooltip title="Slett"><IconButton className={classes.button} color="secondary" onClick={this.handleDeleteClick.bind(this, m)}><Delete /></IconButton></Tooltip>;
-        const actions = <div className={classes.buttonContainer}>{m.active ? deactivateButton : activateButton}{editButton}{deleteButton}</div>
+        const actions = <div className={classes.buttonContainer}>{editButton}{deleteButton}</div>
 
-        const active = m.active ? 'Ja' : 'Nei';
-        const studentEmail = <div className={classes.noWrap}><span className={classes.noWrap}>{m.student_email}</span>  {m.verified_student_email ? <Tooltip title="Bekreftet"><Done /></Tooltip> : <Tooltip title="Ikke bekreftet"><Clear /></Tooltip>}</div>
+        const verifiedStudentEmail = m.verified_student_email ? 'Ja' : 'Nei';
         const studyProgramme = this.state.studyProgrammes.find(sp => sp.study_programme_id === m.study_programme_id);
         const studyProgrammeName = studyProgramme != null ? studyProgramme.programme_code : '';
         const newsletter = m.newsletter ? 'Ja' : 'Nei';
         const vippsTransactionId = m.vipps_transaction_id == null ? '' : m.vipps_transaction_id;
 
-        return [actions, active, m.user_id, m.first_name, m.last_name, studentEmail, m.private_email, m.year_of_admission, studyProgrammeName, newsletter, vippsTransactionId];
+        return [actions, m.active, m.user_id, m.first_name, m.last_name, m.student_email, verifiedStudentEmail, m.private_email, m.year_of_admission, studyProgrammeName, newsletter, vippsTransactionId];
     }
 
     async getData(endpoint) {
@@ -207,6 +239,8 @@ class UserDataTable extends Component {
 
     render() {
         const { classes } = this.props;
+        console.log(this.state);
+        
 
         this.data = this.state.members.map(m => this.formatTableRow(m));
 
@@ -232,14 +266,14 @@ class UserDataTable extends Component {
                                     ? 'Ønsker du å ' + (this.state.memberToActivate.active ? 'de' : '') + 'aktivere ' + this.state.memberToActivate.first_name + ' ' + this.state.memberToActivate.last_name + '?'
                                     : ''
                             }
-                    </DialogContentText>
+                        </DialogContentText>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.handleActivationDialogClose} color="primary">
                             Avbryt
                         </Button>
                         <Button onClick={this.handleActivationClick} color="primary" autoFocus>
-                            { this.state.memberToActivate.active  ? 'Deaktiver' : 'Aktiver' }
+                            {this.state.memberToActivate.active ? 'Deaktiver' : 'Aktiver'}
                         </Button>
                     </DialogActions>
                 </Dialog>
