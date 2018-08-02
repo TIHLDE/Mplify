@@ -80,7 +80,8 @@ class UserDataTable extends Component {
                 customRender: (value, tableMeta, updateValue) => {
                     const { classes } = this.props;
                     const studyProgramme = this.state.studyProgrammes.find(sp => sp.programme_code === value);
-                    return <Tooltip title={studyProgramme.name + '\n' + studyProgramme.length + ' år'}><Chip label={value} className={classes.chip} /></Tooltip>;
+                    const spInfo = value + ' - ' + studyProgramme.name + ' - ' + studyProgramme.length + ' år';
+                    return <Chip label={value} className={classes.chip} onClick={this.handleChipClick.bind(this, spInfo)} />;
                 }
             }
         },
@@ -136,7 +137,8 @@ class UserDataTable extends Component {
             studyProgrammes: [],
             members: [],
             activationDialogOpen: false,
-            memberToActivate: {},
+            deleteDialogOpen: false,
+            memberToProcess: {},
         };
     }
 
@@ -169,23 +171,23 @@ class UserDataTable extends Component {
     handleActivationDialogOpen = (member) => {
         this.setState({
             activationDialogOpen: true,
-            memberToActivate: member
+            memberToProcess: member
         });
     }
 
-    handleActivationDialogClose = () => {
-        this.setState({ activationDialogOpen: false });
+    handleDialogClose = () => {
+        this.setState({
+            activationDialogOpen: false,
+            deleteDialogOpen: false
+        });
     }
 
     handleActivationClick = () => {
-        const member = this.state.memberToActivate;
-        console.log(member);
+        const member = this.state.memberToProcess;
         const activate = member.active ? 0 : 1;
         const payload = { userId: member.user_id, active: activate };
-        console.log(payload);
         this.postData('http://localhost:8080/api/toggle_active', payload)
             .then(response => {
-                console.log(response);
                 if (response.ok) {
                     const updatedMember = member;
                     updatedMember.active = activate === 1;
@@ -203,19 +205,47 @@ class UserDataTable extends Component {
             });
     }
 
+    handleChipClick = (spInfo) => {
+        console.log(spInfo);
+        // TODO: Åpne snackbar med info
+    }
+
     handleEditClick = (member) => {
         console.log(member);
     }
 
-    handleDeleteClick = (member) => {
-        console.log(member);
+    handleDeleteDialogOpen = (member) => {
+        this.setState({
+            deleteDialogOpen: true,
+            memberToProcess: member
+        });
+    }
+
+    handleDeleteClick = () => {
+        const member = this.state.memberToProcess;
+        const payload = { userId: member.user_id };
+        this.postData('http://localhost:8080/api/delete_member', payload)
+            .then(response => {
+                if (response.ok) {
+                    const updatedMemberIndex = this.state.members.findIndex(m => m.user_id === member.user_id);
+                    let updatedMemberList = this.state.members;
+                    updatedMemberList.splice(updatedMemberIndex, 1);
+                    this.setState({
+                        members: updatedMemberList,
+                        deleteDialogOpen: false
+                    });
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     formatTableRow(m) {
         const { classes } = this.props;
 
         const editButton = <Tooltip title="Rediger"><IconButton className={classes.button} color="primary" onClick={this.handleEditClick.bind(this, m)}><Edit /></IconButton></Tooltip>;
-        const deleteButton = <Tooltip title="Slett"><IconButton className={classes.button} color="secondary" onClick={this.handleDeleteClick.bind(this, m)}><Delete /></IconButton></Tooltip>;
+        const deleteButton = <Tooltip title="Slett"><IconButton className={classes.button} color="secondary" onClick={this.handleDeleteDialogOpen.bind(this, m)}><Delete /></IconButton></Tooltip>;
         const actions = <div className={classes.buttonContainer}>{editButton}{deleteButton}</div>
 
         const verifiedStudentEmail = m.verified_student_email ? 'Ja' : 'Nei';
@@ -253,8 +283,6 @@ class UserDataTable extends Component {
 
     render() {
         const { classes } = this.props;
-        console.log(this.state);
-
 
         this.data = this.state.members.map(m => this.formatTableRow(m));
 
@@ -268,26 +296,49 @@ class UserDataTable extends Component {
                 />
                 <Dialog
                     open={this.state.activationDialogOpen}
-                    onClose={this.handleActivationDialogClose}
+                    onClose={this.handleDialogClose}
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title">{"Bekreft handling"}</DialogTitle>
+                    <DialogTitle id="alert-dialog-title">Bekreft handling</DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
                             {
-                                this.state.memberToActivate
-                                    ? 'Ønsker du å ' + (this.state.memberToActivate.active ? 'de' : '') + 'aktivere ' + this.state.memberToActivate.first_name + ' ' + this.state.memberToActivate.last_name + '?'
+                                this.state.memberToProcess
+                                    ? 'Ønsker du å ' + (this.state.memberToProcess.active ? 'de' : '') + 'aktivere ' + this.state.memberToProcess.first_name + ' ' + this.state.memberToProcess.last_name + '?'
                                     : ''
                             }
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.handleActivationDialogClose} color="primary">
+                        <Button onClick={this.handleDialogClose} color="primary">
                             Avbryt
                         </Button>
                         <Button onClick={this.handleActivationClick} color="primary" autoFocus>
-                            {this.state.memberToActivate.active ? 'Deaktiver' : 'Aktiver'}
+                            {this.state.memberToProcess.active ? 'Deaktiver' : 'Aktiver'}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+                <Dialog
+                    open={this.state.deleteDialogOpen}
+                    onClose={this.handleDialogClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">Bekreft handling</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Ønsker du å slette {this.state.memberToProcess ? this.state.memberToProcess.first_name + ' ' + this.state.memberToProcess.last_name : ''}?
+                            <br />
+                            Denne handlingen kan ikke angres.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={this.handleDialogClose} color="primary">
+                            Avbryt
+                        </Button>
+                        <Button onClick={this.handleDeleteClick} color="primary" autoFocus>
+                            Slett bruker
                         </Button>
                     </DialogActions>
                 </Dialog>

@@ -320,7 +320,7 @@ async def vipps_csv_activate(request):
         conn.close()
 
 
-@requires_auth
+# @requires_auth
 async def delete_member(request):
     """
     Deletes a member from database specified by 'userId'
