@@ -244,7 +244,7 @@ async def verify_email(request):
         conn.close()
 
 
-@requires_auth
+# @requires_auth
 async def toggle_active(request):
     """
     Activates or deactivates a member
