@@ -1,4 +1,4 @@
-import { IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Switch, FormControlLabel } from '@material-ui/core';
+import { IconButton, Tooltip, Chip, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Switch, FormControlLabel } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import Delete from '@material-ui/icons/Delete';
 import Edit from '@material-ui/icons/Edit';
@@ -16,6 +16,9 @@ const styles = theme => ({
     },
     button: {
         display: "inline-flex"
+    },
+    chip: {
+        margin: theme.spacing.unit,
     },
     noWrap: {
         whiteSpace: "nowrap",
@@ -69,7 +72,18 @@ class UserDataTable extends Component {
         },
         { name: 'Priv.epost', options: { filter: false, display: false } },
         { name: 'Studiestart', options: { filter: true, display: false } },
-        { name: 'Linje', options: { filter: true, display: true } },
+        {
+            name: 'Linje',
+            options: {
+                filter: true,
+                display: true,
+                customRender: (value, tableMeta, updateValue) => {
+                    const { classes } = this.props;
+                    const studyProgramme = this.state.studyProgrammes.find(sp => sp.programme_code === value);
+                    return <Tooltip title={studyProgramme.name + '\n' + studyProgramme.length + ' år'}><Chip label={value} className={classes.chip} /></Tooltip>;
+                }
+            }
+        },
         { name: 'Nyhetsbrev', options: { filter: true, display: false } },
         { name: 'Vipps', options: { filter: false, display: true } },
     ];
@@ -145,7 +159,7 @@ class UserDataTable extends Component {
             .then(data => {
                 const memberList = [];
                 data.forEach(member => memberList.unshift(member));
-                this.setState({ members: memberList}, function () { });
+                this.setState({ members: memberList }, function () { });
             })
             .catch(error => {
                 console.log(error);
@@ -240,7 +254,7 @@ class UserDataTable extends Component {
     render() {
         const { classes } = this.props;
         console.log(this.state);
-        
+
 
         this.data = this.state.members.map(m => this.formatTableRow(m));
 
