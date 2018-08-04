@@ -50,6 +50,17 @@ async def login(request):
         conn.close()
 
 
+async def is_valid_token(request):
+    token = str(request.match_info['token'])
+
+    if token in sessions.keys():
+        return web.Response(status=200,
+                            text='{"msg": "Token is valid."}',
+                            content_type='application/json')
+    else:
+        return bad_creds_response()
+
+
 # -- web util funcs
 def bad_creds_response():
     """

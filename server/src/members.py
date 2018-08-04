@@ -206,6 +206,9 @@ async def verify_email(request):
     Verifies member's student Email through unique URI containing verification code and  student-email addresse.
     :param request: Contains information about verification code and student email
     :return Response: status 200 if okay, 500 if not
+
+    TODO:
+    Fix logic!
     """
 
     try:
@@ -216,7 +219,7 @@ async def verify_email(request):
                                 text='{"msg": "No verification code sent."}',
                                 content_type='application/json')
         verification_code = bod['emailVerificationCode']
-
+        info = verification_code.split('_')
         await cur.execute("UPDATE user SET verified_student_email = 1 "
                           "WHERE email_verification_code = %s", verification_code)
 
