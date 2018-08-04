@@ -1,4 +1,4 @@
-import { Paper, Typography } from '@material-ui/core';
+import { Paper, Typography, Button } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
 import UserDataTable from './UserDataTable/UserDataTable';
@@ -21,6 +21,9 @@ class AdminSection extends Component {
 
     render() {
         const { classes } = this.props;
+
+        console.log(this.props);
+        
         
         return (
             <div className={classes.root}>
@@ -28,6 +31,7 @@ class AdminSection extends Component {
                     <Typography variant="headline" component="h3">Admin-panel</Typography>
                     <hr />
                     <p>Bulkaktivering med Vipps-csv | Laste opp Terms of Service | Eksportere nyhetsbrevliste | Eksportere epostliste</p>
+                    <Button size="large" variant="contained" color="secondary" onClick={this.props.onLogout.bind(this)}>Logg ut</Button>
                 </Paper>
                 <br />
                 <UserDataTable />

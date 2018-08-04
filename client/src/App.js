@@ -24,26 +24,41 @@ const styles = theme => ({
 
 const authController = {
   isAuthenticated: false,
-  authenticate(cb) {   
-    console.log(this.isAuthenticated);
-    
-    this.isAuthenticated = true;
-    console.log(this.isAuthenticated);
-    setTimeout(cb, 100); // fake async
+  authenticate() {
+    const token = sessionStorage.getItem('token');
+    console.log(token);
+    if (token) {
+      const endpoint = 'http://localhost:8080/api/get_valid_token/' + token;
+      const options = {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      };
+      const res = fetch(endpoint, options);
+      res.then(response => {
+        if (response.ok) {
+          this.isAuthenticated = true;
+        }
+      }).catch(error => {
+        console.log(error);
+      });
+    }
   },
-  signout(cb) {
+  signout() {
+    sessionStorage.clear();
     this.isAuthenticated = false;
-    setTimeout(cb, 100);
   }
 };
 
-const PrivateRoute = ({ component: Component, ...rest }) => (
+const PrivateRoute = ({ component: Component, onLogout, ...rest }) => (
   <Route
     {...rest}
-    render = {
-      props => authController.isAuthenticated 
-      ? (<Component {...props} />)
-      : (<Redirect to={{pathname: "/login", state: { from: props.location }}}/>)
+    render={
+      props => authController.isAuthenticated
+        ? (<Component {...props} onLogout={onLogout} />)
+        : (<Redirect to={{ pathname: "/login", state: { from: props.location } }} />)
     }
   />
 );
@@ -54,30 +69,28 @@ const ConfirmEmail = ({ match }) => (
 
 class App extends Component {
 
-  sessionToken;
-
   constructor() {
     super();
-    this.state = { };
+    this.state = {};
   }
 
-
   componentWillMount() {
-    this.sessionToken = sessionStorage.getItem('token');
-    console.log(this.sessionToken);
-    
-    if (this.sessionToken) {
-      
-    } else {
-      this.setState({ loggedIn: false });
-    }
+    authController.authenticate();
+  }
+
+  handleLogIn = () => {
+    authController.authenticate();
+  }
+
+  handleLogout = () => {
+    authController.signout();
   }
 
   render() {
     const { classes } = this.props;
 
     console.log(authController);
-    
+
 
     return (
       // <div className="App">
@@ -123,8 +136,8 @@ class App extends Component {
             <Route path="/" exact component={UserRegistrationForm} />
             <Route path="/awaiting-confirmation" exact component={AwaitingConfirmationPage} />
             <Route path="/confirm/:code" exact component={ConfirmEmail} />
-            <PrivateRoute path="/admin" exact component={AdminSection} />
-            <Route path='/login' render={(props) => (<LoginPage authController={authController} {...props} />)} />
+            <PrivateRoute path="/admin" exact component={AdminSection} onLogout={this.handleLogout.bind(this)} />
+            <Route path='/login' render={(props) => (<LoginPage onLogIn={this.handleLogIn.bind(this)} {...props} />)} />
           </div>
         </Router>
       </div>

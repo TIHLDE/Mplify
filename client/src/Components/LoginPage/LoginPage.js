@@ -19,8 +19,7 @@ class LoginPage extends Component {
             submitting: false,
             loginFailed: false,
             username: '',
-            password: '',
-            token: ''
+            password: ''
         };
     }
 
@@ -60,10 +59,9 @@ class LoginPage extends Component {
                 if (result.token) {
                     sessionStorage.setItem('token', result.token);
                     this.setState({ 
-                        submitting: false,
-                        token: result.token
+                        submitting: false
                     });
-                    this.props.onAuth();
+                    this.setLoggedIn();
                 } else {
                     this.setState({
                         submitting: false,
@@ -74,6 +72,10 @@ class LoginPage extends Component {
             .catch(error => {
                 console.log(error);
             })
+    }
+
+    setLoggedIn = () => {
+        this.props.onLogIn();
     }
 
     render() {
@@ -128,7 +130,7 @@ class LoginPage extends Component {
                                         size="large"
                                         variant="contained"
                                         color="secondary"
-                                        onClick={console.log.bind(this.props.authController.target)}
+                                        onClick={this.setLoggedIn.bind(this)}
                                     >
                                         Logg inn
                                     </Button>
