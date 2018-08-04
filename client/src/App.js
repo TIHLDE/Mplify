@@ -1,16 +1,17 @@
-import React, { Component } from 'react';
-import uuid from 'uuid';
+import { Grid, Paper, Typography } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
 import $ from 'jquery';
+import React, { Component } from 'react';
+import { BrowserRouter as Router, Link, Route } from "react-router-dom";
+import uuid from 'uuid';
 // import Projects from './Components/Projects';
 // import AddProject from './Components/AddProject';
 // import Todos from './Components/Todos';
 import './App.css';
-import UserRegistrationForm from './Components/UserRegistrationForm/UserRegistrationForm';
-import { Grid, Paper, Typography } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import AdminSection from './Components/AdminSection/AdminSection';
 import AwaitingConfirmationPage from './Components/AwaitingConfirmationPage/AwaitingConfirmationPage';
+import ConfirmEmailPage from './Components/ConfirmEmailPage/ConfirmEmailPage';
+import UserRegistrationForm from './Components/UserRegistrationForm/UserRegistrationForm';
 
 const styles = theme => ({
   root: {
@@ -24,14 +25,6 @@ const styles = theme => ({
     textAlign: "left"
   }
 });
-
-const Child = ({ match }) => (
-  <div>
-    <h3>Kode: {match.params.code}</h3>
-    <p>Her kjører vi en spørring som sjekker om det finnes et element i databasen som matcher koden og brukernavnet.</p>
-    <p>Kanskje vi burde sjekke opp mot NTNU om brukeren er tilknyttet instituttet.</p>
-  </div>
-);
 
 class App extends Component {
   constructor() {
@@ -143,7 +136,7 @@ class App extends Component {
             <br />
             <Route path="/" exact component={UserRegistrationForm} />
             <Route path="/awaiting-confirmation" exact component={AwaitingConfirmationPage} />
-            <Route path="/confirm/:code" exact component={Child} />
+            <Route path="/confirm/:code" exact component={ConfirmEmail} />
             <Route path="/admin" exact component={AdminSection} />
           </div>
         </Router>
@@ -153,3 +146,7 @@ class App extends Component {
 }
 
 export default withStyles(styles)(App);
+
+const ConfirmEmail = ({ match }) => (
+  <ConfirmEmailPage match={match} />
+);
