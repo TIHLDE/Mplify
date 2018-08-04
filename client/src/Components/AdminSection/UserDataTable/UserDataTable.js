@@ -45,8 +45,16 @@ class UserDataTable extends Component {
                             }
                             onChange={event => {
                                 const idIndex = this.columns.findIndex(c => c.name === 'ID');
-                                const member = this.state.members.find(m => m.user_id === tableMeta.tableData[tableMeta.rowIndex].data[idIndex]);
-                                this.handleActivationDialogOpen(member);
+                                console.log(idIndex);
+                                const memberAttributes = tableMeta.tableData[tableMeta.rowIndex];
+                                console.log(memberAttributes);
+                                if (memberAttributes) {
+                                    const memberId = memberAttributes.data[idIndex];
+                                    console.log(memberId);
+                                    const member = this.state.members.find(m => m.user_id === memberId);
+                                    console.log(member);
+                                    this.handleActivationDialogOpen(member);
+                                }
                             }}
                         />
                     );
@@ -224,7 +232,7 @@ class UserDataTable extends Component {
     handleDeleteClick = () => {
         const member = this.state.memberToProcess;
         const payload = { userId: member.user_id };
-        this.postData('http://localhost:8080/api/delete_member', payload)
+        this.postData('http://localhost:8080/api/delete_member', payload, 'DELETE')
             .then(response => {
                 if (response.ok) {
                     const updatedMemberIndex = this.state.members.findIndex(m => m.user_id === member.user_id);
@@ -268,9 +276,9 @@ class UserDataTable extends Component {
         return data;
     }
 
-    async postData(endpoint, payload) {
+    async postData(endpoint, payload, method = 'POST') {
         const options = {
-            method: 'POST',
+            method: method,
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
