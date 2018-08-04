@@ -21,7 +21,7 @@ class AdminSection extends Component {
 
     render() {
         const { classes } = this.props;
-
+        
         return (
             <div className={classes.root}>
                 <Paper className={classes.paper}>
