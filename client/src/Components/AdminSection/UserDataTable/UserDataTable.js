@@ -44,6 +44,7 @@ class UserDataTable extends Component {
                                 <Switch color="primary" checked={value ? true : false} value={value ? "Ja" : "Nei"} />
                             }
                             onChange={event => {
+                                this.forceUpdate();
                                 const idIndex = this.columns.findIndex(c => c.name === 'ID');
                                 console.log(idIndex);
                                 const memberAttributes = tableMeta.tableData[tableMeta.rowIndex];

@@ -1,6 +1,7 @@
-import { Grid, Paper, TextField, Typography, FormControl, Button, FormHelperText } from "@material-ui/core";
+import { Button, FormControl, FormHelperText, Grid, Paper, TextField, Typography } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 
 const styles = theme => ({
     root: {
@@ -19,7 +20,8 @@ class LoginPage extends Component {
             submitting: false,
             loginFailed: false,
             username: '',
-            password: ''
+            password: '',
+            rediriectToAdminPage: false
         };
     }
 
@@ -58,10 +60,10 @@ class LoginPage extends Component {
                 console.log(result);
                 if (result.token) {
                     sessionStorage.setItem('token', result.token);
-                    this.setState({ 
+                    this.setState({
                         submitting: false
                     });
-                    this.setLoggedIn();
+                    this.onLogin();
                 } else {
                     this.setState({
                         submitting: false,
@@ -74,72 +76,72 @@ class LoginPage extends Component {
             })
     }
 
-    setLoggedIn = () => {
+    onLogin = () => {
         this.props.onLogIn();
+        this.setState({ rediriectToAdminPage: true });
     }
 
     render() {
         const { classes } = this.props;
-        console.log(this.props);
-        
+
+        const loginContent = (
+            <Paper className={classes.paper}>
+                <Typography variant="headline" component="h3">Innlogging for SALT-styret</Typography>
+                <hr />
+                <form onSubmit={this.handleSubmit}>
+                    <Grid container spacing={8}>
+                        <Grid item xs={12}>
+                            <TextField
+                                id="username"
+                                name="username"
+                                type="text"
+                                label="Brukernavn:"
+                                className={classes.formControl}
+                                onChange={this.handleChange}
+                                margin="normal"
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                id="password"
+                                name="password"
+                                type="password"
+                                label="Passord:"
+                                className={classes.formControl}
+                                onChange={this.handleChange}
+                                margin="normal"
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <FormControl className={classes.formControl} >
+                                <Button
+                                    size="large"
+                                    variant="contained"
+                                    color="primary"
+                                    disabled={
+                                        this.state.submitting
+                                        || this.state.username === ''
+                                        || this.state.password === ''
+                                    }
+                                    type="submit"
+                                >
+                                    Logg inn
+                                </Button>
+                                <FormHelperText>{this.state.submitting ? 'Logger inn...' : (this.state.loginFailed ? 'Innlogging mislyktes' : '')}</FormHelperText>
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+                </form>
+            </Paper>
+        );
+
+        const redirect = (
+            <Redirect to='/admin' />
+        );
+
         return (
             <div className={classes.root}>
-                <Paper className={classes.paper}>
-                    <Typography variant="headline" component="h3">Innlogging for SALT-styret</Typography>
-                    <hr />
-                    <form onSubmit={this.handleSubmit}>
-                        <Grid container spacing={8}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    id="username"
-                                    name="username"
-                                    type="text"
-                                    label="Brukernavn:"
-                                    className={classes.formControl}
-                                    onChange={this.handleChange}
-                                    margin="normal"
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    label="Passord:"
-                                    className={classes.formControl}
-                                    onChange={this.handleChange}
-                                    margin="normal"
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <FormControl className={classes.formControl} >
-                                    <Button
-                                        size="large"
-                                        variant="contained"
-                                        color="primary"
-                                        disabled={
-                                            this.state.submitting
-                                            || this.state.username === ''
-                                            || this.state.password === ''
-                                        }
-                                        type="submit"
-                                    >
-                                        Logg inn
-                                    </Button>
-                                    <Button
-                                        size="large"
-                                        variant="contained"
-                                        color="secondary"
-                                        onClick={this.setLoggedIn.bind(this)}
-                                    >
-                                        Logg inn
-                                    </Button>
-                                    <FormHelperText>{this.state.submitting ? 'Logger inn...' : (this.state.loginFailed ? 'Innlogging mislyktes' : '')}</FormHelperText>
-                                </FormControl>
-                            </Grid>
-                        </Grid>
-                    </form>
-                </Paper>
+                {this.state.rediriectToAdminPage ? redirect : loginContent}
             </div>
         );
     }

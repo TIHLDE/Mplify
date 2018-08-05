@@ -28,22 +28,7 @@ const authController = {
     const token = sessionStorage.getItem('token');
     console.log(token);
     if (token) {
-      const endpoint = 'http://localhost:8080/api/get_valid_token/' + token;
-      const options = {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      };
-      const res = fetch(endpoint, options);
-      res.then(response => {
-        if (response.ok) {
-          this.isAuthenticated = true;
-        }
-      }).catch(error => {
-        console.log(error);
-      });
+      this.isAuthenticated = true;
     }
   },
   signout() {
