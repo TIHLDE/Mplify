@@ -43,6 +43,7 @@ class AdminSection extends Component {
                 }
             }).catch(error => {
                 console.log(error);
+                this.setState({ redirectToLoginPage: true });
             });
         } else {
             this.setState({ redirectToLoginPage: true });

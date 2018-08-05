@@ -1,15 +1,19 @@
-import { IconButton, Tooltip, Chip, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Switch, FormControlLabel } from '@material-ui/core';
+import { Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, IconButton, Paper, Switch, Tooltip, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import Delete from '@material-ui/icons/Delete';
-import Edit from '@material-ui/icons/Edit';
-import Done from '@material-ui/icons/Done';
 import Clear from '@material-ui/icons/Clear';
+import Delete from '@material-ui/icons/Delete';
+import Done from '@material-ui/icons/Done';
+import Edit from '@material-ui/icons/Edit';
 import MUIDataTable from 'mui-datatables';
 import React, { Component } from 'react';
 
 const styles = theme => ({
     root: {
-        textAlign: "left"
+        textAlign: "center"
+    },
+    paper: {
+        paddingTop: theme.spacing.unit * 2,
+        paddingBottom: theme.spacing.unit * 2,
     },
     buttonContainer: {
         display: "flex"
@@ -44,18 +48,11 @@ class UserDataTable extends Component {
                                 <Switch color="primary" checked={value ? true : false} value={value ? "Ja" : "Nei"} />
                             }
                             onChange={event => {
-                                this.forceUpdate();
                                 const idIndex = this.columns.findIndex(c => c.name === 'ID');
-                                console.log(idIndex);
-                                const memberAttributes = tableMeta.tableData[tableMeta.rowIndex];
-                                console.log(memberAttributes);
-                                if (memberAttributes) {
-                                    const memberId = memberAttributes.data[idIndex];
-                                    console.log(memberId);
-                                    const member = this.state.members.find(m => m.user_id === memberId);
-                                    console.log(member);
-                                    this.handleActivationDialogOpen(member);
-                                }
+                                const memberAttributes = tableMeta.rowData;
+                                const memberId = memberAttributes[idIndex];
+                                const member = this.state.members.find(m => m.user_id === memberId);
+                                this.handleActivationDialogOpen(member);
                             }}
                         />
                     );
@@ -143,6 +140,7 @@ class UserDataTable extends Component {
     constructor() {
         super();
         this.state = {
+            loadingMembers: true,
             studyProgrammes: [],
             members: [],
             activationDialogOpen: false,
@@ -170,7 +168,7 @@ class UserDataTable extends Component {
             .then(data => {
                 const memberList = [];
                 data.forEach(member => memberList.unshift(member));
-                this.setState({ members: memberList }, function () { });
+                this.setState({ members: memberList, loadingMembers: false });
             })
             .catch(error => {
                 console.log(error);
@@ -295,14 +293,24 @@ class UserDataTable extends Component {
 
         this.data = this.state.members.map(m => this.formatTableRow(m));
 
+        const loadingComponent = (
+            <Paper className={classes.paper}>
+                <Typography variant="headline" component="h3">Henter medlemmer...</Typography>
+            </Paper>
+        );
+
+        const dataTable = (
+            <MUIDataTable
+                title={'Registreringer'}
+                data={this.data}
+                columns={this.columns}
+                options={this.options}
+            />
+        );
+
         return (
             <div className={classes.root}>
-                <MUIDataTable
-                    title={'Registreringer'}
-                    data={this.data}
-                    columns={this.columns}
-                    options={this.options}
-                />
+                {this.state.loadingMembers ? loadingComponent : dataTable}
                 <Dialog
                     open={this.state.activationDialogOpen}
                     onClose={this.handleDialogClose}
