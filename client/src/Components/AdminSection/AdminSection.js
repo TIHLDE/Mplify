@@ -1,7 +1,8 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Typography } from '@material-ui/core';
+import { Button, Paper, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
+import BulkActivate from './BulkActivate';
 import UserDataTable from './UserDataTable/UserDataTable';
 
 const styles = theme => ({
@@ -11,7 +12,7 @@ const styles = theme => ({
     paper: {
         paddingTop: theme.spacing.unit * 2,
         paddingBottom: theme.spacing.unit * 2,
-    },
+    }
 });
 
 class AdminSection extends Component {
@@ -19,8 +20,7 @@ class AdminSection extends Component {
         super();
         this.state = {
             authenticating: true,
-            redirectToLoginPage: false,
-            bulkActivateDialogOpen: false
+            redirectToLoginPage: false
         };
     }
 
@@ -56,22 +56,13 @@ class AdminSection extends Component {
             this.setState({ redirectToLoginPage: true });
         }
 
-    }
-
-    handleDialogClose = () => {
-        this.setState({
-            bulkActivateDialogOpen: false,
-        });
-    }
+    }    
 
     onLogout = () => {
         this.props.onLogout();
         this.setState({ redirectToLoginPage: true });
     }
 
-    onBulkActivate = () => {
-        this.setState({ bulkActivateDialogOpen: true });
-    }
 
     render() {
         const { classes } = this.props;
@@ -82,49 +73,23 @@ class AdminSection extends Component {
             </Paper>
         );
 
-        const bulkActivateDialog = (
-            <Dialog
-                    open={this.state.bulkActivateDialogOpen}
-                    onClose={this.handleDialogClose}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                >
-                    <DialogTitle id="alert-dialog-title">Bekreft handling</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
-                            {
-                                'hejj'
-                            }
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={this.handleDialogClose} color="primary">
-                            Avbryt
-                        </Button>
-                        <Button onClick={this.handleActivationClick} color="primary" autoFocus>
-                            {'Aktiver'}
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-        );
-
         const adminContent = (
             <div>
                 <Paper className={classes.paper}>
                     <Typography variant="headline" component="h3">Admin-panel</Typography>
                     <hr />
-                    <p>Bulkaktivering med Vipps-csv | Laste opp Terms of Service | Eksportere nyhetsbrevliste | Eksportere epostliste</p>
-                    <Button size="large" variant="contained" color="primary" onClick={this.onBulkActivate}>Bulk-aktivering</Button>
-                    <Button size="large" variant="contained" color="primary" onClick={console.log.bind('hei')}>Oppdater Terms of Service</Button>
-                    <Button size="large" variant="contained" color="primary" onClick={console.log.bind('hei')}>Eksporter nyhetsbrevliste</Button>
-                    <Button size="large" variant="contained" color="primary" onClick={console.log.bind('hei')}>Eksporter epostliste</Button>
+                    <br />
+                    <BulkActivate />
+                    <Button variant="contained" color="primary" onClick={this.onBulkActivate}>Bulk-aktivering</Button>
+                    <Button variant="contained" color="primary" onClick={console.log.bind('hei')}>Oppdater Terms of Service</Button>
+                    <Button variant="contained" color="primary" onClick={console.log.bind('hei')}>Eksporter nyhetsbrevliste</Button>
+                    <Button variant="contained" color="primary" onClick={console.log.bind('hei')}>Eksporter epostliste</Button>
                     <br />
                     <br />
                     <Button size="large" variant="contained" color="secondary" onClick={this.onLogout.bind(this)}>Logg ut</Button>
                 </Paper>
                 <br />
                 <UserDataTable />
-                {bulkActivateDialog}
             </div>
         );
 

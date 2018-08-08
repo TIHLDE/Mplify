@@ -285,7 +285,7 @@ async def toggle_active(request):
         conn.close()
 
 
-@requires_auth
+# @requires_auth
 async def vipps_csv_activate(request):
     """
     Sets attribute 'active' to 1 in database for all members with matching vipps_transaction_id and correct
