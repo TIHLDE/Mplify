@@ -26,7 +26,6 @@ const authController = {
   isAuthenticated: false,
   authenticate() {
     const token = sessionStorage.getItem('token');
-    console.log(token);
     if (token) {
       this.isAuthenticated = true;
     }
@@ -73,9 +72,6 @@ class App extends Component {
 
   render() {
     const { classes } = this.props;
-
-    console.log(authController);
-
 
     return (
       // <div className="App">
