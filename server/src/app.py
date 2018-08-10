@@ -45,7 +45,7 @@ if __name__ == '__main__':
                     web.get('/api/get_newsletter_email', get_newsletter_email),
                     web.get('/api/get_all_studyprograms', get_all_studyprograms),
                     web.get('/api/get_valid_token/{token}', is_valid_token),
-                    web.post('/api/confirm_email', verify_email),
+                    web.get('/api/confirm_email/{verification_code}', verify_email),
                     web.post('/api/login', login),
                     web.post('/api/register', register_member),
                     web.post('/api/toggle_active', toggle_active),
