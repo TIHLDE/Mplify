@@ -26,6 +26,31 @@ def init():
     EMAIL_HOST = get_environ_sfe("EMAIL_HOST")
 
 
+async def check_vipps_id(request):
+
+    try:
+        (conn, cur) = await mysql_connect()
+        bod = await request.json()
+        if not "vippsTransactionId" in bod.keys():
+            return web.Response(status=401,
+                                text='{"msg": "Vipps transaction id not in body."}',
+                                content_type='application/json')
+
+        await cur.execute("Select * from user where vipps_transaction_id = %s", bod["vippsTransactionId"])
+        r = cur.rowcount
+        if r == 0:
+            return web.Response(status=200,
+                                text='{"msg": "Transaction id is unique."}',
+                                content_type='application/json')
+        else:
+            return web.Response(status=401,
+                                text='{"msg": "Vipps transaction id not unique."}',
+                                content_type='application/json')
+
+    except MySQLError as e:
+        print(e)
+
+
 async def register_member(request):
     """
     TODO
