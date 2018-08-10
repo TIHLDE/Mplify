@@ -30,13 +30,10 @@ async def check_vipps_id(request):
 
     try:
         (conn, cur) = await mysql_connect()
-        bod = await request.json()
-        if not "vippsTransactionId" in bod.keys():
-            return web.Response(status=401,
-                                text='{"msg": "Vipps transaction id not in body."}',
-                                content_type='application/json')
+        vipps_id = str(request.match_info['vipps_id'])
 
-        await cur.execute("Select * from user where vipps_transaction_id = %s", bod["vippsTransactionId"])
+
+        await cur.execute("Select * from user where vipps_transaction_id = %s", vipps_id)
         r = cur.rowcount
         if r == 0:
             return web.Response(status=200,
@@ -118,7 +115,57 @@ async def register_member(request):
         conn.close()
 
 
-@requires_auth
+async def get_tos(request):
+
+    try:
+        (conn, cur) = await mysql_connect()
+
+        await cur.execute("Select text from terms_of_service where id = 1")
+        r = await cur.fetchall()
+
+        return web.Response(status=200,
+                            text=json.dumps(r, default=str),
+                            content_type='application/json')
+    except MySQLError as e:
+        print(e)
+        return web.Response(status=500,
+                            text='{"error": "%s"}' % e,
+                            content_type='application/json')
+
+    finally:
+        await cur.close()
+        conn.close()
+
+
+# @requires_auth
+async def update_tos(request):
+    try:
+        (conn, cur) = await mysql_connect()
+        bod = await request.json()
+        if not "termsOfService" in bod.keys():
+            return web.Response(status=401,
+                                text='{"msg": "termsOfService key not in body."}',
+                                content_type='application/json')
+        await cur.execute("update terms_of_service set text = %s where id = 1", bod["termsOfService"])
+        r = cur.rowcount
+        await conn.commit()
+        if r == 1:
+            return web.Response(status=200,
+                                text='{"msg": "Terms of service updated."}',
+                                content_type='application/json')
+
+    except MySQLError as e:
+        return web.Response(status=500,
+                            text='{"error": "%s"}' % e,
+                            content_type='application/json')
+
+
+    finally:
+        await cur.close()
+        conn.close()
+
+
+# @requires_auth
 async def get_member(request):
     """
     Returns all members with 'first_name' or 'last_name' equal to search_string from end of url
