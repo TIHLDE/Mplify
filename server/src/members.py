@@ -150,7 +150,7 @@ async def get_all_members(request):
         conn.close()
 
 
-@requires_auth
+# @requires_auth
 async def get_newsletter_email(request):
     """
     Returns all member student emails wanting newsletter-email
@@ -159,7 +159,7 @@ async def get_newsletter_email(request):
     """
     try:
         (conn, cur) = await mysql_connect()
-        await cur.execute("SELECT first_name, last_name, student_email FROM user WHERE newsletter = 1")
+        await cur.execute("SELECT first_name, last_name, student_email FROM user WHERE newsletter = 1 AND active = 1")
         r = await cur.fetchall()
         return web.Response(status=200,
                             text=json.dumps(r, default=str,),
@@ -174,7 +174,7 @@ async def get_newsletter_email(request):
         conn.close()
 
 
-@requires_auth
+# @requires_auth
 async def get_email(request):
     """
     Returns all member student-emails
@@ -183,7 +183,7 @@ async def get_email(request):
     """
     try:
         (conn, cur) = await mysql_connect()
-        await cur.execute("SELECT first_name, last_name, student_email FROM user")
+        await cur.execute("SELECT first_name, last_name, student_email FROM user WHERE active = 1")
         r = await cur.fetchall()
         return web.Response(status=200,
                             text=json.dumps(r, default=str,),
