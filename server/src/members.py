@@ -183,7 +183,7 @@ async def get_email(request):
     """
     try:
         (conn, cur) = await mysql_connect()
-        await cur.execute("SELECT first_name, last_name, student_email FROM user WHERE active = 1")
+        await cur.execute("SELECT user_id, first_name, last_name, student_email FROM user WHERE active = 1")
         r = await cur.fetchall()
         return web.Response(status=200,
                             text=json.dumps(r, default=str,),
@@ -203,7 +203,7 @@ async def get_email(request):
 
 async def verify_email(request):
     """
-    Verifies member's student Email through unique URI containing verification code and  student-email addresse.
+    Verifies member's student Email through unique URI containing verification code and student-email addresse.
     :param request: Contains information about verification code and student email
     :return Response: status 200 if okay, 500 if not
 
