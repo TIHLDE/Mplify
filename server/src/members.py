@@ -223,7 +223,7 @@ async def get_all_members(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def get_newsletter_email(request):
     """
     Returns all member student emails wanting newsletter-email
@@ -247,7 +247,7 @@ async def get_newsletter_email(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def get_email(request):
     """
     Returns all member student-emails
@@ -360,7 +360,7 @@ async def toggle_active(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def vipps_csv_activate(request):
     """
     Sets attribute 'active' to 1 in database for all members with matching vipps_transaction_id and correct
@@ -401,7 +401,7 @@ async def vipps_csv_activate(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def delete_member(request):
     """
     Deletes a member from database specified by 'userId'
