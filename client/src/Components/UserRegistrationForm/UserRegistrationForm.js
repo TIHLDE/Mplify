@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from "react";
 import { UserData } from "../../Models/UserData";
 import { Redirect } from 'react-router-dom';
+import TermsOfService from "./TermsOfService";
 
 const styles = theme => ({
     root: {
@@ -297,7 +298,8 @@ class UserRegistrationForm extends Component {
                                 <Checkbox name="wantNewsletter" onChange={this.handleCheckboxChange} />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <InputLabel>Terms of service:</InputLabel>
+                                <TermsOfService />
+                                <InputLabel>Jeg aksepterer:</InputLabel>
                                 <Checkbox name="acceptTermsOfService" onChange={this.handleCheckboxChange} />
                             </Grid>
                             <Grid item xs={12}>
