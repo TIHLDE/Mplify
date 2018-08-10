@@ -88,7 +88,7 @@ class AdminSection extends Component {
                             <Button variant="contained" color="primary" onClick={console.log.bind('hei')}>Oppdater Terms of Service</Button>
                         </Grid>
                         <Grid item xs={12} sm={6} md={4} lg={3}>
-                            <Button variant="contained" color="primary" onClick={console.log.bind('hei')}>Eksporter nyhetsbrevliste</Button>
+                            <ExportEmailList newsletter={true} />
                         </Grid>
                         <Grid item xs={12} sm={6} md={4} lg={3}>
                             <ExportEmailList />
