@@ -137,7 +137,7 @@ async def get_tos(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def update_tos(request):
     try:
         (conn, cur) = await mysql_connect()
@@ -165,7 +165,7 @@ async def update_tos(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def get_member(request):
     """
     Returns all members with 'first_name' or 'last_name' equal to search_string from end of url
@@ -199,7 +199,7 @@ async def get_member(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def get_all_members(request):
     """
     Returns all members from database
@@ -322,7 +322,7 @@ async def verify_email(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def toggle_active(request):
     """
     Activates or deactivates a member

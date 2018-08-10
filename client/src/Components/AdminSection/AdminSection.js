@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import BulkActivate from './BulkActivate';
-import UserDataTable from './UserDataTable/UserDataTable';
+import UserDataTable from './UserDataTable';
 import ExportEmailList from './ExportEmailList';
 
 const styles = theme => ({

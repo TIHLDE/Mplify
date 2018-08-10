@@ -265,7 +265,14 @@ class UserDataTable extends Component {
     }
 
     async getData(endpoint) {
-        const res = await fetch(endpoint);
+        const options = {
+            method: 'GET',
+            headers: {
+                'X-CSRF-Token': sessionStorage.getItem('token')
+            }
+        };
+
+        const res = await fetch(endpoint, options);
 
         if (!res.ok) {
             throw new Error(res.status); // 404
@@ -280,7 +287,8 @@ class UserDataTable extends Component {
             method: method,
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': sessionStorage.getItem('token')
             },
             body: JSON.stringify(payload)
         };
