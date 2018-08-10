@@ -9,11 +9,18 @@ const styles = theme => ({
     paper: {
         paddingTop: theme.spacing.unit * 2,
         paddingBottom: theme.spacing.unit * 2,
+    },
+    textArea: {
+        resize: "none"
     }
 });
 
-
 class ExportEmailList extends Component {
+
+    buttonName = 'Eksporter Epostliste';
+    dialogTitle = 'Epostliste med alle aktive brukere';
+    emailUri = 'http://localhost:8080/api/get_email';
+
     constructor() {
         super();
         this.state = {
@@ -22,6 +29,14 @@ class ExportEmailList extends Component {
             retrieved: false,
             emailList: []
         };
+    }
+
+    componentWillMount() {
+        if (this.props.newsletter) {
+            this.emailUri = 'http://localhost:8080/api/get_newsletter_email';
+            this.buttonName = 'Eksporter Nyhetsbrevliste';
+            this.dialogTitle = 'Epostliste for nyhetsbrev';
+        }
     }
 
     handleDialogClose = () => {
@@ -35,10 +50,9 @@ class ExportEmailList extends Component {
             exportEmailListDialogOpen: true,
             retrieving: true
         });
-        this.getData('http://localhost:8080/api/get_email')
+        this.getData(this.emailUri)
             .then(response => response.json())
             .then(result => {
-                console.log(result);
                 if (result && result.length > 0) {
                     this.setState({
                         retrieving: false,
@@ -71,13 +85,17 @@ class ExportEmailList extends Component {
         return res;
     }
 
+    copyEmails = () => {
+        let textarea = document.getElementById("emails");
+        textarea.select();
+        document.execCommand("copy");
+    }
+
     render() {
         const { classes } = this.props;
 
         const emailList = (
-            <ul>
-                { this.state.emailList.map(user => <li key={user.user_id}>{user.student_email}</li>) }
-            </ul>
+            <textarea id="emails" className={classes.textArea} readOnly rows={12} cols={50} value={this.state.emailList.map(user => user.student_email).join(';')}></textarea>
         );
 
         const noEmailsFound = (
@@ -105,7 +123,7 @@ class ExportEmailList extends Component {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Epostliste med alle aktive brukere</DialogTitle>
+                <DialogTitle id="alert-dialog-title">{this.dialogTitle}</DialogTitle>
                 <DialogContent>
                     {
                         this.state.retrieving
@@ -115,13 +133,14 @@ class ExportEmailList extends Component {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.handleDialogClose} color="primary">Lukk</Button>
+                    <Button onClick={this.copyEmails} color="primary" disabled={!this.state.retrieved}>Kopier adresser</Button>
                 </DialogActions>
             </Dialog>
         );
 
         return (
             <div>
-                <Button variant="contained" color="primary" onClick={this.handleExportEmailListDialogOpen}>Eksporter epostliste</Button>
+                <Button variant="contained" color="primary" onClick={this.handleExportEmailListDialogOpen}>{this.buttonName}</Button>
                 {exportEmailListDialog}
             </div>
         );

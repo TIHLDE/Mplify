@@ -301,7 +301,7 @@ class UserDataTable extends Component {
 
         const dataTable = (
             <MUIDataTable
-                title={'Registreringer'}
+                title={'Medlemmer'}
                 data={this.data}
                 columns={this.columns}
                 options={this.options}
