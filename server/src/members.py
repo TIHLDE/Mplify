@@ -26,6 +26,31 @@ def init():
     EMAIL_HOST = get_environ_sfe("EMAIL_HOST")
 
 
+async def check_vipps_id(request):
+
+    try:
+        (conn, cur) = await mysql_connect()
+        bod = await request.json()
+        if not "vippsTransactionId" in bod.keys():
+            return web.Response(status=401,
+                                text='{"msg": "Vipps transaction id not in body."}',
+                                content_type='application/json')
+
+        await cur.execute("Select * from user where vipps_transaction_id = %s", bod["vippsTransactionId"])
+        r = cur.rowcount
+        if r == 0:
+            return web.Response(status=200,
+                                text='{"msg": "Transaction id is unique."}',
+                                content_type='application/json')
+        else:
+            return web.Response(status=401,
+                                text='{"msg": "Vipps transaction id not unique."}',
+                                content_type='application/json')
+
+    except MySQLError as e:
+        print(e)
+
+
 async def register_member(request):
     """
     TODO
@@ -61,8 +86,9 @@ async def register_member(request):
                               )
             await conn.commit()
             print("Member: '{}' has been added to the database.".format(first_name + ' ' + last_name))
+            student_username = student_email.split('@')[0]
 
-            link = 'https://127.0.0.1/api/confirm/{0}_{1}'.format(email_verification_code, student_email)
+            link = 'https://127.0.0.1/api/confirm/{0}_{1}'.format(email_verification_code, student_username)
             email_content = 'Hei!\nDu har mottatt denne meldingen fordi det blir forsøkt å registrere seg som SALT medlem med denne epostadressen.\n' \
                             'Om dette ikke er tilfelle, vennligst se bort ifra denne eposten.\n\n' \
                             'For å bekrefte brukeren din, klikk på følgende lenke:\n' \
@@ -213,19 +239,21 @@ async def verify_email(request):
 
     try:
         (conn, cur) = await mysql_connect()
-        bod = await request.json()
-        if "emailVerificationCode" not in bod:
+        bod = str(request.match_info['verification_code'])
+        body_split = bod.split('_')
+        if not len(body_split) == 2:
             return web.Response(status=401,
-                                text='{"msg": "No verification code sent."}',
+                                text='{"error": "The verifictaion code was invalid"}',
                                 content_type='application/json')
-        verification_code = bod['emailVerificationCode']
-        info = verification_code.split('_')
+        verification_code = body_split[0]
+
+        student_epost = body_split[1] + "@stud.ntnu.no"
+
         await cur.execute("UPDATE user SET verified_student_email = 1 "
-                          "WHERE email_verification_code = %s", verification_code)
+                          "WHERE student_email = %s and email_verification_code = %s", (student_epost, verification_code))
 
         await conn.commit()
         r = cur.rowcount
-        print(r)
         if r == 1:
             return web.Response(status=200,
                                 text='{"msg": "Email verified"}',
@@ -305,11 +333,14 @@ async def vipps_csv_activate(request):
                 vipps_ids.append(split[4])
         format_strings = ','.join(['%s'] * len(vipps_ids))
 
-        await cur.execute("UPDATE user SET active = 1 WHERE vipps_transaction_id IN (%s)"
+        await cur.execute("UPDATE user SET active = 1 WHERE active = 0 and vipps_transaction_id IN (%s)"
                           % format_strings, tuple(vipps_ids))
+        num_updated = cur.rowcount
         await conn.commit()
+
         return web.Response(status=200,
-                            text='{"msg": "Members with valid transaction ID activated."}',
+                            text='[{"msg": "Members with valid transaction ID activated."},'
+                                 ' {"updatedRows": "%s" }]' % num_updated,
                             content_type='application/json')
 
     except MySQLError as e:
@@ -394,7 +425,6 @@ def input_ok(bod):
             print('{!r} is not in body.'.format(k))
             return False
     trans_id = bod['vippsTransactionId']
-    print(type(trans_id))
     if len(trans_id) != 10 and trans_id != '':
         return False
 
