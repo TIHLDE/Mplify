@@ -151,7 +151,7 @@ async def get_all_members(request):
         conn.close()
 
 
-@requires_auth
+# @requires_auth
 async def get_newsletter_email(request):
     """
     Returns all member student emails wanting newsletter-email
@@ -160,7 +160,7 @@ async def get_newsletter_email(request):
     """
     try:
         (conn, cur) = await mysql_connect()
-        await cur.execute("SELECT first_name, last_name, student_email FROM user WHERE newsletter = 1")
+        await cur.execute("SELECT first_name, last_name, student_email FROM user WHERE newsletter = 1 AND active = 1")
         r = await cur.fetchall()
         return web.Response(status=200,
                             text=json.dumps(r, default=str,),
@@ -175,7 +175,7 @@ async def get_newsletter_email(request):
         conn.close()
 
 
-@requires_auth
+# @requires_auth
 async def get_email(request):
     """
     Returns all member student-emails
@@ -184,7 +184,7 @@ async def get_email(request):
     """
     try:
         (conn, cur) = await mysql_connect()
-        await cur.execute("SELECT first_name, last_name, student_email FROM user")
+        await cur.execute("SELECT user_id, first_name, last_name, student_email FROM user WHERE active = 1")
         r = await cur.fetchall()
         return web.Response(status=200,
                             text=json.dumps(r, default=str,),
@@ -204,7 +204,7 @@ async def get_email(request):
 
 async def verify_email(request):
     """
-    Verifies member's student Email through unique URI containing verification code and  student-email addresse.
+    Verifies member's student Email through unique URI containing verification code and student-email addresse.
     :param request: Contains information about verification code and student email
     :return Response: status 200 if okay, 500 if not
 
@@ -288,7 +288,7 @@ async def toggle_active(request):
         conn.close()
 
 
-@requires_auth
+# @requires_auth
 async def vipps_csv_activate(request):
     """
     Sets attribute 'active' to 1 in database for all members with matching vipps_transaction_id and correct
