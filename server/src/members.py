@@ -69,24 +69,13 @@ async def update_member(request):
             study_programme_id = bod['studyProgrammeId']
             private_email = private_email if private_email != '' else None
 
-            """
-            await cur.execute("update user set first_name = {0}, last_name = {1}, student_email = {2}, "
-                              "private_email = {3}, year_of_admission = {4}, active = {5}, "
-                              "verified_student_email = {6}, newsletter = {7}, vipps_transaction_id = {8}, "
-                              "study_programme_id = {9} where user_id = {10}".format(first_name, last_name, student_email,
-                                                                                     private_email, year_of_admission,
-                                                                                     active, verified_email, newsletter,
-                                                                                     vipps_transaction_id,
-                                                                                     study_programme_id, id))
-            """
             await cur.execute("update user set first_name = %s, last_name = %s, student_email = %s, "
                               "private_email = %s, year_of_admission = %s, active = %s, "
                               "verified_student_email = %s, newsletter = %s, vipps_transaction_id = %s, "
-                              "study_programme_id = %s where user_id = %s", [first_name, last_name, student_email,
-                                                                                     private_email, year_of_admission,
-                                                                                     active, verified_email, newsletter,
-                                                                                     vipps_transaction_id,
-                                                                                     study_programme_id, id])
+                              "study_programme_id = %s where user_id = %s",
+                              [first_name, last_name, student_email, private_email, year_of_admission,
+                               active, verified_email, newsletter, vipps_transaction_id, study_programme_id, id])
+
             print(cur.rowcount)
             await conn.commit()
             return web.Response(status=200,
@@ -198,7 +187,7 @@ async def get_tos(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def update_tos(request):
     try:
         (conn, cur) = await mysql_connect()
@@ -226,7 +215,7 @@ async def update_tos(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def get_member(request):
     """
     Returns all members with 'first_name' or 'last_name' equal to search_string from end of url
@@ -260,7 +249,7 @@ async def get_member(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def get_all_members(request):
     """
     Returns all members from database
@@ -284,7 +273,7 @@ async def get_all_members(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def get_newsletter_email(request):
     """
     Returns all member student emails wanting newsletter-email
@@ -308,7 +297,7 @@ async def get_newsletter_email(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def get_email(request):
     """
     Returns all member student-emails
@@ -383,7 +372,7 @@ async def verify_email(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def toggle_active(request):
     """
     Activates or deactivates a member
@@ -422,6 +411,7 @@ async def toggle_active(request):
 
 
 @requires_auth
+
 async def check_vipps_activate_rows(request):
 
     try:
@@ -456,7 +446,7 @@ async def check_vipps_activate_rows(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def vipps_csv_activate(request):
     """
     Sets attribute 'active' to 1 in database for all members with matching vipps_transaction_id and correct
@@ -497,7 +487,7 @@ async def vipps_csv_activate(request):
         conn.close()
 
 
-# @requires_auth
+@requires_auth
 async def delete_member(request):
     """
     Deletes a member from database specified by 'userId'

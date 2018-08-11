@@ -87,7 +87,8 @@ class BulkActivate extends Component {
       method: method,
       headers: {
         'Accept': 'application/csv',
-        'Content-Type': 'application/csv'
+        'Content-Type': 'application/csv',
+        'X-CSRF-Token': sessionStorage.getItem('token')
       },
       body: payload
     };

@@ -15,49 +15,37 @@ const styles = theme => ({
     }
 });
 
-class ExportEmailList extends Component {
-
-    buttonName = 'Eksporter Epostliste';
-    dialogTitle = 'Epostliste med alle aktive brukere';
-    emailUri = 'http://localhost:8080/api/get_email';
+class TermsOfService extends Component {
 
     constructor() {
         super();
         this.state = {
-            exportEmailListDialogOpen: false,
+            termsOfServiceDialogOpen: false,
             retrieving: false,
             retrieved: false,
-            emailList: []
+            termsOfService: ''
         };
-    }
-
-    componentWillMount() {
-        if (this.props.newsletter) {
-            this.emailUri = 'http://localhost:8080/api/get_newsletter_email';
-            this.buttonName = 'Eksporter Nyhetsbrevliste';
-            this.dialogTitle = 'Epostliste for nyhetsbrev';
-        }
     }
 
     handleDialogClose = () => {
         this.setState({
-            exportEmailListDialogOpen: false,
+            termsOfServiceDialogOpen: false,
         });
     }
 
-    handleExportEmailListDialogOpen = () => {
+    handleTermsOfServiceDialogOpen = () => {
         this.setState({
-            exportEmailListDialogOpen: true,
+            termsOfServiceDialogOpen: true,
             retrieving: true
         });
-        this.getData(this.emailUri)
+        this.getData('http://localhost:8080/api/get_terms_of_service')
             .then(response => response.json())
-            .then(result => {
-                if (result && result.length > 0) {
+            .then(result => {                
+                if (result) {
                     this.setState({
                         retrieving: false,
                         retrieved: true,
-                        emailList: result
+                        termsOfService: result[0].text
                     });
                 } else {
                     this.setState({
@@ -75,56 +63,48 @@ class ExportEmailList extends Component {
 
     async getData(endpoint, method = 'GET') {
         const options = {
-            method: method,
-            headers: {
-                'Accept': 'application/csv',
-                'Content-Type': 'application/csv',
-                'X-CSRF-Token': sessionStorage.getItem('token')
-            }
+            method: method
         };
         const res = await fetch(endpoint, options);
         return res;
     }
 
-    copyEmails = () => {
-        let textarea = document.getElementById("emails");
-        textarea.select();
-        document.execCommand("copy");
-    }
-
     render() {
         const { classes } = this.props;
 
-        const emailList = (
-            <textarea id="emails" className={classes.textArea} readOnly rows={12} cols={50} value={this.state.emailList.map(user => user.student_email).join(';')}></textarea>
+        const termsOfService = (
+            // <DialogContentText id="alert-dialog-description">
+            //     {this.state.termsOfService}
+            // </DialogContentText>
+            <textarea id="emails" className={classes.textArea} readOnly rows={24} cols={window.innerWidth > 600 ? 60 : 40} value={this.state.termsOfService}></textarea>
         );
 
-        const noEmailsFound = (
+        const noTermsOfServiceFound = (
             <DialogContentText id="alert-dialog-description">
-                Klarte ikke å hente eposter fra databasen :(
+                Klarte ikke å hente terms of service fra databasen :(
             </DialogContentText>
         );
 
         const listDoneLoadingContent = (
             this.state.retrieved
-                ? emailList
-                : noEmailsFound
+                ? termsOfService
+                : noTermsOfServiceFound
         );
 
         const listLoadingContent = (
             <DialogContentText id="alert-dialog-description">
-                Henter epost-liste fra databasen...
+                Henter terms of service fra databasen...
             </DialogContentText>
         );
 
-        const exportEmailListDialog = (
+        const termsOfServiceDialog = (
             <Dialog
-                open={this.state.exportEmailListDialogOpen}
+                open={this.state.termsOfServiceDialogOpen}
                 onClose={this.handleDialogClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">{this.dialogTitle}</DialogTitle>
+                <DialogTitle id="alert-dialog-title">Terms of Service</DialogTitle>
                 <DialogContent>
                     {
                         this.state.retrieving
@@ -134,18 +114,17 @@ class ExportEmailList extends Component {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.handleDialogClose} color="primary">Lukk</Button>
-                    <Button onClick={this.copyEmails} color="primary" disabled={!this.state.retrieved}>Kopier adresser</Button>
                 </DialogActions>
             </Dialog>
         );
 
         return (
             <div>
-                <Button variant="contained" color="primary" onClick={this.handleExportEmailListDialogOpen}>{this.buttonName}</Button>
-                {exportEmailListDialog}
+                <Button variant="outlined" onClick={this.handleTermsOfServiceDialogOpen}>Terms of Service</Button>
+                {termsOfServiceDialog}
             </div>
         );
     }
 }
 
-export default withStyles(styles)(ExportEmailList);
+export default withStyles(styles)(TermsOfService);

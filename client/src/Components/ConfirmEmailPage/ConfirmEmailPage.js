@@ -22,9 +22,7 @@ class ConfirmEmailPage extends Component {
     }
 
     componentWillMount() {
-        const payload = { emailVerificationCode: this.props.match.params.code };
-
-        this.postData('http://localhost:8080/api/confirm_email', payload)
+        this.getData('http://localhost:8080/api/confirm_email/' + this.props.match.params.code)
             .then(response => {
                 if (response.ok) {
                     this.setState({ verified: true, processing: false });
@@ -38,14 +36,9 @@ class ConfirmEmailPage extends Component {
             });
     }
 
-    async postData(endpoint, payload) {
+    async getData(endpoint, payload) {
         const options = {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
+            method: 'GET'
         };
         const res = await fetch(endpoint, options);
         return res;

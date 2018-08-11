@@ -1,8 +1,10 @@
-import { Button, Checkbox, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField, Typography, Paper } from "@material-ui/core";
+import { Button, Checkbox, FormControl, FormHelperText, Grid, Input, InputAdornment, InputLabel, MenuItem, Paper, Select, TextField, Typography } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from "react";
-import { UserData } from "../../Models/UserData";
 import { Redirect } from 'react-router-dom';
+import { UserData } from "../../Models/UserData";
+import TermsOfService from "./TermsOfService";
+import VippsInfo from "./VippsInfo";
 
 const styles = theme => ({
     root: {
@@ -28,6 +30,7 @@ class UserRegistrationForm extends Component {
 
     studentEmailError = false;
     vippsFormatError = false;
+    vippsNotUniqueError = false;
 
     constructor() {
         super();
@@ -47,7 +50,7 @@ class UserRegistrationForm extends Component {
 
             submitting: false,
             redirect: false,
-        };        
+        };
     }
 
     componentWillMount() {
@@ -80,15 +83,21 @@ class UserRegistrationForm extends Component {
         this.setState({ [event.target.name]: studyProgramme });
     }
 
-    handleSubmit = event => {
+    async handleSubmit(event) {
         event.preventDefault();
-        this.setState({submitting: true});
+        this.setState({ submitting: true });
 
         this.studentEmailError = !this.isNtnuEmail(this.state.studentEmail);
         this.vippsFormatError = (this.state.vippsTransactionId.length !== 0 && this.state.vippsTransactionId.length !== 10) || (this.state.vippsTransactionId.length !== 0 && !this.isNumber(this.state.vippsTransactionId));
+        this.vippsNotUniqueError = false;
+
+        if (!this.vippsFormatError && this.state.vippsTransactionId) {
+            const vippsUniqueResponse = await this.getData('http://localhost:8080/api/check_vipps_transaction_id/' + this.state.vippsTransactionId);
+            this.vippsNotUniqueError = !vippsUniqueResponse.ok;
+        }
 
         this.forceUpdate();
-        if (!this.studentEmailError && !this.vippsFormatError) {
+        if (!this.studentEmailError && !this.vippsFormatError && !this.vippsNotUniqueError) {
             const data = new UserData();
             data.firstName = this.state.firstName;
             data.lastName = this.state.lastName;
@@ -101,24 +110,24 @@ class UserRegistrationForm extends Component {
 
             this.postData('http://localhost:8080/api/register', data)
                 .then(response => {
-                    console.log(response);
                     if (response.ok) {
-                        this.setState({redirect: true});
+                        this.setState({ redirect: true });
                     } else {
-                        this.setState({submitting: false});
+                        this.setState({ submitting: false });
                     }
                 })
                 .catch(error => {
                     console.log(error);
                 })
         }
-        this.setState({submitting: false});
+        this.setState({ submitting: false });
     }
 
     populateStudyProgrammeEntries() {
         this.getData('http://localhost:8080/api/get_all_studyprograms')
+            .then(response => response.json())
             .then(data => {
-                const studyProgrammeList = [];                
+                const studyProgrammeList = [];
                 data.forEach(studyProgramme => studyProgrammeList.push(studyProgramme));
                 this.setState({ studyProgrammes: studyProgrammeList });
             })
@@ -146,13 +155,7 @@ class UserRegistrationForm extends Component {
 
     async getData(endpoint) {
         const res = await fetch(endpoint);
-
-        if (!res.ok) {
-            throw new Error(res.status); // 404
-        }
-
-        const data = await res.json();
-        return data;
+        return res;
     }
 
     async postData(endpoint, payload) {
@@ -170,12 +173,12 @@ class UserRegistrationForm extends Component {
 
     render() {
         const { classes } = this.props;
-        
+
         return (
             <div className={classes.root}>
                 <Paper className={classes.paper}>
                     <Typography variant="headline" component="h3">Registrering</Typography>
-                    <form onSubmit={this.handleSubmit}>
+                    <form onSubmit={this.handleSubmit.bind(this)}>
                         <Grid container spacing={8}>
                             <Grid item xs={12} sm={6}>
                                 <TextField
@@ -271,24 +274,43 @@ class UserRegistrationForm extends Component {
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField
-                                    id="vipps_transaction_id"
-                                    name="vippsTransactionId"
-                                    type="text"
-                                    label="Vipps transaksjons-id:"
-                                    className={classes.formControl}
-                                    onChange={this.handleChange}
-                                    margin="normal"
-                                    helperText={this.vippsFormatError ? "Må bestå av 10 siffer" : "Ikke påkrevd"}
-                                    error={this.vippsFormatError}
-                                />
+                                <FormControl 
+                                    className={classes.formControl} 
+                                    aria-describedby="vipps_helper_text"
+                                    error={this.vippsFormatError || this.vippsNotUniqueError}>
+                                    <InputLabel htmlFor="vipps_transaction_id">Vipps transaksjons-id:</InputLabel>
+                                    <Input
+                                        id="vipps_transaction_id"
+                                        name="vippsTransactionId"
+                                        type="text"
+                                        onChange={this.handleChange}
+                                        endAdornment={
+                                            <InputAdornment position="end">
+                                                <VippsInfo />
+                                            </InputAdornment>
+                                        }
+                                        
+                                    />
+                                    <FormHelperText id="vipps_helper_text">
+                                        {
+                                            this.vippsFormatError
+                                                ? 'Må bestå av 10 siffer'
+                                                : (
+                                                    this.vippsNotUniqueError
+                                                        ? 'Koden er allerede i bruk'
+                                                        : 'Ikke påkrevd'
+                                                )
+                                        }
+                                    </FormHelperText>
+                                </FormControl>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <InputLabel>Nyhetsbrev:</InputLabel>
                                 <Checkbox name="wantNewsletter" onChange={this.handleCheckboxChange} />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <InputLabel>Terms of service:</InputLabel>
+                                <TermsOfService />
+                                <InputLabel>Jeg aksepterer:</InputLabel>
                                 <Checkbox name="acceptTermsOfService" onChange={this.handleCheckboxChange} />
                             </Grid>
                             <Grid item xs={12}>
@@ -321,7 +343,5 @@ class UserRegistrationForm extends Component {
             </div>
         );
     }
-
 }
-
 export default withStyles(styles)(UserRegistrationForm);
