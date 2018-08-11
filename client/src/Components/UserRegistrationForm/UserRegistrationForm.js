@@ -1,9 +1,10 @@
-import { Button, Checkbox, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField, Typography, Paper } from "@material-ui/core";
+import { Button, Checkbox, FormControl, FormHelperText, Grid, Input, InputAdornment, InputLabel, MenuItem, Paper, Select, TextField, Typography } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from "react";
-import { UserData } from "../../Models/UserData";
 import { Redirect } from 'react-router-dom';
+import { UserData } from "../../Models/UserData";
 import TermsOfService from "./TermsOfService";
+import VippsInfo from "./VippsInfo";
 
 const styles = theme => ({
     root: {
@@ -273,25 +274,35 @@ class UserRegistrationForm extends Component {
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField
-                                    id="vipps_transaction_id"
-                                    name="vippsTransactionId"
-                                    type="text"
-                                    label="Vipps transaksjons-id:"
-                                    className={classes.formControl}
-                                    onChange={this.handleChange}
-                                    margin="normal"
-                                    helperText={
-                                        this.vippsFormatError
-                                        ? 'Må bestå av 10 siffer'
-                                        : (
-                                            this.vippsNotUniqueError
-                                            ? 'Koden er allerede i bruk'
-                                            : 'Ikke påkrevd'
-                                        )
-                                    }
-                                    error={this.vippsFormatError || this.vippsNotUniqueError}
-                                />
+                                <FormControl 
+                                    className={classes.formControl} 
+                                    aria-describedby="vipps_helper_text"
+                                    error={this.vippsFormatError || this.vippsNotUniqueError}>
+                                    <InputLabel htmlFor="vipps_transaction_id">Vipps transaksjons-id:</InputLabel>
+                                    <Input
+                                        id="vipps_transaction_id"
+                                        name="vippsTransactionId"
+                                        type="text"
+                                        onChange={this.handleChange}
+                                        endAdornment={
+                                            <InputAdornment position="end">
+                                                <VippsInfo />
+                                            </InputAdornment>
+                                        }
+                                        
+                                    />
+                                    <FormHelperText id="vipps_helper_text">
+                                        {
+                                            this.vippsFormatError
+                                                ? 'Må bestå av 10 siffer'
+                                                : (
+                                                    this.vippsNotUniqueError
+                                                        ? 'Koden er allerede i bruk'
+                                                        : 'Ikke påkrevd'
+                                                )
+                                        }
+                                    </FormHelperText>
+                                </FormControl>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <InputLabel>Nyhetsbrev:</InputLabel>
@@ -332,7 +343,5 @@ class UserRegistrationForm extends Component {
             </div>
         );
     }
-
 }
-
 export default withStyles(styles)(UserRegistrationForm);
