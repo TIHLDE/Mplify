@@ -48,6 +48,67 @@ async def check_vipps_id(request):
         print(e)
 
 
+# @requires_auth
+async def update_member(request):
+
+    try:
+        (conn, cur) = await mysql_connect()
+        bod = await request.json()
+        if input_ok(bod):
+            id = bod['id']
+            first_name = bod['firstName']
+            last_name = bod['lastName']
+            student_email = bod['studentEmail']
+            private_email = bod['privateEmail']
+            year_of_admission = int(bod['yearOfAdmission'])
+            active = bod['active']
+            verified_email = bod['verifiedStudentEmail']
+            newsletter = bod['newsletter']
+            trans_id = bod['vippsTransactionId']
+            vipps_transaction_id = trans_id if trans_id != '' else None
+            study_programme_id = bod['studyProgrammeId']
+            private_email = private_email if private_email != '' else None
+
+            """
+            await cur.execute("update user set first_name = {0}, last_name = {1}, student_email = {2}, "
+                              "private_email = {3}, year_of_admission = {4}, active = {5}, "
+                              "verified_student_email = {6}, newsletter = {7}, vipps_transaction_id = {8}, "
+                              "study_programme_id = {9} where user_id = {10}".format(first_name, last_name, student_email,
+                                                                                     private_email, year_of_admission,
+                                                                                     active, verified_email, newsletter,
+                                                                                     vipps_transaction_id,
+                                                                                     study_programme_id, id))
+            """
+            await cur.execute("update user set first_name = %s, last_name = %s, student_email = %s, "
+                              "private_email = %s, year_of_admission = %s, active = %s, "
+                              "verified_student_email = %s, newsletter = %s, vipps_transaction_id = %s, "
+                              "study_programme_id = %s where user_id = %s", [first_name, last_name, student_email,
+                                                                                     private_email, year_of_admission,
+                                                                                     active, verified_email, newsletter,
+                                                                                     vipps_transaction_id,
+                                                                                     study_programme_id, id])
+            print(cur.rowcount)
+            await conn.commit()
+            return web.Response(status=200,
+                                text='{"msg": "Member updated."}',
+                                content_type='application/json')
+
+        else:
+            return web.Response(status=401,
+                                text='{"msg": "Invalid input."}',
+                                content_type='application/json')
+
+    except MySQLError as e:
+        print(e)
+        return web.Response(status=500,
+                            text='{{"error": "{0}"}}'.format(e),
+                            content_type='application/json')
+
+    finally:
+        await cur.close()
+        conn.close()
+
+
 async def register_member(request):
     """
     TODO
@@ -353,6 +414,41 @@ async def toggle_active(request):
         print(e)
         return web.Response(status=500,
                             text='{"error": "Something went wrong when trying to activate member"',
+                            content_type='application/json')
+
+    finally:
+        await cur.close()
+        conn.close()
+
+
+@requires_auth
+async def check_vipps_activate_rows(request):
+
+    try:
+        (conn, cur) = await mysql_connect()
+        bod = await request.text()
+        lines = bod.splitlines()
+        vipps_ids = []
+        for l in lines:
+            split = l.split(',')
+            if all(keys in split for keys in ("TransactionInfo", "Studentforeningen SALT", "350.00")):
+                vipps_ids.append(split[4])
+        format_strings = ','.join(['%s'] * len(vipps_ids))
+
+        await cur.execute("SELECT count(distinct vipps_transaction_id) as updatableRows "
+                          "from user WHERE active = 0 and vipps_transaction_id IN (%s)"
+                          % format_strings, tuple(vipps_ids))
+        num_updatable= await cur.fetchone()
+        print(num_updatable)
+
+        return web.Response(status=200,
+                            text=json.dumps(num_updatable),
+                            content_type='application/json')
+
+    except MySQLError as e:
+        print(e)
+        return web.Response(status=500,
+                            text=json.dumps(e, default=str),
                             content_type='application/json')
 
     finally:

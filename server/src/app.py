@@ -18,7 +18,8 @@ loop = asyncio.get_event_loop()
 if __name__ == '__main__':
     from auth import login, is_valid_token
     from members import get_all_members, get_member, register_member, get_email, get_newsletter_email, verify_email, \
-        toggle_active, vipps_csv_activate, delete_member, get_all_studyprograms, check_vipps_id, update_tos, get_tos
+        toggle_active, vipps_csv_activate, delete_member, get_all_studyprograms, check_vipps_id, update_tos, get_tos, \
+        update_member, check_vipps_activate_rows
     from db import init as init_db
     from members import init as init_members
 
@@ -51,8 +52,10 @@ if __name__ == '__main__':
                     web.post('/api/login', login),
                     web.post('/api/register', register_member),
                     web.post('/api/toggle_active', toggle_active),
+                    web.post('/api/check_vipps_rows', check_vipps_activate_rows),
                     web.post('/api/csv_activate', vipps_csv_activate),
                     web.put('/api/update_terms_of_service', update_tos),
+                    web.put('/api/update_member', update_member),
                     web.delete('/api/delete_member', delete_member)])
 
     # Configure default CORS settings.
