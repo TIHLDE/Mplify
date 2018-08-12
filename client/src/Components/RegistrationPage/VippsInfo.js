@@ -37,7 +37,7 @@ class VippsInfo extends Component {
                         Ja, du kan kan registrere deg uten en Vipps transaksjons-id, men det er best å gjøre det med én gang.
                     </DialogContentText>
                     <DialogContentText>
-                        Dersom du registrerer deg uten, må du i etterkant av å ha betalt medlemsavgiften sende en epost til salt@studentsalt.no.
+                        Dersom du registrerer deg uten, må du i etterkant av å ha betalt medlemsavgiften sende en epost til postmottak@studentalt.no.
                     </DialogContentText>
                     <DialogContentText>
                         Eposten må inneholde hvem du er, din studentepost og et skjermbilde av Vipps-kvitteringen din.
@@ -63,7 +63,7 @@ class VippsInfo extends Component {
                     </DialogContentText>
                     <DialogContentText>
                         Register deg uten uten din transaksjons-id,
-                        og send en epost til salt@studentalt.no hvor du oppgir din hvem du er,
+                        og send en epost til postmottak@studentalt.no hvor du oppgir din hvem du er,
                         og legger ved din student-epost og skjermbilde av din kvittering.
                         Opplys om at noen andre har brukt din transaksjons-id.
                     </DialogContentText>
