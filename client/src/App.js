@@ -7,7 +7,7 @@ import AdminSection from './Components/AdminSection/AdminSection';
 import AwaitingConfirmationPage from './Components/AwaitingConfirmationPage/AwaitingConfirmationPage';
 import ConfirmEmailPage from './Components/ConfirmEmailPage/ConfirmEmailPage';
 import LoginPage from './Components/LoginPage/LoginPage';
-import UserRegistrationForm from './Components/UserRegistrationForm/UserRegistrationForm';
+import RegistrationPage from './Components/RegistrationPage/RegistrationPage';
 
 const styles = theme => ({
   root: {
@@ -114,7 +114,7 @@ class App extends Component {
               </Grid>
             </Grid>
             <br />
-            <Route path="/" exact component={UserRegistrationForm} />
+            <Route path="/" exact component={RegistrationPage} />
             <Route path="/awaiting-confirmation" exact component={AwaitingConfirmationPage} />
             <Route path="/confirm/:code" exact component={ConfirmEmail} />
             <PrivateRoute path="/admin" exact component={AdminSection} onLogout={this.handleLogout.bind(this)} />
