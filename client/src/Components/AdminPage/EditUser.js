@@ -20,7 +20,7 @@ const styles = theme => ({
     }
 });
 
-class RegistrationPage extends Component {
+class EditUser extends Component {
 
     constructor() {
         super();
@@ -217,4 +217,4 @@ class RegistrationPage extends Component {
         );
     }
 }
-export default withStyles(styles)(RegistrationPage);
+export default withStyles(styles)(EditUser);

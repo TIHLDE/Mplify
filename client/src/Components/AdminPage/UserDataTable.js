@@ -259,9 +259,8 @@ class UserDataTable extends Component {
         const studyProgramme = this.state.studyProgrammes.find(sp => sp.study_programme_id === m.study_programme_id);
         const studyProgrammeName = studyProgramme != null ? studyProgramme.programme_code : '';
         const newsletter = m.newsletter ? 'Ja' : 'Nei';
-        const vippsTransactionId = m.vipps_transaction_id == null ? '' : m.vipps_transaction_id;
 
-        return [actions, m.active, m.user_id, m.first_name, m.last_name, m.student_email, verifiedStudentEmail, m.private_email, m.year_of_admission, studyProgrammeName, newsletter, vippsTransactionId];
+        return [actions, m.active, m.user_id, m.first_name, m.last_name, m.student_email, verifiedStudentEmail, m.private_email || '', m.year_of_admission, studyProgrammeName, newsletter, m.vipps_transaction_id || ''];
     }
 
     async getData(endpoint) {
