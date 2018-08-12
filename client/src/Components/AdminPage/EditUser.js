@@ -3,8 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from "react";
 import { Redirect } from 'react-router-dom';
 import { UserData } from "../../Models/UserData";
-import UserRegistrationForm from "./UserRegistrationForm";
-
+import UserRegistrationForm from "../RegistrationPage/UserRegistrationForm";
 const styles = theme => ({
     root: {
         textAlign: "center"
@@ -43,6 +42,10 @@ class EditUser extends Component {
             submitting: false,
             redirect: false,
         };
+    }
+
+    componentWillMount() {
+        console.log(this.props);
     }
 
     setRedirect = () => {
@@ -177,6 +180,8 @@ class EditUser extends Component {
                     <Typography variant="headline" component="h3">Registrering</Typography>
                     <form onSubmit={this.handleSubmit.bind(this)}>
                         <UserRegistrationForm
+                            userToEdit={this.props.userToEdit}
+
                             onTextChange={this.handleTextChange.bind(this)}
                             onCheckboxChange={this.handleCheckboxChange.bind(this)}
                             onStudyProgrammeChange={this.handleStudyProgrammeChange.bind(this)}

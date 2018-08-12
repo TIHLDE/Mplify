@@ -6,6 +6,7 @@ import BulkActivate from './BulkActivate';
 import UserDataTable from './UserDataTable';
 import ExportEmailList from './ExportEmailList';
 import UpdateTermsOfService from './UpdateTermsOfService';
+import EditUser from './EditUser';
 
 const styles = theme => ({
     root: {
@@ -22,7 +23,10 @@ class AdminPage extends Component {
         super();
         this.state = {
             authenticating: true,
-            redirectToLoginPage: false
+            redirectToLoginPage: false,
+
+            editingUser: false,
+            userToEdit: null
         };
     }
 
@@ -57,7 +61,20 @@ class AdminPage extends Component {
         } else {
             this.setState({ redirectToLoginPage: true });
         }
+    }
 
+    handleStartEditingUser = (user) => {        
+        this.setState({
+            editingUser: true,
+            userToEdit: user
+        });        
+    }
+
+    handleStopEditingUser = () => {
+        this.setState({
+            editingUser: false,
+            userToEdit: null
+        });
     }
 
     onLogout = () => {
@@ -100,7 +117,7 @@ class AdminPage extends Component {
                     <Button size="large" variant="contained" color="secondary" onClick={this.onLogout.bind(this)}>Logg ut</Button>
                 </Paper>
                 <br />
-                <UserDataTable />
+                { this.state.editingUser ? <EditUser onStopEditingUser={this.handleStopEditingUser.bind(this)} userToEdit={this.state.userToEdit} /> : <UserDataTable onStartEditingUser={this.handleStartEditingUser.bind(this)} /> }
             </div>
         );
 

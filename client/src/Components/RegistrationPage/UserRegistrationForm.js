@@ -44,8 +44,27 @@ class UserRegistrationForm extends Component {
     }
 
     componentWillMount() {
+        console.log(this.props);
+
         this.populateStudyProgrammeEntries();
         this.populateYearOfAdmissionYears();
+
+        if (this.props.userToEdit) {
+            const u = this.props.userToEdit;
+            console.log(u);            
+            
+            this.setState({
+                firstName: u.first_name,
+                lastName: u.last_name,
+                studentEmail: u.student_email,
+                privateEmail: u.private_email,
+                studyProgramme: { study_programme_id: u.study_programme_id, programme_code: '', name: '', length: 0 },
+                yearOfAdmission: u.year_of_admission,
+                vippsTransactionId: u.vipps_transaction_id || '',
+                wantNewsletter: u.newsletter === 1,
+                acceptTermsOfService: true,
+            });
+        }
     }
 
     onTextChange = event => {
@@ -55,7 +74,7 @@ class UserRegistrationForm extends Component {
 
     onCheckboxChange = event => {
         this.setState({ [event.target.name]: event.target.checked });
-        this.props.onCheckboxChange(event);
+        this.props.onCheckboxChange(event);        
     }
 
     onStudyProgrammeChange = event => {
@@ -71,6 +90,12 @@ class UserRegistrationForm extends Component {
                 const studyProgrammeList = [];
                 data.forEach(studyProgramme => studyProgrammeList.push(studyProgramme));
                 this.setState({ studyProgrammes: studyProgrammeList });
+
+                if (this.state.studyProgramme.study_programme_id > 0) {
+                    this.setState({
+                        studyProgramme: studyProgrammeList.find(sp => sp.study_programme_id === this.state.studyProgramme.study_programme_id)
+                    });
+                }
             })
             .catch(error => {
                 console.log(error);
@@ -105,6 +130,7 @@ class UserRegistrationForm extends Component {
                             id="first_name"
                             name="firstName"
                             type="text"
+                            value={this.state.firstName}
                             label="Fornavn:"
                             className={classes.formControl}
                             onChange={this.onTextChange}
@@ -116,6 +142,7 @@ class UserRegistrationForm extends Component {
                             id="last_name"
                             name="lastName"
                             type="text"
+                            value={this.state.lastName}
                             label="Etternavn:"
                             className={classes.formControl}
                             onChange={this.onTextChange}
@@ -127,6 +154,7 @@ class UserRegistrationForm extends Component {
                             id="student_email"
                             name="studentEmail"
                             type="email"
+                            value={this.state.studentEmail}
                             label="Student-epost:"
                             className={classes.formControl}
                             onChange={this.onTextChange}
@@ -140,6 +168,7 @@ class UserRegistrationForm extends Component {
                             id="private_email"
                             name="privateEmail"
                             type="email"
+                            value={this.state.privateEmail}
                             label="Privat epost:"
                             className={classes.formControl}
                             onChange={this.onTextChange}
@@ -203,13 +232,13 @@ class UserRegistrationForm extends Component {
                                 id="vipps_transaction_id"
                                 name="vippsTransactionId"
                                 type="text"
+                                value={this.state.vippsTransactionId}
                                 onChange={this.onTextChange}
                                 endAdornment={
                                     <InputAdornment position="end">
                                         <VippsInfo />
                                     </InputAdornment>
                                 }
-
                             />
                             <FormHelperText id="vipps_helper_text">
                                 {
@@ -225,13 +254,13 @@ class UserRegistrationForm extends Component {
                         </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                        <InputLabel>Nyhetsbrev:</InputLabel>
-                        <Checkbox name="wantNewsletter" onChange={this.onCheckboxChange} />
+                        <InputLabel>Nyhetsbrev/Klypa:</InputLabel>
+                        <Checkbox name="wantNewsletter" checked={this.state.wantNewsletter} onChange={this.onCheckboxChange} />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                         <TermsOfService />
                         <InputLabel>Jeg aksepterer:</InputLabel>
-                        <Checkbox name="acceptTermsOfService" onChange={this.onCheckboxChange} />
+                        <Checkbox name="acceptTermsOfService" checked={this.state.acceptTermsOfService} onChange={this.onCheckboxChange} />
                     </Grid>
                 </Grid>
             </div>

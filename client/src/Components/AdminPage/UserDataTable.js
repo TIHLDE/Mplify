@@ -218,7 +218,7 @@ class UserDataTable extends Component {
     }
 
     handleEditClick = (member) => {
-        console.log(member);
+        this.props.onStartEditingUser(member);
     }
 
     handleDeleteDialogOpen = (member) => {

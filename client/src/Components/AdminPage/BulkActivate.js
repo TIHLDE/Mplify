@@ -71,11 +71,7 @@ class BulkActivate extends Component {
       .then(response => response.json())
       .then(result => {
         console.log(result);
-        if (result.ok) {
-          console.log('yay');
-        } else {
-          console.log('nay');
-        }
+        //TODO Here goes work
       })
       .catch(err => {
         console.log(err);
