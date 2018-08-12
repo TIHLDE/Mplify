@@ -20,10 +20,9 @@ async def validate_member(request):
         (conn, cur) = await mysql_connect()
         student_email = str(request.match_info['student_email'])
 
-        await cur.execute("select first_name, last_name from user where student_email = %s "
+        await cur.execute("select user_id, first_name, last_name from user where student_email = %s "
                           "and active = 1 and verified_student_email = 1", student_email)
 
-        print(cur.rowcount)
         r = await cur.fetchone()
 
         return web.Response(status=200,

@@ -541,7 +541,6 @@ async def get_all_studyprograms(request):
 
 # - Web util funcs
 
-
 def generate_verification_code():
     m = hashlib.md5()
     m.update(str(random.randint(1, 10000)).encode())
