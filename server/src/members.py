@@ -48,7 +48,7 @@ async def check_vipps_id(request):
         print(e)
 
 
-# @requires_auth
+@requires_auth
 async def update_member(request):
 
     try:
@@ -61,8 +61,6 @@ async def update_member(request):
             student_email = bod['studentEmail']
             private_email = bod['privateEmail']
             year_of_admission = int(bod['yearOfAdmission'])
-            active = bod['active']
-            verified_email = bod['verifiedStudentEmail']
             newsletter = bod['newsletter']
             trans_id = bod['vippsTransactionId']
             vipps_transaction_id = trans_id if trans_id != '' else None
@@ -70,11 +68,11 @@ async def update_member(request):
             private_email = private_email if private_email != '' else None
 
             await cur.execute("update user set first_name = %s, last_name = %s, student_email = %s, "
-                              "private_email = %s, year_of_admission = %s, active = %s, "
-                              "verified_student_email = %s, newsletter = %s, vipps_transaction_id = %s, "
+                              "private_email = %s, year_of_admission = %s, "
+                              "newsletter = %s, vipps_transaction_id = %s, "
                               "study_programme_id = %s where user_id = %s",
                               [first_name, last_name, student_email, private_email, year_of_admission,
-                               active, verified_email, newsletter, vipps_transaction_id, study_programme_id, id])
+                               newsletter, vipps_transaction_id, study_programme_id, id])
 
             print(cur.rowcount)
             await conn.commit()
@@ -90,7 +88,7 @@ async def update_member(request):
     except MySQLError as e:
         print(e)
         return web.Response(status=500,
-                            text='{{"error": "{0}"}}'.format(e),
+                            text=json.dumps(e, default=str),
                             content_type='application/json')
 
     finally:
@@ -209,7 +207,6 @@ async def update_tos(request):
                             text='{"error": "%s"}' % e,
                             content_type='application/json')
 
-
     finally:
         await cur.close()
         conn.close()
@@ -282,7 +279,8 @@ async def get_newsletter_email(request):
     """
     try:
         (conn, cur) = await mysql_connect()
-        await cur.execute("SELECT first_name, last_name, student_email FROM user WHERE newsletter = 1 AND active = 1")
+        await cur.execute("SELECT DISTINCT private_email FROM user "
+                          "WHERE newsletter = 1 AND active = 1 AND verified_student_email = 1")
         r = await cur.fetchall()
         return web.Response(status=200,
                             text=json.dumps(r, default=str,),
@@ -306,7 +304,8 @@ async def get_email(request):
     """
     try:
         (conn, cur) = await mysql_connect()
-        await cur.execute("SELECT user_id, first_name, last_name, student_email FROM user WHERE active = 1")
+        await cur.execute("SELECT DISTINCT student_email FROM user "
+                          "WHERE active = 1 AND verified_student_email = 1")
         r = await cur.fetchall()
         return web.Response(status=200,
                             text=json.dumps(r, default=str,),
@@ -411,7 +410,6 @@ async def toggle_active(request):
 
 
 @requires_auth
-
 async def check_vipps_activate_rows(request):
 
     try:
@@ -546,7 +544,7 @@ async def get_all_studyprograms(request):
 
 def generate_verification_code():
     m = hashlib.md5()
-    m.update(str(random.randint).encode())
+    m.update(str(random.randint(1, 10000)).encode())
     return m.hexdigest()
 
 

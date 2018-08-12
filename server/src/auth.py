@@ -6,12 +6,34 @@ import json
 
 from aiohttp import web
 from functools import wraps
+from pymysql import MySQLError
 
 from db import mysql_connect
 
 sessions = {}
 TTL = 900   # 15 minutes
 ITERATIONS = 30000
+
+
+async def validate_member(request):
+    try:
+        (conn, cur) = await mysql_connect()
+        student_email = str(request.match_info['student_email'])
+
+        await cur.execute("select first_name, last_name from user where student_email = %s "
+                          "and active = 1 and verified_student_email = 1", student_email)
+
+        print(cur.rowcount)
+        r = await cur.fetchone()
+
+        return web.Response(status=200,
+                            text=json.dumps(r, default=str),
+                            content_type='application/json')
+    except MySQLError as e:
+        print(e)
+        return web.Response(status=500,
+                            text=json.dumps(e, default=str),
+                            content_type='application/json')
 
 
 async def login(request):
