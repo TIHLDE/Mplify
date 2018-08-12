@@ -17,7 +17,7 @@ const styles = theme => ({
     }
 });
 
-class AdminSection extends Component {
+class AdminPage extends Component {
     constructor() {
         super();
         this.state = {
@@ -120,4 +120,4 @@ class AdminSection extends Component {
     }
 }
 
-export default withStyles(styles)(AdminSection);
+export default withStyles(styles)(AdminPage);

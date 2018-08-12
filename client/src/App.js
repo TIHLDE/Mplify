@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Link, Redirect, Route } from "react-router-dom";
 import './App.css';
-import AdminSection from './Components/AdminSection/AdminSection';
+import AdminPage from './Components/AdminPage/AdminPage';
 import AwaitingConfirmationPage from './Components/AwaitingConfirmationPage/AwaitingConfirmationPage';
 import ConfirmEmailPage from './Components/ConfirmEmailPage/ConfirmEmailPage';
 import LoginPage from './Components/LoginPage/LoginPage';
@@ -74,13 +74,6 @@ class App extends Component {
     const { classes } = this.props;
 
     return (
-      // <div className="App">
-      //     <AddProject addProject={this.handleAddProject.bind(this)} />
-      //     <Projects projects={this.state.projects} onDelete={this.handleDeleteProject.bind(this)} />
-      //     <hr />
-      //     <Todos todos={this.state.todos} />
-      // </div>
-
       <div className="App">
         <Router>
           <div>
@@ -117,7 +110,7 @@ class App extends Component {
             <Route path="/" exact component={RegistrationPage} />
             <Route path="/awaiting-confirmation" exact component={AwaitingConfirmationPage} />
             <Route path="/confirm/:code" exact component={ConfirmEmail} />
-            <PrivateRoute path="/admin" exact component={AdminSection} onLogout={this.handleLogout.bind(this)} />
+            <PrivateRoute path="/admin" exact component={AdminPage} onLogout={this.handleLogout.bind(this)} />
             <Route path='/login' render={(props) => (<LoginPage onLogIn={this.handleLogIn.bind(this)} {...props} />)} />
           </div>
         </Router>
