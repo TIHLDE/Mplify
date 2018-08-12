@@ -1,7 +1,6 @@
 import { Button, FormControl, FormHelperText, Grid, Paper, Typography } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from "react";
-import { Redirect } from 'react-router-dom';
 import { UserData } from "../../Models/UserData";
 import UserRegistrationForm from "../RegistrationPage/UserRegistrationForm";
 const styles = theme => ({
@@ -46,18 +45,6 @@ class EditUser extends Component {
 
     componentWillMount() {
         console.log(this.props);
-    }
-
-    setRedirect = () => {
-        this.setState({
-            redirect: true
-        })
-    }
-
-    renderRedirect = () => {
-        if (this.state.redirect) {
-            return <Redirect to='/awaiting-confirmation' />
-        }
     }
 
     handleTextChange = event => {
@@ -177,7 +164,7 @@ class EditUser extends Component {
         return (
             <div className={classes.root}>
                 <Paper className={classes.paper}>
-                    <Typography variant="headline" component="h3">Registrering</Typography>
+                    <Typography variant="headline" component="h3">{ 'Oppdatering av medlem #' + this.props.userToEdit.user_id + ': ' + this.props.userToEdit.first_name + ' ' + this.props.userToEdit.last_name }</Typography>
                     <form onSubmit={this.handleSubmit.bind(this)}>
                         <UserRegistrationForm
                             userToEdit={this.props.userToEdit}
@@ -209,10 +196,9 @@ class EditUser extends Component {
                                         }
                                         type="submit"
                                     >
-                                        Registrer
+                                        Oppdater
                                     </Button>
                                     <FormHelperText>{this.state.submitting ? 'Sender data...' : ''}</FormHelperText>
-                                    {this.renderRedirect()}
                                 </FormControl>
                             </Grid>
                         </Grid>
