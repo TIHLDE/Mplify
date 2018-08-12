@@ -13,7 +13,7 @@ class VippsInfo extends Component {
 
     handleDialogClose = () => {
         this.setState({
-            vippsInfoDialogOpen: false,
+            vippsInfoDialogOpen: false
         });
     }
 

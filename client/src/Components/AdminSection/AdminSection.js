@@ -5,6 +5,7 @@ import { Redirect } from 'react-router-dom';
 import BulkActivate from './BulkActivate';
 import UserDataTable from './UserDataTable';
 import ExportEmailList from './ExportEmailList';
+import UpdateTermsOfService from './UpdateTermsOfService';
 
 const styles = theme => ({
     root: {
@@ -85,7 +86,7 @@ class AdminSection extends Component {
                             <BulkActivate />
                         </Grid>
                         <Grid item xs={12} sm={6} md={4} lg={3}>
-                            <Button variant="contained" color="primary" onClick={console.log.bind('hei')}>Oppdater Terms of Service</Button>
+                            <UpdateTermsOfService />
                         </Grid>
                         <Grid item xs={12} sm={6} md={4} lg={3}>
                             <ExportEmailList newsletter={true} />

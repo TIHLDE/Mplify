@@ -73,9 +73,6 @@ class TermsOfService extends Component {
         const { classes } = this.props;
 
         const termsOfService = (
-            // <DialogContentText id="alert-dialog-description">
-            //     {this.state.termsOfService}
-            // </DialogContentText>
             <textarea id="emails" className={classes.textArea} readOnly rows={24} cols={window.innerWidth > 600 ? 60 : 40} value={this.state.termsOfService}></textarea>
         );
 
