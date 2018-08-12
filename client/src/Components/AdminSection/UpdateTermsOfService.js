@@ -47,6 +47,9 @@ class UpdateTermsOfService extends Component {
     handleTermsOfServiceDialogOpen = () => {
         this.setState({
             termsOfServiceDialogOpen: true,
+            updating: false,
+            updateFailure: false,
+            updateSuccess: false
         });
     }
 
@@ -61,9 +64,8 @@ class UpdateTermsOfService extends Component {
             termsOfService: this.state.termsOfService
         }
 
-        this.postData('http://localhost:8080/api/update_terms_of_service', data)
+        this.putData('http://localhost:8080/api/update_terms_of_service', data)
             .then(response => {
-                console.log(response);
                 if (response.ok) {
                     this.setState({
                         updating: false,
@@ -85,9 +87,15 @@ class UpdateTermsOfService extends Component {
             })
     }
 
-    async postData(endpoint, method = 'POST') {
+    async putData(endpoint, payload) {
         const options = {
-            method: method
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': sessionStorage.getItem('token')
+            },
+            body: JSON.stringify(payload)
         };
         const res = await fetch(endpoint, options);
         return res;
@@ -114,7 +122,7 @@ class UpdateTermsOfService extends Component {
                             ? <CircularProgress className={classes.progress} />
                             : (
                                 this.state.updateSuccess
-                                    ? <DialogContentText>Terms of Service er oppdatert.</DialogContentText>
+                                    ? <DialogContentText>Terms of Service ble oppdatert.</DialogContentText>
                                     : (
                                         this.state.updateFailure
                                             ? <DialogContentText>Oppdatering mislyktes :( prøv igjen senere</DialogContentText>
@@ -125,7 +133,7 @@ class UpdateTermsOfService extends Component {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.handleDialogClose} color="primary">Lukk</Button>
-                    <Button onClick={this.handleUpdateTermsOfService} color="primary" disabled={!this.state.termsOfService}>Oppdater</Button>
+                    <Button onClick={this.handleUpdateTermsOfService} color="primary" disabled={!this.state.termsOfService || this.state.updating || this.state.updateSuccess || this.state.updateFailure}>Oppdater</Button>
                 </DialogActions>
             </Dialog>
         );
