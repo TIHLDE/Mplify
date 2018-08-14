@@ -24,6 +24,7 @@ class EditUser extends Component {
         super();
 
         this.state = {
+            userId: '',
             firstName: '',
             lastName: '',
             studentEmail: '',
@@ -39,27 +40,38 @@ class EditUser extends Component {
             vippsNotUniqueError: false,
 
             submitting: false,
+            updateFailure: false,
+            updateSuccess: false,
             redirect: false,
         };
     }
 
     componentWillMount() {
-        console.log(this.props);
+        const u = this.props.userToEdit;
+        this.setState({
+            userId: u.user_id,
+            firstName: u.first_name,
+            lastName: u.last_name,
+            studentEmail: u.student_email || '',
+            privateEmail: u.private_email,
+            studyProgramme: {study_programme_id: u.study_programme_id},
+            yearOfAdmission: u.year_of_admission,
+            vippsTransactionId: u.vipps_transaction_id || '',
+            wantNewsletter: u.newsletter,
+            acceptTermsOfService: true
+        });
     }
 
     handleTextChange = event => {
         this.setState({ [event.target.name]: event.target.value });
-        console.log(this.state);
     };
 
     handleCheckboxChange = event => {
         this.setState({ [event.target.name]: event.target.checked });
-        console.log(this.state);
     }
 
     handleStudyProgrammeChange = (event, studyProgramme) => {
         this.setState({ [event.target.name]: studyProgramme });
-        console.log(this.state);
     }
 
     async handleSubmit(event) {
@@ -97,11 +109,14 @@ class EditUser extends Component {
             }
         }
 
-        if (allowSubmit) {
+        if (allowSubmit) {            
             this.setState({
-                submitting: true
+                submitting: true,
+                updateFailure: false,
+                updateSuccess: false
             });
             const data = new UserData();
+            data.userId = this.state.userId;
             data.firstName = this.state.firstName;
             data.lastName = this.state.lastName;
             data.studentEmail = this.state.studentEmail;
@@ -111,21 +126,27 @@ class EditUser extends Component {
             data.vippsTransactionId = this.state.vippsTransactionId;
             data.studyProgrammeId = this.state.studyProgramme.study_programme_id;
 
-            let shouldRedirect = false;
-
-            this.postData('http://localhost:8080/api/register', data)
+            this.putData('http://localhost:8080/api/update_member', data)
                 .then(response => {
                     if (response.ok) {
-                        shouldRedirect = true;
+                        this.setState({
+                            updateSuccess: true
+                        });
+                    } else {
+                        this.setState({
+                            updateFailure: true
+                        });
                     }
                 })
                 .catch(error => {
                     console.log(error);
+                    this.setState({
+                        updateFailure: true
+                    });
                 })
                 .finally(() => {
                     this.setState({
-                        submitting: false,
-                        redirect: shouldRedirect
+                        submitting: false
                     });
                 })
         }
@@ -145,12 +166,13 @@ class EditUser extends Component {
         return res;
     }
 
-    async postData(endpoint, payload) {
+    async putData(endpoint, payload) {
         const options = {
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': sessionStorage.getItem('token')
             },
             body: JSON.stringify(payload)
         };
@@ -164,7 +186,7 @@ class EditUser extends Component {
         return (
             <div className={classes.root}>
                 <Paper className={classes.paper}>
-                    <Typography variant="headline" component="h3">{ 'Oppdatering av medlem #' + this.props.userToEdit.user_id + ': ' + this.props.userToEdit.first_name + ' ' + this.props.userToEdit.last_name }</Typography>
+                    <Typography variant="headline" component="h3">{'Oppdatering av medlem #' + this.props.userToEdit.user_id + ': ' + this.props.userToEdit.first_name + ' ' + this.props.userToEdit.last_name}</Typography>
                     <form onSubmit={this.handleSubmit.bind(this)}>
                         <UserRegistrationForm
                             userToEdit={this.props.userToEdit}
@@ -198,7 +220,21 @@ class EditUser extends Component {
                                     >
                                         Oppdater
                                     </Button>
-                                    <FormHelperText>{this.state.submitting ? 'Sender data...' : ''}</FormHelperText>
+                                    <FormHelperText>
+                                        {
+                                            this.state.submitting
+                                                ? 'Oppdaterer info...'
+                                                : (
+                                                    this.state.updateSuccess
+                                                        ? 'Bruker oppdatert'
+                                                        : (
+                                                            this.state.updateFailure
+                                                                ? 'Oppdatering feilet'
+                                                                : ''
+                                                        )
+                                                )
+                                        }
+                                    </FormHelperText>
                                 </FormControl>
                             </Grid>
                         </Grid>
