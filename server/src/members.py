@@ -55,7 +55,7 @@ async def update_member(request):
         (conn, cur) = await mysql_connect()
         bod = await request.json()
         if input_ok(bod):
-            id = bod['id']
+            userId = bod['userId']
             first_name = bod['firstName']
             last_name = bod['lastName']
             student_email = bod['studentEmail']
@@ -72,7 +72,7 @@ async def update_member(request):
                               "newsletter = %s, vipps_transaction_id = %s, "
                               "study_programme_id = %s where user_id = %s",
                               [first_name, last_name, student_email, private_email, year_of_admission,
-                               newsletter, vipps_transaction_id, study_programme_id, id])
+                               newsletter, vipps_transaction_id, study_programme_id, userId])
 
             print(cur.rowcount)
             await conn.commit()
