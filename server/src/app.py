@@ -28,18 +28,6 @@ if __name__ == '__main__':
 
     cors = aiohttp_cors.setup(app)
 
-    """register_resource = cors.add(app.router.add_resource("/api/register"))
-    route = cors.add(
-        register_resource.add_route("POST", register_member), {
-            "*": aiohttp_cors.ResourceOptions(
-                allow_credentials=True,
-                expose_headers="*",
-                allow_headers="*"
-            )
-        }
-    )
-    """
-
     app.add_routes([web.get('/api/user/{name}', get_member),
                     web.get('/api/allusers', get_all_members),
                     web.get('/api/get_email', get_email),
