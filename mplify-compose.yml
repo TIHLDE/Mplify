@@ -16,7 +16,6 @@ services:
     image: tihlde/mplify-web:latest
     networks:
       net: {}
-      proxy: {}
     ports:
     - 8081:80
     environment:
@@ -26,7 +25,5 @@ services:
     - api
 
 networks:
-  proxy:
-    external: true
   net:
     external: false
