@@ -104,8 +104,9 @@ def requires_auth(func):
         @wraps(f)
         async def wrapper(request):
             token = request.headers.get('X-CSRF-Token')
-            if token not in sessions:
+            if not retrieve_session(token):
                 return bad_creds_response()
+            sessions[token]["expires"] = time.time() + TTL
             return await f(request)
 
         return wrapper

@@ -22,7 +22,7 @@ class ConfirmEmailPage extends Component {
     }
 
     componentWillMount() {
-        this.getData('http://localhost:8080/api/confirm_email/' + this.props.match.params.code)
+        this.getData('/api/confirm_email/' + this.props.match.params.code)
             .then(response => {
                 if (response.ok) {
                     this.setState({ verified: true, processing: false });

@@ -54,7 +54,7 @@ class LoginPage extends Component {
             password: this.state.password
         }
 
-        this.postData('http://localhost:8080/api/login', data)
+        this.postData('/api/login', data)
             .then(response => response.json())
             .then(result => {
                 console.log(result);

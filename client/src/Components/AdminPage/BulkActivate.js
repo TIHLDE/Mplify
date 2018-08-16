@@ -67,7 +67,7 @@ class BulkActivate extends Component {
   }
 
   handleActivationClick = () => {
-    this.postData('http://localhost:8080/api/csv_activate', this.state.csvFile)
+    this.postData('/api/csv_activate', this.state.csvFile)
       .then(response => response.json())
       .then(result => {
         console.log(result);
