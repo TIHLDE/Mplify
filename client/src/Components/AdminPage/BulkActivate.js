@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Chip } from '@material-ui/core';
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Chip } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
 import Dropzone from 'react-dropzone';
@@ -29,28 +29,37 @@ class BulkActivate extends Component {
       csvFile: null,
       invalidFileType: false,
       bulkActivateDialogOpen: false,
+      activationAttempted: false,
       activating: false,
       activated: false,
+      amountActivated: -1
     };
   }
 
   handleRemoveFile = () => {
     this.setState({
       csvFile: null,
-      invalidFileType: false
+      invalidFileType: false,
+      activationAttempted: false
     });
   }
 
   handleDialogClose = () => {
     this.setState({
       bulkActivateDialogOpen: false,
-      csvFile: null,
-      invalidFileType: false
     });
   }
 
   handleBulkActivateDialogOpen = () => {
-    this.setState({ bulkActivateDialogOpen: true });
+    this.setState({
+      bulkActivateDialogOpen: true,
+      csvFile: null,
+      invalidFileType: false,
+      activationAttempted: false,
+      activating: false,
+      activated: false,
+      amountActivated: -1
+    });
   }
 
   onDrop(fileArray) {
@@ -67,14 +76,37 @@ class BulkActivate extends Component {
   }
 
   handleActivationClick = () => {
-    this.postData('/api/csv_activate', this.state.csvFile)
+
+    this.setState({
+      activationAttempted: true,
+      activating: true,
+    });
+
+    this.postData('http://localhost:8080/api/csv_activate', this.state.csvFile)
       .then(response => response.json())
       .then(result => {
-        console.log(result);
-        //TODO Here goes work
+        const amountActivated = parseInt(result[1].updatedRows, 10);
+        if (amountActivated > 0) {
+          this.setState({
+            activated: true,
+            amountActivated: amountActivated
+          });
+        } else {
+          this.setState({
+            activated: false
+          });
+        }
       })
       .catch(err => {
         console.log(err);
+        this.setState({
+          activated: false
+        });
+      })
+      .finally(() => {
+        this.setState({
+          activating: false
+        });
       });
   }
 
@@ -119,8 +151,31 @@ class BulkActivate extends Component {
         {
           this.state.csvFile
             ? <div className={classes.root}><DialogContentText id="alert-dialog-description">Fil lastet opp:</DialogContentText><Chip label={this.state.csvFile.name} className={classes.chip} onDelete={this.handleRemoveFile} /></div>
-            : ''
+            : 'Noe gikk galt. Vennligst prøv igjen.'
         }
+      </div>
+    );
+
+    const preActivation = (
+      this.state.csvFile
+        ? filePresentContent
+        : fileNotPresentContent
+    );
+
+    const userFeedback = (
+      this.state.activating
+        ? <CircularProgress />
+        : (
+          this.state.activated
+            ? <DialogContentText>Det ble aktivert {this.state.amountActivated > 0 ? this.state.amountActivated : 0} bruker{this.state.amountActivated === 1 ? '' : 'e'}.</DialogContentText>
+            : <DialogContentText>Ingen brukere ble aktivert.</DialogContentText>
+        )
+    );
+
+    const postActivation = (
+      <div>
+        { !this.state.activated ? preActivation : '' }
+        { userFeedback }
       </div>
     );
 
@@ -134,16 +189,24 @@ class BulkActivate extends Component {
         <DialogTitle id="alert-dialog-title">Aktiver medlemmer med csv-fil</DialogTitle>
         <DialogContent>
           {
-            this.state.csvFile
-              ? filePresentContent
-              : fileNotPresentContent
+            this.state.activationAttempted
+              ? postActivation
+              : preActivation
           }
         </DialogContent>
         <DialogActions>
           <Button onClick={this.handleDialogClose} color="primary">
             Avbryt
           </Button>
-          <Button onClick={this.handleActivationClick} disabled={this.state.csvFile == null} color="primary" autoFocus>
+          <Button
+            onClick={this.handleActivationClick}
+            disabled={
+              this.state.csvFile == null
+              || this.state.activationAttempted
+            }
+            color="primary"
+            autoFocus
+          >
             Aktiver
           </Button>
         </DialogActions>

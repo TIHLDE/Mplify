@@ -1,0 +1,11 @@
+0.0.0.0:80
+index index.html
+
+ext .html
+errors error.log
+
+proxy /api {$API_HOST}:{$API_PORT} {
+    transparent
+}
+
+
