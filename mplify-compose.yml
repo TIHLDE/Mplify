@@ -1,0 +1,41 @@
+version: "3.3"
+
+services:
+  #  api:
+  #    image: tihlde/mplify-api:latest
+  #    networks:
+  #      net:
+  #        aliases:
+  #          - api
+  #    environment:
+  #      DB_PASSWORD:
+  #      DB_USER:
+  #      DB_NAME:
+
+  web:
+    image: tihlde/mplify-web:latest
+    networks:
+      net: {}
+      proxy: {}
+    ports:
+    - 8081:80
+    environment:
+      API_HOST: api
+      API_PORT: 8080
+    depends_on:
+    - api
+    labels:
+    - com.df.notify=true
+    - com.df.distribute=true
+    - com.df.servicePath=/salt
+    - com.df.reqPathSearch=/salt/
+    - com.df.reqPathReplace=/
+    - com.df.port=80
+
+
+
+networks:
+  proxy:
+    external: true
+  net:
+    external: false
