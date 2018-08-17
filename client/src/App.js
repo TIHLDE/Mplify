@@ -1,7 +1,7 @@
 import { Grid, Paper, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Link, Redirect, Route } from "react-router-dom";
+import { HashRouter as Router, Link, Redirect, Route } from "react-router-dom";
 import './App.css';
 import AdminPage from './Components/AdminPage/AdminPage';
 import AwaitingConfirmationPage from './Components/AwaitingConfirmationPage/AwaitingConfirmationPage';
@@ -51,6 +51,10 @@ const ConfirmEmail = ({ match }) => (
   <ConfirmEmailPage match={match} />
 );
 
+const RedirectToRegistration = () => (
+  <Redirect to='/registration' />
+);
+
 class App extends Component {
 
   constructor() {
@@ -72,42 +76,12 @@ class App extends Component {
 
   render() {
     const { classes } = this.props;
-
     return (
       <div className="App">
         <Router>
-          <div>{/*
-            <Grid container spacing={8}>
-              <Grid item xs={2}>
-                <div className={classes.root}>
-                  <Paper className={classes.paper}>
-                    <Typography variant="headline" component="h3">[DEV] Velg scenario</Typography>
-                    <hr />
-                    <ul className={classes.navigation}>
-                      <li>
-                        <Link to="/">Ny registrering</Link>
-                      </li>
-                      <li>
-                        <Link to="/awaiting-confirmation">Ferdig med registrering</Link>
-                      </li>
-                      <li>
-                        <Link to="/confirm/asdf1234_brukernavn">Bekrefte epost</Link>
-                      </li>
-                      <li>
-                        <Link to="/admin">Admin</Link>
-                      </li>
-                      <li>
-                        <Link to="/login">Login</Link>
-                      </li>
-                    </ul>
-                  </Paper>
-                </div>
-              </Grid>
-              <Grid item xs={10}>
-              </Grid>
-            </Grid>
-            <br />*/}
-            <Route path="/" exact component={RegistrationPage} />
+          <div>
+            <Route path="/" exact component={RedirectToRegistration} />
+            <Route path="/registration" exact component={RegistrationPage} />
             <Route path="/awaiting-confirmation" exact component={AwaitingConfirmationPage} />
             <Route path="/confirm/:code" exact component={ConfirmEmail} />
             <PrivateRoute path="/admin" exact component={AdminPage} onLogout={this.handleLogout.bind(this)} />
@@ -118,5 +92,4 @@ class App extends Component {
     );
   }
 }
-
 export default withStyles(styles)(App);

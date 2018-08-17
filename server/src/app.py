@@ -2,6 +2,7 @@ from aiohttp import web
 import asyncio
 import os
 import aiohttp_cors
+from logzero import logger
 
 
 def get_environ_sfe(name, default=None):
@@ -60,4 +61,4 @@ if __name__ == '__main__':
     for route in list(app.router.routes()):
         cors.add(route)
 
-    web.run_app(app)
+    web.run_app(app, host='0.0.0.0', port=8080, access_log=logger)
