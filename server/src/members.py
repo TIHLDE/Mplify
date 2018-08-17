@@ -139,9 +139,9 @@ async def register_member(request):
                             'For å bekrefte brukeren din, klikk på følgende lenke:\n' \
                             '{0}\n\n' \
                             'Mvh.\nSALT'.format(link)
-            #success, msg = send_email(student_email, "Epostbekreftelse for SALT-medlem", email_content)
-            success = True
-            msg = ""
+            success, msg = send_email(student_email, "Epostbekreftelse for SALT-medlem", email_content)
+            #success = True
+            #msg = ""
             if success:
                 return web.Response(status=200,
                                     text='{"msg": "%s"}' % msg,
