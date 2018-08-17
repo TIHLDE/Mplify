@@ -133,15 +133,15 @@ async def register_member(request):
             print("Member: '{}' has been added to the database.".format(first_name + ' ' + last_name))
             student_username = student_email.split('@')[0]
 
-            link = 'http://medlem.studentalt.no/api/confirm/{0}_{1}'.format(email_verification_code, student_username)
+            link = 'http://medlem.studentalt.no/#/confirm/{0}_{1}'.format(email_verification_code, student_username)
             email_content = 'Hei!\nDu har mottatt denne meldingen fordi det blir forsøkt å registrere seg som SALT medlem med denne epostadressen.\n' \
                             'Om dette ikke er tilfelle, vennligst se bort ifra denne eposten.\n\n' \
                             'For å bekrefte brukeren din, klikk på følgende lenke:\n' \
                             '{0}\n\n' \
                             'Mvh.\nSALT'.format(link)
-            success, msg = send_email(student_email, "Epostbekreftelse for SALT-medlem", email_content)
-            #success = True
-            #msg = ""
+            #success, msg = send_email(student_email, "Epostbekreftelse for SALT-medlem", email_content)
+            success = True
+            msg = ""
             if success:
                 return web.Response(status=200,
                                     text='{"msg": "%s"}' % msg,

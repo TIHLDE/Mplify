@@ -76,7 +76,7 @@ class App extends Component {
     return (
       <div className="App">
         <Router>
-          <div>
+          <div>{/*
             <Grid container spacing={8}>
               <Grid item xs={2}>
                 <div className={classes.root}>
@@ -106,7 +106,7 @@ class App extends Component {
               <Grid item xs={10}>
               </Grid>
             </Grid>
-            <br />
+            <br />*/}
             <Route path="/" exact component={RegistrationPage} />
             <Route path="/awaiting-confirmation" exact component={AwaitingConfirmationPage} />
             <Route path="/confirm/:code" exact component={ConfirmEmail} />
