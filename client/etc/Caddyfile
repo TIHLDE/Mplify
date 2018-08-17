@@ -7,5 +7,3 @@ errors error.log
 proxy /api {$API_HOST}:{$API_PORT} {
     transparent
 }
-
-
