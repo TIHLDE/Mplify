@@ -31,7 +31,16 @@ async def check_vipps_id(request):
     try:
         (conn, cur) = await mysql_connect()
         vipps_id = str(request.match_info['vipps_id'])
-
+        q = request.query
+        user_id = None
+        if 'user_id' in q:
+            user_id = q['user_id']
+            await cur.execute("Select * from user where vipps_transaction_id = %s AND user_id = %s", [vipps_id, user_id])
+            r = cur.rowcount
+            if r == 1:
+                return web.Response(status=200,
+                                    text='{"msg": "Transaction id belongs to userId."}',
+                                    content_type='application/json')
 
         await cur.execute("Select * from user where vipps_transaction_id = %s", vipps_id)
         r = cur.rowcount
