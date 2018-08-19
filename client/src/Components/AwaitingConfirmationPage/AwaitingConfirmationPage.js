@@ -9,6 +9,9 @@ const styles = theme => ({
     paper: {
         paddingTop: theme.spacing.unit * 2,
         paddingBottom: theme.spacing.unit * 2,
+        maxWidth: 600,
+        marginLeft: "auto",
+        marginRight: "auto",
     },
 });
 

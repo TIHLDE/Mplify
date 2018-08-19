@@ -38,7 +38,7 @@ class TermsOfService extends Component {
             termsOfServiceDialogOpen: true,
             retrieving: true
         });
-        this.getData('/api/get_terms_of_service')
+        this.getData('http://localhost:8080/api/get_terms_of_service')
             .then(response => response.json())
             .then(result => {                
                 if (result) {

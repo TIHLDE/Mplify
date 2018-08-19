@@ -9,6 +9,9 @@ const styles = theme => ({
     paper: {
         paddingTop: theme.spacing.unit * 2,
         paddingBottom: theme.spacing.unit * 2,
+        maxWidth: 600,
+        marginLeft: "auto",
+        marginRight: "auto",
     },
 });
 
@@ -22,7 +25,7 @@ class ConfirmEmailPage extends Component {
     }
 
     componentWillMount() {
-        this.getData('/api/confirm_email/' + this.props.match.params.code)
+        this.getData('http://localhost:8080/api/confirm_email/' + this.props.match.params.code)
             .then(response => {
                 if (response.ok) {
                     this.setState({ verified: true, processing: false });

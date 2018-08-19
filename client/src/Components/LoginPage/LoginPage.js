@@ -10,6 +10,9 @@ const styles = theme => ({
     paper: {
         paddingTop: theme.spacing.unit * 2,
         paddingBottom: theme.spacing.unit * 2,
+        maxWidth: 600,
+        marginLeft: "auto",
+        marginRight: "auto",
     },
 });
 
@@ -54,7 +57,7 @@ class LoginPage extends Component {
             password: this.state.password
         }
 
-        this.postData('/api/login', data)
+        this.postData('http://localhost:8080/api/login', data)
             .then(response => response.json())
             .then(result => {
                 console.log(result);

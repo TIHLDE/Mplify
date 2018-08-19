@@ -1,13 +1,14 @@
-import { Grid, Paper, Typography } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
+import { Paper } from '@material-ui/core';
+import { createMuiTheme, MuiThemeProvider, withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
-import { HashRouter as Router, Link, Redirect, Route } from "react-router-dom";
+import { HashRouter as Router, Redirect, Route } from "react-router-dom";
 import './App.css';
 import AdminPage from './Components/AdminPage/AdminPage';
 import AwaitingConfirmationPage from './Components/AwaitingConfirmationPage/AwaitingConfirmationPage';
 import ConfirmEmailPage from './Components/ConfirmEmailPage/ConfirmEmailPage';
 import LoginPage from './Components/LoginPage/LoginPage';
 import RegistrationPage from './Components/RegistrationPage/RegistrationPage';
+import LOGO from './‫Images/SALT.png';
 
 const styles = theme => ({
   root: {
@@ -15,11 +16,20 @@ const styles = theme => ({
   },
   paper: {
     paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
-  },
-  navigation: {
-    textAlign: "left"
+    marginBottom: theme.spacing.unit * 2,
+    marginLeft: "auto",
+    marginRight: "auto",
+    textAlign: "center",
+    maxWidth: 275,
   }
+});
+
+const theme = createMuiTheme({
+  palette: {
+    primary: { main: '#2e7d32' },
+    secondary: { main: '#b71c1c' },
+    error: { main: '#db9020' }
+  },
 });
 
 const authController = {
@@ -76,18 +86,24 @@ class App extends Component {
 
   render() {
     const { classes } = this.props;
+
     return (
       <div className="App">
-        <Router>
-          <div>
-            <Route path="/" exact component={RedirectToRegistration} />
-            <Route path="/registration" exact component={RegistrationPage} />
-            <Route path="/awaiting-confirmation" exact component={AwaitingConfirmationPage} />
-            <Route path="/confirm/:code" exact component={ConfirmEmail} />
-            <PrivateRoute path="/admin" exact component={AdminPage} onLogout={this.handleLogout.bind(this)} />
-            <Route path='/login' render={(props) => (<LoginPage onLogIn={this.handleLogIn.bind(this)} {...props} />)} />
-          </div>
-        </Router>
+        <MuiThemeProvider theme={theme}>
+          <Paper className={classes.paper} >
+            <img onClick={this.handleImageClick} src={LOGO} height="128px" alt="" />
+          </Paper>
+          <Router>
+            <div>
+              <Route path="/" exact component={RedirectToRegistration} />
+              <Route path="/registration" exact component={RegistrationPage} />
+              <Route path="/awaiting-confirmation" exact component={AwaitingConfirmationPage} />
+              <Route path="/confirm/:code" exact component={ConfirmEmail} />
+              <PrivateRoute path="/admin" exact component={AdminPage} onLogout={this.handleLogout.bind(this)} />
+              <Route path='/login' render={(props) => (<LoginPage onLogIn={this.handleLogIn.bind(this)} {...props} />)} />
+            </div>
+          </Router>
+        </MuiThemeProvider>
       </div>
     );
   }

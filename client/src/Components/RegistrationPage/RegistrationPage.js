@@ -12,6 +12,9 @@ const styles = theme => ({
     paper: {
         paddingTop: theme.spacing.unit * 2,
         paddingBottom: theme.spacing.unit * 2,
+        maxWidth: 600,
+        marginLeft: "auto",
+        marginRight: "auto",
     },
     formControl: {
         textAlign: "left",
@@ -59,17 +62,14 @@ class RegistrationPage extends Component {
 
     handleTextChange = event => {
         this.setState({ [event.target.name]: event.target.value });
-        console.log(this.state);
     };
 
     handleCheckboxChange = event => {
         this.setState({ [event.target.name]: event.target.checked });
-        console.log(this.state);
     }
 
     handleStudyProgrammeChange = (event, studyProgramme) => {
         this.setState({ [event.target.name]: studyProgramme });
-        console.log(this.state);
     }
 
     async handleSubmit(event) {
@@ -98,7 +98,7 @@ class RegistrationPage extends Component {
         }
 
         if (!this.state.vippsFormatError && this.state.vippsTransactionId) {
-            const vippsUniqueResponse = await this.getData('/api/check_vipps_transaction_id/' + this.state.vippsTransactionId);
+            const vippsUniqueResponse = await this.getData('http://localhost:8080/api/check_vipps_transaction_id/' + this.state.vippsTransactionId);
             if (!vippsUniqueResponse.ok) {
                 allowSubmit = false;
                 this.setState({
@@ -123,7 +123,7 @@ class RegistrationPage extends Component {
 
             let shouldRedirect = false;
 
-            this.postData('/api/register', data)
+            this.postData('http://localhost:8080/api/register', data)
                 .then(response => {
                     if (response.ok) {
                         shouldRedirect = true;

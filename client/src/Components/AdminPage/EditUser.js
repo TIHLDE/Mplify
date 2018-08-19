@@ -54,7 +54,7 @@ class EditUser extends Component {
             lastName: u.last_name,
             studentEmail: u.student_email || '',
             privateEmail: u.private_email,
-            studyProgramme: {study_programme_id: u.study_programme_id},
+            studyProgramme: { study_programme_id: u.study_programme_id },
             yearOfAdmission: u.year_of_admission,
             vippsTransactionId: u.vipps_transaction_id || '',
             wantNewsletter: u.newsletter,
@@ -79,7 +79,9 @@ class EditUser extends Component {
         this.setState({
             studentEmailError: false,
             vippsFormatError: false,
-            vippsNotUniqueError: false
+            vippsNotUniqueError: false,
+            updateFailure: false,
+            updateSuccess: false
         });
 
         let allowSubmit = true;
@@ -100,7 +102,8 @@ class EditUser extends Component {
         }
 
         if (!this.state.vippsFormatError && this.state.vippsTransactionId) {
-            const vippsUniqueResponse = await this.getData('/api/check_vipps_transaction_id/' + this.state.vippsTransactionId);
+            const url = 'http://localhost:8080/api/check_vipps_transaction_id/' + this.state.vippsTransactionId + '?user_id=' + this.props.userToEdit.user_id
+            const vippsUniqueResponse = await this.getData(url);
             if (!vippsUniqueResponse.ok) {
                 allowSubmit = false;
                 this.setState({
@@ -111,9 +114,7 @@ class EditUser extends Component {
 
         if (allowSubmit) {            
             this.setState({
-                submitting: true,
-                updateFailure: false,
-                updateSuccess: false
+                submitting: true
             });
             const data = new UserData();
             data.userId = this.state.userId;
@@ -126,7 +127,7 @@ class EditUser extends Component {
             data.vippsTransactionId = this.state.vippsTransactionId;
             data.studyProgrammeId = this.state.studyProgramme.study_programme_id;
 
-            this.putData('/api/update_member', data)
+            this.putData('http://localhost:8080/api/update_member', data)
                 .then(response => {
                     if (response.ok) {
                         this.setState({
@@ -200,7 +201,22 @@ class EditUser extends Component {
                             vippsNotUniqueError={this.state.vippsNotUniqueError}
                         />
                         <Grid container spacing={8}>
-                            <Grid item xs={12}>
+                            <Grid item xs={6}>
+                                <FormControl className={classes.formControl} >
+                                    <Button
+                                        size="large"
+                                        variant="contained"
+                                        color="secondary"
+                                        onClick={this.props.onStopEditingUser}
+                                    >
+                                        Gå tilbake
+                                    </Button>
+                                    <FormHelperText>
+                                        Ulagrede endringer vil bli forkastet
+                                    </FormHelperText>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={6}>
                                 <FormControl className={classes.formControl} >
                                     <Button
                                         size="large"

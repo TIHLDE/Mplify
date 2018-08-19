@@ -33,7 +33,7 @@ class AdminPage extends Component {
     componentWillMount() {
         const token = sessionStorage.getItem('token');
         if (token) {
-            const endpoint = '/api/get_valid_token/' + token;
+            const endpoint = 'http://localhost:8080/api/get_valid_token/' + token;
             const options = {
                 method: 'GET',
                 headers: {

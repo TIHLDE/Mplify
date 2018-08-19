@@ -64,7 +64,7 @@ class UpdateTermsOfService extends Component {
             termsOfService: this.state.termsOfService
         }
 
-        this.putData('/api/update_terms_of_service', data)
+        this.putData('http://localhost:8080/api/update_terms_of_service', data)
             .then(response => {
                 if (response.ok) {
                     this.setState({
