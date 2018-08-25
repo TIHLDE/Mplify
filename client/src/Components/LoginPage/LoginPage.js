@@ -60,7 +60,6 @@ class LoginPage extends Component {
         this.postData('http://localhost:8080/api/login', data)
             .then(response => response.json())
             .then(result => {
-                console.log(result);
                 if (result.token) {
                     sessionStorage.setItem('token', result.token);
                     this.setState({
