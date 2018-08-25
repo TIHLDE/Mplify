@@ -39,7 +39,7 @@ class UserDataTable extends Component {
             options: {
                 filter: true,
                 display: true,
-                customRender: (value, tableMeta, updateValue) => {
+                customBodyRender: (value, tableMeta, updateValue) => {
                     return (
                         <FormControlLabel
                             label={value ? "Ja" : "Nei"}
@@ -69,7 +69,7 @@ class UserDataTable extends Component {
             options: {
                 filter: true,
                 display: true,
-                customRender: (value, tableMeta, updateValue) => {
+                customBodyRender: (value, tableMeta, updateValue) => {
                     return value === "Ja"
                         ? <Tooltip title="Bekreftet"><Done /></Tooltip>
                         : <Tooltip title="Ikke bekreftet"><Clear /></Tooltip>
@@ -83,7 +83,7 @@ class UserDataTable extends Component {
             options: {
                 filter: true,
                 display: true,
-                customRender: (value, tableMeta, updateValue) => {
+                customBodyRender: (value, tableMeta, updateValue) => {
                     const { classes } = this.props;
                     const studyProgramme = this.state.studyProgrammes.find(sp => sp.programme_code === value);
                     const spInfo = value + ' - ' + studyProgramme.name + ' - ' + studyProgramme.length + ' år';
@@ -154,7 +154,7 @@ class UserDataTable extends Component {
             .then(data => {
                 const studyProgrammeList = [];
                 data.forEach(studyProgramme => studyProgrammeList.push(studyProgramme));
-                this.setState({ studyProgrammes: studyProgrammeList }, function () {
+                this.setState({ studyProgrammes: studyProgrammeList }, () => {
                     this.fetchMembers();
                 })
             })
@@ -180,14 +180,14 @@ class UserDataTable extends Component {
             activationDialogOpen: true,
             memberToProcess: member
         });
-    }
+    };
 
     handleDialogClose = () => {
         this.setState({
             activationDialogOpen: false,
             deleteDialogOpen: false
         });
-    }
+    };
 
     handleActivationClick = () => {
         const member = this.state.memberToProcess;
@@ -210,23 +210,23 @@ class UserDataTable extends Component {
             .catch(error => {
                 console.log(error);
             });
-    }
+    };
 
     handleChipClick = (spInfo) => {
         console.log(spInfo);
         // TODO: Åpne snackbar med info
-    }
+    };
 
     handleEditClick = (member) => {
         this.props.onStartEditingUser(member);
-    }
+    };
 
     handleDeleteDialogOpen = (member) => {
         this.setState({
             deleteDialogOpen: true,
             memberToProcess: member
         });
-    }
+    };
 
     handleDeleteClick = () => {
         const member = this.state.memberToProcess;
@@ -246,7 +246,7 @@ class UserDataTable extends Component {
             .catch(error => {
                 console.log(error);
             });
-    }
+    };
 
     formatTableRow(m) {
         const { classes } = this.props;
