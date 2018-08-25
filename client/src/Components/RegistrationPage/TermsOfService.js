@@ -38,7 +38,7 @@ class TermsOfService extends Component {
             termsOfServiceDialogOpen: true,
             retrieving: true
         });
-        this.getData('/api/get_terms_of_service')
+        this.getData('http://localhost:8080/api/get_terms_of_service')
             .then(response => response.json())
             .then(result => {                
                 if (result) {
@@ -78,7 +78,7 @@ class TermsOfService extends Component {
 
         const noTermsOfServiceFound = (
             <DialogContentText id="alert-dialog-description">
-                Klarte ikke å hente terms of service fra databasen :(
+                Klarte ikke å hente samtykkeerklæring fra databasen :(
             </DialogContentText>
         );
 
@@ -90,7 +90,7 @@ class TermsOfService extends Component {
 
         const listLoadingContent = (
             <DialogContentText id="alert-dialog-description">
-                Henter terms of service fra databasen...
+                Henter samtykkeerklæring fra databasen...
             </DialogContentText>
         );
 
@@ -101,7 +101,7 @@ class TermsOfService extends Component {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Terms of Service</DialogTitle>
+                <DialogTitle id="alert-dialog-title">Samtykkeerklæring</DialogTitle>
                 <DialogContent>
                     {
                         this.state.retrieving
@@ -117,7 +117,7 @@ class TermsOfService extends Component {
 
         return (
             <div>
-                <Button variant="outlined" onClick={this.handleTermsOfServiceDialogOpen}>Terms of Service</Button>
+                <Button variant="outlined" onClick={this.handleTermsOfServiceDialogOpen}>Samtykkeerklæring</Button>
                 {termsOfServiceDialog}
             </div>
         );

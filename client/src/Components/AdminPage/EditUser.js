@@ -102,7 +102,7 @@ class EditUser extends Component {
         }
 
         if (!this.state.vippsFormatError && this.state.vippsTransactionId) {
-            const url = '/api/check_vipps_transaction_id/' + this.state.vippsTransactionId + '?user_id=' + this.props.userToEdit.user_id
+            const url = 'http://localhost:8080/api/check_vipps_transaction_id/' + this.state.vippsTransactionId + '?user_id=' + this.props.userToEdit.user_id
             const vippsUniqueResponse = await this.getData(url);
             if (!vippsUniqueResponse.ok) {
                 allowSubmit = false;
@@ -127,7 +127,7 @@ class EditUser extends Component {
             data.vippsTransactionId = this.state.vippsTransactionId;
             data.studyProgrammeId = this.state.studyProgramme.study_programme_id;
 
-            this.putData('/api/update_member', data)
+            this.putData('http://localhost:8080/api/update_member', data)
                 .then(response => {
                     if (response.ok) {
                         this.setState({

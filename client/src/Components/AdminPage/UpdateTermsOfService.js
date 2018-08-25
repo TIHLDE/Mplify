@@ -36,13 +36,13 @@ class UpdateTermsOfService extends Component {
         this.setState({
             termsOfService: event.target.value
         });
-    }
+    };
 
     handleDialogClose = () => {
         this.setState({
             termsOfServiceDialogOpen: false,
         });
-    }
+    };
 
     handleTermsOfServiceDialogOpen = () => {
         this.setState({
@@ -51,7 +51,7 @@ class UpdateTermsOfService extends Component {
             updateFailure: false,
             updateSuccess: false
         });
-    }
+    };
 
     handleUpdateTermsOfService = () => {
         this.setState({
@@ -62,9 +62,9 @@ class UpdateTermsOfService extends Component {
 
         const data = {
             termsOfService: this.state.termsOfService
-        }
+        };
 
-        this.putData('/api/update_terms_of_service', data)
+        this.putData('http://localhost:8080/api/update_terms_of_service', data)
             .then(response => {
                 if (response.ok) {
                     this.setState({
@@ -85,7 +85,7 @@ class UpdateTermsOfService extends Component {
                     updateFailure: true
                 });
             })
-    }
+    };
 
     async putData(endpoint, payload) {
         const options = {
@@ -115,14 +115,14 @@ class UpdateTermsOfService extends Component {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Oppdater Terms of Service</DialogTitle>
+                <DialogTitle id="alert-dialog-title">Oppdater samtykkeerklæring</DialogTitle>
                 <DialogContent>
                     {
                         this.state.updating
                             ? <CircularProgress className={classes.progress} />
                             : (
                                 this.state.updateSuccess
-                                    ? <DialogContentText>Terms of Service ble oppdatert.</DialogContentText>
+                                    ? <DialogContentText>Samtykkeerklæringen ble oppdatert.</DialogContentText>
                                     : (
                                         this.state.updateFailure
                                             ? <DialogContentText>Oppdatering mislyktes :( prøv igjen senere</DialogContentText>
@@ -140,7 +140,7 @@ class UpdateTermsOfService extends Component {
 
         return (
             <div>
-                <Button variant="contained" color="primary" onClick={this.handleTermsOfServiceDialogOpen}>Oppdater Terms of Service</Button>
+                <Button variant="contained" color="primary" onClick={this.handleTermsOfServiceDialogOpen}>Oppdater samtykkeerklæring</Button>
                 {termsOfServiceDialog}
             </div>
         );

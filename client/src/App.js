@@ -1,7 +1,7 @@
-import { Paper } from '@material-ui/core';
-import { createMuiTheme, MuiThemeProvider, withStyles } from '@material-ui/core/styles';
-import React, { Component } from 'react';
-import { HashRouter as Router, Redirect, Route } from "react-router-dom";
+import {Paper} from '@material-ui/core';
+import {createMuiTheme, MuiThemeProvider, withStyles} from '@material-ui/core/styles';
+import React, {Component} from 'react';
+import {HashRouter as Router, Redirect, Route} from "react-router-dom";
 import './App.css';
 import AdminPage from './Components/AdminPage/AdminPage';
 import AwaitingConfirmationPage from './Components/AwaitingConfirmationPage/AwaitingConfirmationPage';

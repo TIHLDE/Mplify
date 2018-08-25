@@ -19,7 +19,7 @@ class ExportEmailList extends Component {
 
     buttonName = 'Eksporter Epostliste';
     dialogTitle = 'Epostliste med alle aktive brukere';
-    emailUri = '/api/get_email';
+    emailUri = 'http://localhost:8080/api/get_email';
 
     constructor() {
         super();
@@ -33,7 +33,7 @@ class ExportEmailList extends Component {
 
     componentWillMount() {
         if (this.props.newsletter) {
-            this.emailUri = '/api/get_newsletter_email';
+            this.emailUri = 'http://localhost:8080/api/get_newsletter_email';
             this.buttonName = 'Eksporter Nyhetsbrevliste';
             this.dialogTitle = 'Epostliste for nyhetsbrev';
         }

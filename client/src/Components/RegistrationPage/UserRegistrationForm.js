@@ -44,8 +44,6 @@ class UserRegistrationForm extends Component {
     }
 
     componentWillMount() {
-        console.log(this.props);
-
         this.populateStudyProgrammeEntries();
         this.populateYearOfAdmissionYears();
 
@@ -75,16 +73,16 @@ class UserRegistrationForm extends Component {
     onCheckboxChange = event => {
         this.setState({ [event.target.name]: event.target.checked });
         this.props.onCheckboxChange(event);        
-    }
+    };
 
     onStudyProgrammeChange = event => {
         const studyProgramme = this.state.studyProgrammes.find(e => e.study_programme_id === event.target.value);
         this.setState({ [event.target.name]: studyProgramme });
         this.props.onStudyProgrammeChange(event, studyProgramme);
-    }
+    };
 
     populateStudyProgrammeEntries() {
-        this.getData('/api/get_all_studyprograms')
+        this.getData('http://localhost:8080/api/get_all_studyprograms')
             .then(response => response.json())
             .then(data => {
                 const studyProgrammeList = [];
