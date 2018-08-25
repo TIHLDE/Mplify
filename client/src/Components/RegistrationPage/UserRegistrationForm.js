@@ -82,7 +82,7 @@ class UserRegistrationForm extends Component {
     };
 
     populateStudyProgrammeEntries() {
-        this.getData('http://localhost:8080/api/get_all_studyprograms')
+        this.getData('/api/get_all_studyprograms')
             .then(response => response.json())
             .then(data => {
                 const studyProgrammeList = [];

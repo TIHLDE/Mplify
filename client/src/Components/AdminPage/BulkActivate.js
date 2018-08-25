@@ -81,7 +81,7 @@ class BulkActivate extends Component {
                     invalidFileType: false
                 },
                 () => {
-                    this.postData('http://localhost:8080/api/check_vipps_rows', fileArray[0])
+                    this.postData('/api/check_vipps_rows', fileArray[0])
                         .then(response => response.json())
                         .then(result => {
                             this.setState({
@@ -108,7 +108,7 @@ class BulkActivate extends Component {
             activating: true,
         });
 
-        this.postData('http://localhost:8080/api/csv_activate', this.state.csvFile)
+        this.postData('/api/csv_activate', this.state.csvFile)
             .then(response => response.json())
             .then(result => {
                 const amountActivated = parseInt(result[1].updatedRows, 10);

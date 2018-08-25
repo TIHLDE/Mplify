@@ -150,7 +150,7 @@ class UserDataTable extends Component {
     }
 
     componentWillMount() {
-        this.getData('http://localhost:8080/api/get_all_studyprograms')
+        this.getData('/api/get_all_studyprograms')
             .then(data => {
                 const studyProgrammeList = [];
                 data.forEach(studyProgramme => studyProgrammeList.push(studyProgramme));
@@ -164,7 +164,7 @@ class UserDataTable extends Component {
     }
 
     fetchMembers() {
-        this.getData('http://localhost:8080/api/allusers')
+        this.getData('/api/allusers')
             .then(data => {
                 const memberList = [];
                 data.forEach(member => memberList.unshift(member));
@@ -193,7 +193,7 @@ class UserDataTable extends Component {
         const member = this.state.memberToProcess;
         const activate = member.active ? 0 : 1;
         const payload = { userId: member.user_id, active: activate };
-        this.postData('http://localhost:8080/api/toggle_active', payload)
+        this.postData('/api/toggle_active', payload)
             .then(response => {
                 if (response.ok) {
                     const updatedMember = member;
@@ -231,7 +231,7 @@ class UserDataTable extends Component {
     handleDeleteClick = () => {
         const member = this.state.memberToProcess;
         const payload = { userId: member.user_id };
-        this.postData('http://localhost:8080/api/delete_member', payload, 'DELETE')
+        this.postData('/api/delete_member', payload, 'DELETE')
             .then(response => {
                 if (response.ok) {
                     const updatedMemberIndex = this.state.members.findIndex(m => m.user_id === member.user_id);
