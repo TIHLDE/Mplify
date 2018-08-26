@@ -2,6 +2,7 @@ import { Button, FormControl, FormHelperText, Grid, Paper, TextField, Typography
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
+import UserApi from "../../Api/UserApi";
 
 const styles = theme => ({
     root: {
@@ -28,19 +29,6 @@ class LoginPage extends Component {
         };
     }
 
-    async postData(endpoint, payload) {
-        const options = {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        };
-        const res = await fetch(endpoint, options);
-        return res;
-    }
-
     handleChange = event => {
         this.setState({ [event.target.name]: event.target.value });
     };
@@ -52,12 +40,7 @@ class LoginPage extends Component {
             loginFailed: false
         });
 
-        const data = {
-            username: this.state.username,
-            password: this.state.password
-        }
-
-        this.postData('/api/login', data)
+        UserApi.login(this.state.username, this.state.password)
             .then(response => response.json())
             .then(result => {
                 if (result.token) {

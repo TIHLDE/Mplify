@@ -1,4 +1,4 @@
-import { Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, IconButton, Paper, Switch, Tooltip, Typography } from '@material-ui/core';
+import { Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, IconButton, Paper, Switch, Tooltip, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import Clear from '@material-ui/icons/Clear';
 import Delete from '@material-ui/icons/Delete';
@@ -6,6 +6,8 @@ import Done from '@material-ui/icons/Done';
 import Edit from '@material-ui/icons/Edit';
 import MUIDataTable from 'mui-datatables';
 import React, { Component } from 'react';
+import AdminApi from "../../Api/AdminApi";
+import UserApi from "../../Api/UserApi";
 
 const styles = theme => ({
     root: {
@@ -150,10 +152,11 @@ class UserDataTable extends Component {
     }
 
     componentWillMount() {
-        this.getData('/api/get_all_studyprograms')
-            .then(data => {
+        UserApi.getStudyProgrammes()
+            .then(response => response.json())
+            .then(result => {
                 const studyProgrammeList = [];
-                data.forEach(studyProgramme => studyProgrammeList.push(studyProgramme));
+                result.forEach(studyProgramme => studyProgrammeList.push(studyProgramme));
                 this.setState({ studyProgrammes: studyProgrammeList }, () => {
                     this.fetchMembers();
                 })
@@ -164,10 +167,11 @@ class UserDataTable extends Component {
     }
 
     fetchMembers() {
-        this.getData('/api/allusers')
-            .then(data => {
+        AdminApi.getMembers()
+            .then(response => response.json())
+            .then(result => {
                 const memberList = [];
-                data.forEach(member => memberList.unshift(member));
+                result.forEach(member => memberList.unshift(member));
                 this.setState({ members: memberList, loadingMembers: false });
             })
             .catch(error => {
@@ -192,8 +196,7 @@ class UserDataTable extends Component {
     handleActivationClick = () => {
         const member = this.state.memberToProcess;
         const activate = member.active ? 0 : 1;
-        const payload = { userId: member.user_id, active: activate };
-        this.postData('/api/toggle_active', payload)
+        AdminApi.postToggleActive(member.user_id, activate)
             .then(response => {
                 if (response.ok) {
                     const updatedMember = member;
@@ -230,8 +233,7 @@ class UserDataTable extends Component {
 
     handleDeleteClick = () => {
         const member = this.state.memberToProcess;
-        const payload = { userId: member.user_id };
-        this.postData('/api/delete_member', payload, 'DELETE')
+        AdminApi.deleteMember(member.user_id)
             .then(response => {
                 if (response.ok) {
                     const updatedMemberIndex = this.state.members.findIndex(m => m.user_id === member.user_id);
@@ -263,38 +265,6 @@ class UserDataTable extends Component {
         return [actions, m.active, m.user_id, m.first_name, m.last_name, m.student_email, verifiedStudentEmail, m.private_email || '', m.year_of_admission, studyProgrammeName, newsletter, m.vipps_transaction_id || ''];
     }
 
-    async getData(endpoint) {
-        const options = {
-            method: 'GET',
-            headers: {
-                'X-CSRF-Token': sessionStorage.getItem('token')
-            }
-        };
-
-        const res = await fetch(endpoint, options);
-
-        if (!res.ok) {
-            throw new Error(res.status); // 404
-        }
-
-        const data = await res.json();
-        return data;
-    }
-
-    async postData(endpoint, payload, method = 'POST') {
-        const options = {
-            method: method,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': sessionStorage.getItem('token')
-            },
-            body: JSON.stringify(payload)
-        };
-        const res = await fetch(endpoint, options);
-        return res;
-    }
-
     render() {
         const { classes } = this.props;
 
@@ -302,6 +272,7 @@ class UserDataTable extends Component {
 
         const loadingComponent = (
             <Paper className={classes.paper}>
+                <CircularProgress />
                 <Typography variant="headline" component="h3">Henter medlemmer...</Typography>
             </Paper>
         );

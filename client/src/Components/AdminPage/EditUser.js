@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from "react";
 import { UserData } from "../../Models/UserData";
 import UserRegistrationForm from "../RegistrationPage/UserRegistrationForm";
+import AdminApi from "../../Api/AdminApi";
 const styles = theme => ({
     root: {
         textAlign: "center"
@@ -68,11 +69,11 @@ class EditUser extends Component {
 
     handleCheckboxChange = event => {
         this.setState({ [event.target.name]: event.target.checked });
-    }
+    };
 
     handleStudyProgrammeChange = (event, studyProgramme) => {
         this.setState({ [event.target.name]: studyProgramme });
-    }
+    };
 
     async handleSubmit(event) {
         event.preventDefault();
@@ -102,8 +103,7 @@ class EditUser extends Component {
         }
 
         if (!this.state.vippsFormatError && this.state.vippsTransactionId) {
-            const url = '/api/check_vipps_transaction_id/' + this.state.vippsTransactionId + '?user_id=' + this.props.userToEdit.user_id
-            const vippsUniqueResponse = await this.getData(url);
+            const vippsUniqueResponse = await AdminApi.checkVippsTransactonId(this.state.vippsTransactionId, this.props.userToEdit.user_id);
             if (!vippsUniqueResponse.ok) {
                 allowSubmit = false;
                 this.setState({
@@ -127,7 +127,7 @@ class EditUser extends Component {
             data.vippsTransactionId = this.state.vippsTransactionId;
             data.studyProgrammeId = this.state.studyProgramme.study_programme_id;
 
-            this.putData('/api/update_member', data)
+            AdminApi.updateMember(data)
                 .then(response => {
                     if (response.ok) {
                         this.setState({
@@ -164,20 +164,6 @@ class EditUser extends Component {
 
     async getData(endpoint) {
         const res = await fetch(endpoint);
-        return res;
-    }
-
-    async putData(endpoint, payload) {
-        const options = {
-            method: 'PUT',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': sessionStorage.getItem('token')
-            },
-            body: JSON.stringify(payload)
-        };
-        const res = await fetch(endpoint, options);
         return res;
     }
 

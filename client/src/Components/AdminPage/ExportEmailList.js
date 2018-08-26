@@ -1,6 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
+import AdminApi from "../../Api/AdminApi";
 
 const styles = theme => ({
     root: {
@@ -19,7 +20,7 @@ class ExportEmailList extends Component {
 
     buttonName = 'Eksporter Epostliste';
     dialogTitle = 'Epostliste med alle aktive brukere';
-    emailUri = '/api/get_email';
+    isNewsletter = false;
 
     constructor() {
         super();
@@ -33,9 +34,9 @@ class ExportEmailList extends Component {
 
     componentWillMount() {
         if (this.props.newsletter) {
-            this.emailUri = '/api/get_newsletter_email';
             this.buttonName = 'Eksporter Nyhetsbrevliste';
             this.dialogTitle = 'Epostliste for nyhetsbrev';
+            this.isNewsletter = true;
         }
     }
 
@@ -43,14 +44,14 @@ class ExportEmailList extends Component {
         this.setState({
             exportEmailListDialogOpen: false,
         });
-    }
+    };
 
     handleExportEmailListDialogOpen = () => {
         this.setState({
             exportEmailListDialogOpen: true,
             retrieving: true
         });
-        this.getData(this.emailUri)
+        AdminApi.getEmailList(this.isNewsletter)
             .then(response => response.json())
             .then(result => {
                 if (result && result.length > 0) {
@@ -71,26 +72,13 @@ class ExportEmailList extends Component {
                     retrieving: false
                 });
             });
-    }
-
-    async getData(endpoint, method = 'GET') {
-        const options = {
-            method: method,
-            headers: {
-                'Accept': 'application/csv',
-                'Content-Type': 'application/csv',
-                'X-CSRF-Token': sessionStorage.getItem('token')
-            }
-        };
-        const res = await fetch(endpoint, options);
-        return res;
-    }
+    };
 
     copyEmails = () => {
         let textarea = document.getElementById("emails");
         textarea.select();
         document.execCommand("copy");
-    }
+    };
 
     render() {
         const { classes } = this.props;

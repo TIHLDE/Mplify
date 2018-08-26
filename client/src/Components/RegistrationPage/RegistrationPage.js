@@ -4,6 +4,7 @@ import React, { Component } from "react";
 import { Redirect } from 'react-router-dom';
 import { UserData } from "../../Models/UserData";
 import UserRegistrationForm from "./UserRegistrationForm";
+import UserApi from "../../Api/UserApi";
 
 const styles = theme => ({
     root: {
@@ -98,7 +99,7 @@ class RegistrationPage extends Component {
         }
 
         if (!this.state.vippsFormatError && this.state.vippsTransactionId) {
-            const vippsUniqueResponse = await this.getData('/api/check_vipps_transaction_id/' + this.state.vippsTransactionId);
+            const vippsUniqueResponse = await UserApi.checkVippsTransactonId(this.state.vippsTransactionId);
             if (!vippsUniqueResponse.ok) {
                 allowSubmit = false;
                 this.setState({
@@ -123,7 +124,7 @@ class RegistrationPage extends Component {
 
             let shouldRedirect = false;
 
-            this.postData('/api/register', data)
+            UserApi.registerMember(data)
                 .then(response => {
                     if (response.ok) {
                         shouldRedirect = true;
@@ -154,20 +155,6 @@ class RegistrationPage extends Component {
         const res = await fetch(endpoint);
         return res;
     }
-
-    async postData(endpoint, payload) {
-        const options = {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        };
-        const res = await fetch(endpoint, options);
-        return res;
-    }
-
     render() {
         const { classes } = this.props;
 

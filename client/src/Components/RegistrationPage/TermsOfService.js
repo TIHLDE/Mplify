@@ -1,6 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
+import UserApi from "../../Api/UserApi";
 
 const styles = theme => ({
     root: {
@@ -31,14 +32,14 @@ class TermsOfService extends Component {
         this.setState({
             termsOfServiceDialogOpen: false,
         });
-    }
+    };
 
     handleTermsOfServiceDialogOpen = () => {
         this.setState({
             termsOfServiceDialogOpen: true,
             retrieving: true
         });
-        this.getData('/api/get_terms_of_service')
+        UserApi.getTermsOfService()
             .then(response => response.json())
             .then(result => {                
                 if (result) {
@@ -59,15 +60,7 @@ class TermsOfService extends Component {
                     retrieving: false
                 });
             });
-    }
-
-    async getData(endpoint, method = 'GET') {
-        const options = {
-            method: method
-        };
-        const res = await fetch(endpoint, options);
-        return res;
-    }
+    };
 
     render() {
         const { classes } = this.props;

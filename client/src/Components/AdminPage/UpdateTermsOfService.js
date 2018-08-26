@@ -1,6 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, CircularProgress } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
+import AdminApi from "../../Api/AdminApi";
 
 const styles = theme => ({
     root: {
@@ -60,11 +61,7 @@ class UpdateTermsOfService extends Component {
             updateFailure: false
         });
 
-        const data = {
-            termsOfService: this.state.termsOfService
-        };
-
-        this.putData('/api/update_terms_of_service', data)
+        AdminApi.updateTermsOfService(this.state.termsOfService)
             .then(response => {
                 if (response.ok) {
                     this.setState({
@@ -86,20 +83,6 @@ class UpdateTermsOfService extends Component {
                 });
             })
     };
-
-    async putData(endpoint, payload) {
-        const options = {
-            method: 'PUT',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': sessionStorage.getItem('token')
-            },
-            body: JSON.stringify(payload)
-        };
-        const res = await fetch(endpoint, options);
-        return res;
-    }
 
     render() {
         const { classes } = this.props;

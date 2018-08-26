@@ -11,6 +11,7 @@ import {
 import {withStyles} from '@material-ui/core/styles';
 import React, {Component} from 'react';
 import Dropzone from 'react-dropzone';
+import AdminApi from "../../Api/AdminApi";
 
 const styles = theme => ({
     root: {
@@ -81,7 +82,7 @@ class BulkActivate extends Component {
                     invalidFileType: false
                 },
                 () => {
-                    this.postData('/api/check_vipps_rows', fileArray[0])
+                    AdminApi.checkAmountOfUsersToActivate(fileArray[0])
                         .then(response => response.json())
                         .then(result => {
                             this.setState({
@@ -108,7 +109,7 @@ class BulkActivate extends Component {
             activating: true,
         });
 
-        this.postData('/api/csv_activate', this.state.csvFile)
+        AdminApi.bulkActivate(this.state.csvFile)
             .then(response => response.json())
             .then(result => {
                 const amountActivated = parseInt(result[1].updatedRows, 10);
@@ -135,20 +136,6 @@ class BulkActivate extends Component {
                 });
             });
     };
-
-    async postData(endpoint, payload, method = 'POST') {
-        const options = {
-            method: method,
-            headers: {
-                'Accept': 'application/csv',
-                'Content-Type': 'application/csv',
-                'X-CSRF-Token': sessionStorage.getItem('token')
-            },
-            body: payload
-        };
-        const res = await fetch(endpoint, options);
-        return res;
-    }
 
     render() {
         const {classes} = this.props;

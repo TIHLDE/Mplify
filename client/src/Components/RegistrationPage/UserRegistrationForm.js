@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from "react";
 import TermsOfService from "./TermsOfService";
 import VippsInfo from "./VippsInfo";
+import UserApi from "../../Api/UserApi";
 
 const styles = theme => ({
     root: {
@@ -82,7 +83,7 @@ class UserRegistrationForm extends Component {
     };
 
     populateStudyProgrammeEntries() {
-        this.getData('/api/get_all_studyprograms')
+        UserApi.getStudyProgrammes()
             .then(response => response.json())
             .then(data => {
                 const studyProgrammeList = [];

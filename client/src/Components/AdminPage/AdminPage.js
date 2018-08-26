@@ -7,6 +7,7 @@ import UserDataTable from './UserDataTable';
 import ExportEmailList from './ExportEmailList';
 import UpdateTermsOfService from './UpdateTermsOfService';
 import EditUser from './EditUser';
+import UserApi from "../../Api/UserApi";
 
 const styles = theme => ({
     root: {
@@ -33,16 +34,8 @@ class AdminPage extends Component {
     componentWillMount() {
         const token = sessionStorage.getItem('token');
         if (token) {
-            const endpoint = '/api/get_valid_token/' + token;
-            const options = {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            };
-            const res = fetch(endpoint, options);
-            res.then(response => {
+            UserApi.checkValidToken(token)
+                .then(response => {
                 if (response.ok) {
                     this.setState({ authenticating: false });
                 } else {
@@ -68,20 +61,19 @@ class AdminPage extends Component {
             editingUser: true,
             userToEdit: user
         });        
-    }
+    };
 
     handleStopEditingUser = () => {
         this.setState({
             editingUser: false,
             userToEdit: null
         });
-    }
+    };
 
     onLogout = () => {
         this.props.onLogout();
         this.setState({ redirectToLoginPage: true });
-    }
-
+    };
 
     render() {
         const { classes } = this.props;

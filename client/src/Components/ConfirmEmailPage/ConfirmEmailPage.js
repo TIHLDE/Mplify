@@ -1,6 +1,7 @@
 import { Paper, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
+import UserApi from "../../Api/UserApi";
 
 const styles = theme => ({
     root: {
@@ -25,7 +26,7 @@ class ConfirmEmailPage extends Component {
     }
 
     componentWillMount() {
-        this.getData('/api/confirm_email/' + this.props.match.params.code)
+        UserApi.confirmEmail(this.props.match.params.code)
             .then(response => {
                 if (response.ok) {
                     this.setState({ verified: true, processing: false });
