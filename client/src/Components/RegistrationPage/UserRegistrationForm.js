@@ -50,7 +50,6 @@ class UserRegistrationForm extends Component {
 
         if (this.props.userToEdit) {
             const u = this.props.userToEdit;
-            console.log(u);            
             
             this.setState({
                 firstName: u.first_name,

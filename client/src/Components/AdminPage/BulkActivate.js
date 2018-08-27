@@ -88,7 +88,6 @@ class BulkActivate extends Component {
                             this.setState({
                                 amountToBeActivated: result.updatableRows
                             });
-                            console.log(result);
                         })
                         .catch(err => {
                             console.log(err);
