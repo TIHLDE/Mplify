@@ -176,6 +176,7 @@ class UserDataTable extends Component {
             })
             .catch(error => {
                 console.log(error);
+                this.setState({ loadingMembers: false }, () => window.location.reload(true));
             });
     }
 
