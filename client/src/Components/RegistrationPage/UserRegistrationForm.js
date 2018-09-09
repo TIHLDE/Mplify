@@ -245,7 +245,7 @@ class UserRegistrationForm extends Component {
                                         : (
                                             this.props.vippsNotUniqueError
                                                 ? 'Koden er allerede i bruk'
-                                                : 'Ikke påkrevd'
+                                                : 'Ikke påkrevd (men nødvendig for aktivering)'
                                         )
                                 }
                             </FormHelperText>
