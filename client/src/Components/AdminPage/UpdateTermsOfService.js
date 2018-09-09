@@ -2,6 +2,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { withStyles } from '@material-ui/core/styles';
 import React, { Component } from 'react';
 import AdminApi from "../../Api/AdminApi";
+import UserApi from "../../Api/UserApi";
 
 const styles = theme => ({
     root: {
@@ -21,8 +22,8 @@ const styles = theme => ({
 
 class UpdateTermsOfService extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             termsOfServiceDialogOpen: false,
             termsOfService: '',
@@ -31,6 +32,16 @@ class UpdateTermsOfService extends Component {
             updateSuccess: false,
             updateFailure: false
         };
+    }
+
+    componentWillMount() {
+        UserApi.getTermsOfService()
+            .then(response => response.json())
+            .then(result => {
+                this.setState({
+                    termsOfService: result[0].text
+                })
+            })
     }
 
     handleTextareaChange = event => {
@@ -88,7 +99,13 @@ class UpdateTermsOfService extends Component {
         const { classes } = this.props;
 
         const termsOfServiceInput = (
-            <textarea id="terms_of_service_input" className={classes.textArea} rows={24} cols={window.innerWidth > 600 ? 60 : 40} onChange={this.handleTextareaChange}></textarea>
+            <textarea id="terms_of_service_input"
+                      value={this.state.termsOfService}
+                      className={classes.textArea}
+                      rows={24}
+                      cols={window.innerWidth > 600 ? 60 : 40}
+                      onChange={this.handleTextareaChange}
+            />
         );
 
         const termsOfServiceDialog = (

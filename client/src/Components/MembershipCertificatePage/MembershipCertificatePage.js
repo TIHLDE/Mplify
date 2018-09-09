@@ -24,7 +24,7 @@ class MembershipCertificatePage extends Component {
         this.state = {
             member: this.defaultMember,
             submitting: false,
-            checkFailed: false,
+            loginFailed: false,
             studentEmail: '',
         };
     }
@@ -37,7 +37,7 @@ class MembershipCertificatePage extends Component {
         event.preventDefault();
         this.setState({
             submitting: true,
-            checkFailed: false
+            loginFailed: false
         });
 
         UserApi.checkUser(this.state.studentEmail)
@@ -51,7 +51,7 @@ class MembershipCertificatePage extends Component {
                 } else {
                     this.setState({
                         submitting: false,
-                        checkFailed: true
+                        loginFailed: true
                     });
                 }
             })
@@ -98,7 +98,7 @@ class MembershipCertificatePage extends Component {
                             >
                                 Sjekk medlem
                             </Button>
-                            <FormHelperText>{this.state.submitting ? 'Sjekker medlem...' : (this.state.checkFailed ? 'Fant ikke medlem' : '')}</FormHelperText>
+                            <FormHelperText>{this.state.submitting ? 'Sjekker medlem...' : (this.state.loginFailed ? 'Fant ikke medlem' : '')}</FormHelperText>
                         </FormControl>
                     </Grid>
                 </Grid>

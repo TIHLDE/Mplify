@@ -12,7 +12,7 @@ class UserApi {
 
     static login(username, password) {
         const payload = {
-            studentEmail: username,
+            username: username,
             password: password
         };
         return apiRequest('login', 'POST', payload);

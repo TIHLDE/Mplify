@@ -75,11 +75,11 @@ class App extends Component {
 
   handleLogIn = () => {
     authController.authenticate();
-  }
+  };
 
   handleLogout = () => {
     authController.signout();
-  }
+  };
 
   render() {
     const { classes } = this.props;

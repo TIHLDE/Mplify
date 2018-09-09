@@ -37,10 +37,12 @@ class LoginPage extends Component {
         event.preventDefault();
         this.setState({
             submitting: true,
-            checkFailed: false
+            loginFailed: false
         });
 
-        UserApi.login(this.state.studentEmail, this.state.password)
+        console.log(this.state)
+
+        UserApi.login(this.state.username, this.state.password)
             .then(response => response.json())
             .then(result => {
                 if (result.token) {
@@ -52,19 +54,23 @@ class LoginPage extends Component {
                 } else {
                     this.setState({
                         submitting: false,
-                        checkFailed: true
+                        loginFailed: true
                     });
                 }
             })
             .catch(error => {
                 console.log(error);
+                this.setState({
+                    submitting: false,
+                    loginFailed: true
+                });
             })
-    }
+    };
 
     onLogin = () => {
         this.props.onLogIn();
         this.setState({ rediriectToAdminPage: true });
-    }
+    };
 
     render() {
         const { classes } = this.props;
