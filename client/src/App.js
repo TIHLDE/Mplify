@@ -9,6 +9,7 @@ import ConfirmEmailPage from './Components/ConfirmEmailPage/ConfirmEmailPage';
 import LoginPage from './Components/LoginPage/LoginPage';
 import RegistrationPage from './Components/RegistrationPage/RegistrationPage';
 import LOGO from './‫Images/SALT.png';
+import MembershipCertificatePage from "./Components/MembershipCertificatePage/MembershipCertificatePage";
 
 const styles = theme => ({
   root: {
@@ -61,10 +62,6 @@ const ConfirmEmail = ({ match }) => (
   <ConfirmEmailPage match={match} />
 );
 
-const RedirectToRegistration = () => (
-  <Redirect to='/registration' />
-);
-
 class App extends Component {
 
   constructor() {
@@ -95,7 +92,7 @@ class App extends Component {
           </Paper>
           <Router>
             <div>
-              <Route path="/" exact component={RedirectToRegistration} />
+              <Route path="/" exact component={MembershipCertificatePage} />
               <Route path="/registration" exact component={RegistrationPage} />
               <Route path="/awaiting-confirmation" exact component={AwaitingConfirmationPage} />
               <Route path="/confirm/:code" exact component={ConfirmEmail} />

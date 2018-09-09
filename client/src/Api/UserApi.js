@@ -12,7 +12,7 @@ class UserApi {
 
     static login(username, password) {
         const payload = {
-            username: username,
+            studentEmail: username,
             password: password
         };
         return apiRequest('login', 'POST', payload);
@@ -33,6 +33,11 @@ class UserApi {
 
     static checkVippsTransactonId(transactionId) {
         const url = 'check_vipps_transaction_id/' + transactionId;
+        return apiRequest(url);
+    }
+
+    static checkUser(studentEmail) {
+        const url = 'validate_member/' + studentEmail;
         return apiRequest(url);
     }
 }

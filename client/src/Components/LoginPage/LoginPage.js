@@ -37,10 +37,10 @@ class LoginPage extends Component {
         event.preventDefault();
         this.setState({
             submitting: true,
-            loginFailed: false
+            checkFailed: false
         });
 
-        UserApi.login(this.state.username, this.state.password)
+        UserApi.login(this.state.studentEmail, this.state.password)
             .then(response => response.json())
             .then(result => {
                 if (result.token) {
@@ -52,7 +52,7 @@ class LoginPage extends Component {
                 } else {
                     this.setState({
                         submitting: false,
-                        loginFailed: true
+                        checkFailed: true
                     });
                 }
             })
