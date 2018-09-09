@@ -173,7 +173,12 @@ async def register_member(request):
 
 
 async def get_tos(request):
+    """
+    Returns the current Terms of Service text.
 
+    :param request:
+    :return: 200 and the current Terms of Service text.
+    """
     try:
         (conn, cur) = await mysql_connect()
 
@@ -196,6 +201,13 @@ async def get_tos(request):
 
 @requires_auth
 async def update_tos(request):
+    """
+    Updates the Terms of Service text.
+
+    :param request: Contains a body with the new Terms of Service text
+    :return: 200 if updated successfully, 401 if the payload is bad, and 500 if an Error occured.
+    """
+
     try:
         (conn, cur) = await mysql_connect()
         bod = await request.json()
@@ -334,7 +346,7 @@ async def get_email(request):
 
 async def verify_email(request):
     """
-    Verifies member's student Email through unique URI containing verification code and student-email addresse.
+    Verifies member's student Email through unique URI containing verification code and student-email address.
     :param request: Contains information about verification code and student email
     :return Response: status 200 if okay, 500 if not
 
@@ -394,7 +406,7 @@ async def toggle_active(request):
         if not all(keys in bod for keys in ("userId", "active")):
             return web.Response(status=400,
                                 text='{"error": "Something went wrong when trying to activate member. '
-                                     'Post parameters are missing."',
+                                     'Post arguments are missing."',
                                 content_type='application/json')
 
         await cur.execute("UPDATE user SET active = %s WHERE user_id = %s", (bod['active'], bod['userId']))
@@ -420,7 +432,12 @@ async def toggle_active(request):
 
 @requires_auth
 async def check_vipps_activate_rows(request):
+    """
+    Checks and returns the amount of members that would be activated by a given csv-upload.
 
+    :param request: Contains the csv data used for checking.
+    :return: status 200 and number of activations that would result from the csv-file; status 500 if an Error occured.
+    """
     try:
         (conn, cur) = await mysql_connect()
         bod = await request.text()
@@ -436,14 +453,12 @@ async def check_vipps_activate_rows(request):
                           "from user WHERE active = 0 and vipps_transaction_id IN (%s)"
                           % format_strings, tuple(vipps_ids))
         num_updatable= await cur.fetchone()
-        print(num_updatable)
 
         return web.Response(status=200,
                             text=json.dumps(num_updatable),
                             content_type='application/json')
 
     except MySQLError as e:
-        print(e)
         return web.Response(status=500,
                             text=json.dumps(e, default=str),
                             content_type='application/json')
@@ -456,10 +471,10 @@ async def check_vipps_activate_rows(request):
 @requires_auth
 async def vipps_csv_activate(request):
     """
-    Sets attribute 'active' to 1 in database for all members with matching vipps_transaction_id and correct
+    Sets attribute 'active' to 1 in database for all non-active members with matching vipps_transaction_id and correct
     amount paid, found in CSV file received.
     :param request: Contains CSV file in multipart/form-data
-    :return Response: status 200 if ok, 500 if not
+    :return Response: status 200 and amount of members activated if ok, 500 if not
     """
 
     try:
@@ -473,18 +488,33 @@ async def vipps_csv_activate(request):
                 vipps_ids.append(split[4])
         format_strings = ','.join(['%s'] * len(vipps_ids))
 
+        await cur.execute("SELECT student_email from user where active = 0 and vipps_transaction_id"
+                          " IN (%s)" % format_strings, tuple(vipps_ids))
+
+        email_list = await cur.fetchall()
+
         await cur.execute("UPDATE user SET active = 1 WHERE active = 0 and vipps_transaction_id IN (%s)"
                           % format_strings, tuple(vipps_ids))
         num_updated = cur.rowcount
         await conn.commit()
 
+        email_content = 'Hei!\nDin betaling av medlemskontigent via vipps transaksjonsID har nå blitt bekreftet' \
+                        ', og ditt medlemskap har blitt aktivert.\n' \
+                        '\n\n' \
+                        'Mvh.\nSALT'
+
+        emails_sent = 0
+        for e in email_list:
+            email = e['student_email']
+            success, msg = send_email(email, "Ditt medlemskap hos SALT er aktivert", email_content)
+            if success:
+                emails_sent += 1
         return web.Response(status=200,
                             text='[{"msg": "Members with valid transaction ID activated."},'
                                  ' {"updatedRows": "%s" }]' % num_updated,
                             content_type='application/json')
 
     except MySQLError as e:
-        print(e)
         return web.Response(status=500,
                             text='{"error": "%s"}' % e,
                             content_type='application/json')
@@ -516,7 +546,6 @@ async def delete_member(request):
                                 content_type='application/json')
 
     except MySQLError as e:
-        print(e)
         return web.Response(status=500,
                             text='{"error": "%s"}' % e,
                             content_type='application/json')
@@ -527,7 +556,6 @@ async def delete_member(request):
 
 
 async def get_all_studyprograms(request):
-
 
     try:
         (conn, cur) = await mysql_connect()
@@ -548,7 +576,9 @@ async def get_all_studyprograms(request):
         await cur.close()
         conn.close()
 
+
 # - Web util funcs
+
 
 def generate_verification_code():
     m = hashlib.md5()
@@ -580,15 +610,12 @@ def input_ok(bod):
 def send_email(recipient, subject, body, sender='no-reply@tihlde.org'):
     """
     Sends an email with the given data to the given recipient.
+
     :param recipient: Recipient email address
     :param subject: Subject of the email
     :param body: Body of the email
     :param sender: Email address of the sender
-    :param smtp_host: Host to send the email with. Standard is 'localhost'
-    :return: None if successful. Error-msg if not.
-
-    TODO:
-        - Configure correct smtp-host and sender
+    :return: True if successful. False if not.
     """
     msg = MIMEMultipart()
     msg['From'] = sender
@@ -607,3 +634,6 @@ def send_email(recipient, subject, body, sender='no-reply@tihlde.org'):
 
     except smtplib.SMTPException as error:
         return False, 'Unable to send verification email to "{0}". Error-msg:\n{1}'.format(recipient, error)
+
+    finally:
+        smtp_obj.quit()
