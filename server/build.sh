@@ -1,2 +1,2 @@
-docker build . -t tihlde/mplify-api:latest
-docker push tihlde/mplify-api:latest
+docker build . -t tihlde/mplify-api:1.1.0
+docker push tihlde/mplify-api:1.1.0
