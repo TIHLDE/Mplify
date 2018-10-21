@@ -47,8 +47,8 @@ const authController = {
   }
 };
 
-const RedirectToRegistration = () => (
-  <Redirect to='/registration' />
+const RedirectToMembershipCertificate = () => (
+  <Redirect to='/membership-certificate' />
 );
 
 const PrivateRoute = ({ component: Component, onLogout, ...rest }) => (
@@ -96,7 +96,7 @@ class App extends Component {
           </Paper>
           <Router>
             <div>
-              <Route path="/" exact component={RedirectToRegistration} />
+              <Route path="/" exact component={RedirectToMembershipCertificate} />
               <Route path="/membership-certificate" exact component={MembershipCertificatePage} />
               <Route path="/registration" exact component={RegistrationPage} />
               <Route path="/awaiting-confirmation" exact component={AwaitingConfirmationPage} />

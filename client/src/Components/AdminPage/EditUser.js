@@ -94,7 +94,7 @@ class EditUser extends Component {
             });
         }
 
-        if ((this.state.vippsTransactionId.length !== 0 && this.state.vippsTransactionId.length !== 10)
+        if ((this.state.vippsTransactionId.length !== 0 && this.state.vippsTransactionId.length >= 9)
             || (this.state.vippsTransactionId.length !== 0 && !this.isNumber(this.state.vippsTransactionId))) {
             allowSubmit = false;
             this.setState({

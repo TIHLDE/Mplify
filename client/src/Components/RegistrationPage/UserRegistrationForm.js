@@ -241,7 +241,7 @@ class UserRegistrationForm extends Component {
                             <FormHelperText id="vipps_helper_text">
                                 {
                                     this.props.vippsFormatError
-                                        ? 'Må bestå av 10 siffer'
+                                        ? 'Må bestå av minst 9 siffer'
                                         : (
                                             this.props.vippsNotUniqueError
                                                 ? 'Koden er allerede i bruk'
