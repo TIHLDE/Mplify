@@ -56,6 +56,14 @@ class AdminApi {
         };
         return apiRequest('check_vipps_rows', 'POST', csvFile, headers);
     }
+
+    static resendVerificationEmail(userId) {
+        const url = 'send_verification_email';
+        const payload = {
+            userId: userId
+        };
+        return apiRequest(url, 'POST', payload);
+    }
 }
 
 export default AdminApi;

@@ -2,6 +2,7 @@ import { Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, D
 import { withStyles } from '@material-ui/core/styles';
 import Clear from '@material-ui/icons/Clear';
 import Delete from '@material-ui/icons/Delete';
+import Email from '@material-ui/icons/Email'
 import Done from '@material-ui/icons/Done';
 import Edit from '@material-ui/icons/Edit';
 import MUIDataTable from 'mui-datatables';
@@ -47,7 +48,7 @@ class UserDataTable extends Component {
                             label={value ? "Ja" : "Nei"}
                             value={value ? "Ja" : "Nei"}
                             control={
-                                <Switch color="primary" checked={value ? true : false} value={value ? "Ja" : "Nei"} />
+                                <Switch color="primary" checked={!!value} value={value ? "Ja" : "Nei"} />
                             }
                             onChange={event => {
                                 const idIndex = this.columns.findIndex(c => c.name === 'ID');
@@ -139,14 +140,15 @@ class UserDataTable extends Component {
         }
     };
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             loadingMembers: true,
             studyProgrammes: [],
             members: [],
             activationDialogOpen: false,
             deleteDialogOpen: false,
+            resendVerificationDialogOpen: false,
             memberToProcess: {},
         };
     }
@@ -190,7 +192,8 @@ class UserDataTable extends Component {
     handleDialogClose = () => {
         this.setState({
             activationDialogOpen: false,
-            deleteDialogOpen: false
+            deleteDialogOpen: false,
+            resendVerificationDialogOpen: false
         });
     };
 
@@ -251,12 +254,36 @@ class UserDataTable extends Component {
             });
     };
 
+    handleResendVerificationDialogOpen = (member) => {
+        this.setState({
+            resendVerificationDialogOpen: true,
+            memberToProcess: member
+        })
+    };
+
+    handleResendVerificationClick = () => {
+        const member = this.state.memberToProcess;
+        AdminApi.resendVerificationEmail(member.user_id)
+            .then(response => {
+                if (response.ok) {
+                    this.setState({
+                        resendVerificationDialogOpen: false
+                    });
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    };
+
+
     formatTableRow(m) {
         const { classes } = this.props;
 
         const editButton = <Tooltip title="Rediger"><IconButton className={classes.button} color="primary" onClick={this.handleEditClick.bind(this, m)}><Edit /></IconButton></Tooltip>;
         const deleteButton = <Tooltip title="Slett"><IconButton className={classes.button} color="secondary" onClick={this.handleDeleteDialogOpen.bind(this, m)}><Delete /></IconButton></Tooltip>;
-        const actions = <div className={classes.buttonContainer}>{editButton}{deleteButton}</div>
+        const resendVerificationButton = m.verified_student_email ? '' : <Tooltip title="Send ny bekreftelse"><IconButton className={classes.button} color="primary" onClick={this.handleResendVerificationDialogOpen.bind(this, m)}><Email/></IconButton></Tooltip>;
+        const actions = <div className={classes.buttonContainer}>{editButton}{deleteButton}{resendVerificationButton}</div>;
 
         const verifiedStudentEmail = m.verified_student_email ? 'Ja' : 'Nei';
         const studyProgramme = this.state.studyProgrammes.find(sp => sp.study_programme_id === m.study_programme_id);
@@ -335,6 +362,29 @@ class UserDataTable extends Component {
                         </Button>
                         <Button onClick={this.handleDeleteClick} color="primary" autoFocus>
                             Slett bruker
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+                <Dialog
+                    open={this.state.resendVerificationDialogOpen}
+                    onClose={this.handleDialogClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">Bekreft handling</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Ønsker du å sende ny verifikasjonsepost til {this.state.memberToProcess ? this.state.memberToProcess.first_name + ' ' + this.state.memberToProcess.last_name : 'ERROR'}?
+                            <br />
+                            Denne handlingen kan ikke angres.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={this.handleDialogClose} color="primary">
+                            Avbryt
+                        </Button>
+                        <Button onClick={this.handleResendVerificationClick} color="primary" autoFocus>
+                            Send
                         </Button>
                     </DialogActions>
                 </Dialog>
