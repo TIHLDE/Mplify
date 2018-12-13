@@ -57,6 +57,10 @@ async def check_vipps_id(request):
     except MySQLError as e:
         print(e)
 
+    finally:
+        await cur.close()
+        conn.close()
+
 
 async def check_student_email(request):
 
@@ -83,6 +87,10 @@ async def check_student_email(request):
 
     except MySQLError as e:
         print(e)
+
+    finally:
+        await cur.close()
+        conn.close()
 
 
 @requires_auth
@@ -177,8 +185,7 @@ async def register_member(request):
                             '{0}\n\n' \
                             'Mvh.\nSALT'.format(link)
             success, msg = send_email(student_email, "Epostbekreftelse for SALT-medlem", email_content)
-            #success = True
-            #msg = ""
+
             if success:
                 return web.Response(status=200,
                                     text='{"msg": "%s"}' % msg,
@@ -190,6 +197,59 @@ async def register_member(request):
         else:
             return web.Response(status=401,
                                 text='{"msg": "Invalid input."}',
+                                content_type='application/json')
+
+    except MySQLError as e:
+        print(e)
+
+    finally:
+        await cur.close()
+        conn.close()
+
+
+@requires_auth
+async def send_new_email_verification_code(request):
+    """
+    Updates 'email_verification_code' for the member specified, and send confirmation email with generated
+    activation link.
+
+    :param request: http-request with 'studentEmail': '<student email>'
+    :return: status 200 and msg if successful, status 500 and error information if not.
+    """
+
+    try:
+        (conn, cur) = await mysql_connect()
+        bod = await request.json()
+        if 'studentEmail' not in bod:
+            return web.Response(status=401,
+                                text='{"msg": "studentEmail not in body"}',
+                                content_type='application/json')
+        student_email = bod['studentEmail']
+
+        email_verification_code = generate_verification_code()
+
+        await cur.execute("update user set email_verification_code = %s where student_email = %s",
+                          [email_verification_code, student_email])
+        await conn.commit()
+        print("Success: email_verification code updated for user with student_email {}.".format(student_email))
+
+        student_username = student_email.split('@')[0]
+
+        link = 'http://medlem.studentalt.no/#/confirm/{0}_{1}'.format(email_verification_code, student_username)
+        email_content = 'Hei!\nDu har mottatt denne meldingen fordi det blir forsøkt å registrere seg som SALT medlem med denne epostadressen.\n' \
+                        'Om dette ikke er tilfelle, vennligst se bort ifra denne eposten.\n\n' \
+                        'For å bekrefte brukeren din, klikk på følgende lenke:\n' \
+                        '{0}\n\n' \
+                        'Mvh.\nSALT'.format(link)
+        success, msg = send_email(student_email, "Epostbekreftelse for SALT-medlem", email_content)
+
+        if success:
+            return web.Response(status=200,
+                                text='{"msg": "%s"}' % msg,
+                                content_type='application/json')
+        else:
+            return web.Response(status=500,
+                                text=json.dumps(msg, default=str),
                                 content_type='application/json')
 
     except MySQLError as e:
