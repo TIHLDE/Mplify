@@ -13,6 +13,7 @@ from db import mysql_connect
 from auth import requires_auth
 from app import get_environ_sfe
 
+
 EMAIL_PASSWORD = ''
 EMAIL_USER = ''
 EMAIL_HOST = ''
@@ -51,6 +52,33 @@ async def check_vipps_id(request):
         else:
             return web.Response(status=401,
                                 text='{"msg": "Vipps transaction id not unique."}',
+                                content_type='application/json')
+
+    except MySQLError as e:
+        print(e)
+
+
+async def check_student_email(request):
+
+    try:
+        (conn, cur) = await mysql_connect()
+        bod = await request.json()
+
+        if 'studentEmail' not in bod:
+            return web.Response(status=401,
+                                text='{"msg": "studentEmail not in body"}',
+                                content_type='application/json')
+        studentEmail = bod['studentEmail']
+
+        await cur.execute("select * from user where student_email = %s ", studentEmail)
+        if cur.rowcount != 0:
+            return web.Response(status=409,
+                                text='{"msg": "Student email already in use."}',
+                                content_type='application/json')
+
+        else:
+            return web.Response(status=200,
+                                text='{"msg": "Student email is unique."}',
                                 content_type='application/json')
 
     except MySQLError as e:
@@ -594,7 +622,7 @@ def input_ok(bod):
             print('{!r} is not in body.'.format(k))
             return False
     trans_id = bod['vippsTransactionId']
-    if len(trans_id) != 10 and trans_id != '':
+    if len(trans_id) < 9 and trans_id != '':
         return False
 
     s_email = bod['studentEmail'].lower()

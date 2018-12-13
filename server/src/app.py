@@ -4,6 +4,8 @@ import os
 import aiohttp_cors
 from logzero import logger
 
+__author__ = "Orjan Bostad Vesterlid"
+
 
 def get_environ_sfe(name, default=None):
     if name not in os.environ:
@@ -20,7 +22,7 @@ if __name__ == '__main__':
     from auth import login, is_valid_token, validate_member
     from members import get_all_members, get_member, register_member, get_email, get_newsletter_email, verify_email, \
         toggle_active, vipps_csv_activate, delete_member, get_all_studyprograms, check_vipps_id, update_tos, get_tos, \
-        update_member, check_vipps_activate_rows
+        update_member, check_vipps_activate_rows, check_student_email
     from db import init as init_db
     from members import init as init_members
 
@@ -44,6 +46,7 @@ if __name__ == '__main__':
                     web.post('/api/toggle_active', toggle_active),
                     web.post('/api/check_vipps_rows', check_vipps_activate_rows),
                     web.post('/api/csv_activate', vipps_csv_activate),
+                    web.post('/api/check_student_email', check_student_email),
                     web.put('/api/update_terms_of_service', update_tos),
                     web.put('/api/update_member', update_member),
                     web.delete('/api/delete_member', delete_member)])
