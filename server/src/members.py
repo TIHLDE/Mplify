@@ -5,6 +5,7 @@ from datetime import date
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import datetime
 
 from aiohttp import web
 from pymysql import MySQLError
@@ -18,6 +19,7 @@ EMAIL_PASSWORD = ''
 EMAIL_USER = ''
 EMAIL_HOST = ''
 loop = None
+SEMESTER_SLUTT = {"month": 6, "day": 15}
 
 
 def init():
@@ -72,9 +74,9 @@ async def check_student_email(request):
             return web.Response(status=401,
                                 text='{"msg": "studentEmail not in body"}',
                                 content_type='application/json')
-        studentEmail = bod['studentEmail']
+        student_email = bod['studentEmail']
 
-        await cur.execute("select * from user where student_email = %s ", studentEmail)
+        await cur.execute("select * from user where student_email = %s ", student_email)
         if cur.rowcount != 0:
             return web.Response(status=409,
                                 text='{"msg": "Student email already in use."}',
@@ -143,11 +145,8 @@ async def update_member(request):
 
 async def register_member(request):
     """
-    TODO
-     - create function for validating email-address against
-       NTNU-ldap ('@stud.ntnu.no' & department)
-     - Set correct link-address for production
-     """
+
+    """
 
     try:
         (conn, cur) = await mysql_connect()
@@ -254,6 +253,47 @@ async def send_new_email_verification_code(request):
 
     except MySQLError as e:
         print(e)
+
+    finally:
+        await cur.close()
+        conn.close()
+
+
+@requires_auth
+async def get_expired_members(request):
+    """
+    Returns a list of all members that should have finished their degree, calculated by current semester and normed time
+    for each members associated study programme.
+
+    :param request:
+    :return: List of all expired members.
+    """
+
+    try:
+        (conn, cur) = await mysql_connect()
+
+        today = datetime.date.today()
+        this_year = today.year
+        semester_slutt = datetime.date(year=this_year, month=SEMESTER_SLUTT['month'], day=SEMESTER_SLUTT['day'])
+
+        if (semester_slutt - today).days > 0:
+            this_year -= 1
+
+        await cur.execute("SELECT u.user_id, u.first_name, u.last_name, u.student_email, s.name, "
+                          "u.year_of_admission, s.length as 'normed_years' FROM user u join study_programme s on "
+                          "u.study_programme_id = s.study_programme_id where (%s - u.year_of_admission) >= s.length "
+                          "order by u.user_id ASC",
+                          this_year)
+        r = await cur.fetchall()
+        return web.Response(status=200,
+                            text=json.dumps(r, default=str),
+                            content_type='application/json')
+
+    except MySQLError as e:
+        print(e)
+        return web.Response(status=500,
+                            text='{"error": "%s"}' % e,
+                            content_type='application/json')
 
     finally:
         await cur.close()
@@ -435,11 +475,9 @@ async def get_email(request):
 async def verify_email(request):
     """
     Verifies member's student Email through unique URI containing verification code and student-email address.
+
     :param request: Contains information about verification code and student email
     :return Response: status 200 if okay, 500 if not
-
-    TODO:
-    Fix logic!
     """
 
     try:
