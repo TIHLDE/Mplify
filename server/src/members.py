@@ -58,6 +58,9 @@ async def check_vipps_id(request):
 
     except MySQLError as e:
         print(e)
+        return web.Response(status=500,
+                            text=json.dumps(e, default=str),
+                            content_type='application/json')
 
     finally:
         await cur.close()
@@ -89,6 +92,9 @@ async def check_student_email(request):
 
     except MySQLError as e:
         print(e)
+        return web.Response(status=500,
+                            text=json.dumps(e, default=str),
+                            content_type='application/json')
 
     finally:
         await cur.close()
@@ -257,6 +263,38 @@ async def send_new_email_verification_code(request):
     finally:
         await cur.close()
         conn.close()
+
+
+@requires_auth
+async def toggle_email_verified(request):
+    """
+    Toggles the 'verified_student_email' attribute of a user with the given userId.
+
+    :param request:
+    :return: status 200 if success, 404 if user not found, 500 if MySQL error.
+    """
+    try:
+        (conn, cur) = await mysql_connect()
+        user_id = str(request.match_info['user_id'])
+
+        await cur.execute("update user set verified_student_email = not verified_student_email where user_id = %s", [user_id, ])
+        await conn.commit()
+
+        r = cur.rowcount
+        if r == 1:
+            return web.Response(status=200,
+                                text='{"msg": "email_verified attribute flipped."}',
+                                content_type='application/json')
+        else:
+            return web.Response(status=404,
+                                text='{"error": "No user found with user_id %"}' % user_id,
+                                content_type='application/json')
+
+    except MySQLError as e:
+        print(e)
+        return web.Response(status=500,
+                            text='{"error": "%s"}' % e,
+                            content_type='application/json')
 
 
 @requires_auth
