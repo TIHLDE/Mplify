@@ -80,14 +80,14 @@ class AdminPage extends Component {
 
         const loadingScreen = (
             <Paper className={classes.paper}>
-                <Typography variant="headline" component="h3">Autentiserer...</Typography>
+                <Typography variant="h5" component="h3">Autentiserer...</Typography>
             </Paper>
         );
 
         const adminContent = (
             <div className={classes.root}>
                 <Paper className={classes.paper}>
-                    <Typography variant="headline" component="h3">Admin-panel</Typography>
+                    <Typography variant="h5" component="h3">Admin-panel</Typography>
                     <hr />
                     <br />
                     <Grid container spacing={8}>

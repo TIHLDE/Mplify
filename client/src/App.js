@@ -31,6 +31,9 @@ const theme = createMuiTheme({
     secondary: { main: '#b71c1c' },
     error: { main: '#db9020' }
   },
+  typography: {
+    useNextVariants: true,
+  },
 });
 
 const authController = {

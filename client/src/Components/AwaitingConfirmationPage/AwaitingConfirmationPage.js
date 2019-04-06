@@ -27,7 +27,7 @@ class AwaitingConfirmationPage extends Component {
         return (
             <div className={classes.root}>
                 <Paper className={classes.paper}>
-                    <Typography variant="headline" component="h3">Takk for at du registerte deg!</Typography>
+                    <Typography variant="h5" component="h3">Takk for at du registerte deg!</Typography>
                     <hr />
                     <p>Vi har nå sendt en epost til student-eposten din for å bekrefte den.</p>
                     <p>Åpne eposten og følg lenken for å fullføre registeringen.</p>

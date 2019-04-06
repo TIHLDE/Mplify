@@ -1,4 +1,4 @@
-import { Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, IconButton, Paper, Switch, Tooltip, Typography } from '@material-ui/core';
+import { Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Paper, Switch, Tooltip, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import Clear from '@material-ui/icons/Clear';
 import Delete from '@material-ui/icons/Delete';
@@ -44,12 +44,10 @@ class UserDataTable extends Component {
                 display: true,
                 customBodyRender: (value, tableMeta, updateValue) => {
                     return (
-                        <FormControlLabel
-                            label={value ? "Ja" : "Nei"}
+                        <Switch
+                            color="primary"
+                            checked={!!value}
                             value={value ? "Ja" : "Nei"}
-                            control={
-                                <Switch color="primary" checked={!!value} value={value ? "Ja" : "Nei"} />
-                            }
                             onChange={event => {
                                 const idIndex = this.columns.findIndex(c => c.name === 'ID');
                                 const memberAttributes = tableMeta.rowData;
@@ -107,7 +105,7 @@ class UserDataTable extends Component {
         selectableRows: false,
         textLabels: {
             body: {
-                noMatch: "Fant ingen elementer elementer",
+                noMatch: "Fant ingen elementer",
                 toolTip: "Sortér",
             },
             pagination: {
@@ -263,7 +261,7 @@ class UserDataTable extends Component {
 
     handleResendVerificationClick = () => {
         const member = this.state.memberToProcess;
-        AdminApi.resendVerificationEmail(member.user_id)
+        AdminApi.resendVerificationEmail(member.student_email)
             .then(response => {
                 if (response.ok) {
                     this.setState({
@@ -301,7 +299,7 @@ class UserDataTable extends Component {
         const loadingComponent = (
             <Paper className={classes.paper}>
                 <CircularProgress />
-                <Typography variant="headline" component="h3">Henter medlemmer...</Typography>
+                <Typography variant="h5" component="h3">Henter medlemmer...</Typography>
             </Paper>
         );
 

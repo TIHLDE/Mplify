@@ -173,7 +173,7 @@ class EditUser extends Component {
         return (
             <div className={classes.root}>
                 <Paper className={classes.paper}>
-                    <Typography variant="headline" component="h3">{'Oppdatering av medlem #' + this.props.userToEdit.user_id + ': ' + this.props.userToEdit.first_name + ' ' + this.props.userToEdit.last_name}</Typography>
+                    <Typography variant="h5" component="h3">{'Oppdatering av medlem #' + this.props.userToEdit.user_id + ': ' + this.props.userToEdit.first_name + ' ' + this.props.userToEdit.last_name}</Typography>
                     <form onSubmit={this.handleSubmit.bind(this)}>
                         <UserRegistrationForm
                             userToEdit={this.props.userToEdit}

@@ -53,7 +53,7 @@ class ConfirmEmailPage extends Component {
         if (this.state.processing) {
             return (
                 <Paper className={classes.paper}>
-                    <Typography variant="headline" component="h3">Behandler forespørsel...</Typography>
+                    <Typography variant="h5" component="h3">Behandler forespørsel...</Typography>
                     <hr />
                     <p>Vent et lite øyeblikk, dette burde ikke ta lang tid.</p>
                 </Paper>
@@ -61,7 +61,7 @@ class ConfirmEmailPage extends Component {
         } else if (this.state.verified) {
             return (
                 <Paper className={classes.paper}>
-                    <Typography variant="headline" component="h3">Eposten din er nå bekreftet!</Typography>
+                    <Typography variant="h5" component="h3">Eposten din er nå bekreftet!</Typography>
                     <hr />
                     <p>Du har nå fullført registreringen.</p>
                 </Paper>
@@ -69,7 +69,7 @@ class ConfirmEmailPage extends Component {
         } else {
             return (
                 <Paper className={classes.paper}>
-                    <Typography variant="headline" component="h3">Lenken er ikke gyldig.</Typography>
+                    <Typography variant="h5" component="h3">Lenken er ikke gyldig.</Typography>
                     <hr />
                     <p>Dette kan skyldes at koden er ugyldig, eller at eposten din allerede har blitt aktivert.</p>
                 </Paper>

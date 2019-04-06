@@ -26,8 +26,8 @@ const styles = theme => ({
 
 class RegistrationPage extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
             firstName: '',
@@ -90,7 +90,7 @@ class RegistrationPage extends Component {
             });
         }
 
-        if ((this.state.vippsTransactionId.length !== 0 && this.state.vippsTransactionId.length >= 9)
+        if ((this.state.vippsTransactionId.length !== 0 && this.state.vippsTransactionId.length < 9)
             || (this.state.vippsTransactionId.length !== 0 && !this.isNumber(this.state.vippsTransactionId))) {
             allowSubmit = false;
             this.setState({
@@ -161,7 +161,7 @@ class RegistrationPage extends Component {
         return (
             <div className={classes.root}>
                 <Paper className={classes.paper}>
-                    <Typography variant="headline" component="h3">Registrering</Typography>
+                    <Typography variant="h5" component="h3">Registrering</Typography>
                     <form onSubmit={this.handleSubmit.bind(this)}>
                         <UserRegistrationForm
                             onTextChange={this.handleTextChange.bind(this)}

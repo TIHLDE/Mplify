@@ -38,7 +38,7 @@ class UpdateTermsOfService extends Component {
         UserApi.getTermsOfService()
             .then(response => response.json())
             .then(result => {
-                this.setState({
+                result.length > 0 && this.setState({
                     termsOfService: result[0].text
                 })
             })

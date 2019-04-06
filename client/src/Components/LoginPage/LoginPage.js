@@ -77,7 +77,7 @@ class LoginPage extends Component {
 
         const loginContent = (
             <Paper className={classes.paper}>
-                <Typography variant="headline" component="h3">Innlogging for SALT-styret</Typography>
+                <Typography variant="h5" component="h3">Innlogging for SALT-styret</Typography>
                 <hr />
                 <form onSubmit={this.handleSubmit}>
                     <Grid container spacing={8}>

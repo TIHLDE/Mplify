@@ -57,10 +57,10 @@ class AdminApi {
         return apiRequest('check_vipps_rows', 'POST', csvFile, headers);
     }
 
-    static resendVerificationEmail(userId) {
-        const url = 'send_verification_email';
+    static resendVerificationEmail(studentEmail) {
+        const url = 'send_new_email_verification_code';
         const payload = {
-            userId: userId
+            studentEmail: studentEmail
         };
         return apiRequest(url, 'POST', payload);
     }

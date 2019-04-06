@@ -122,7 +122,7 @@ class MembershipCertificatePage extends Component {
         return (
             <div className={classes.root}>
                 <Paper className={classes.paper}>
-                    <Typography variant="headline" component="h3">Medlemsbevis</Typography>
+                    <Typography variant="h5" component="h3">Medlemsbevis</Typography>
                     <hr />
                     {this.state.member.user_id > 0 ? outputContent : inputContent}
                 </Paper>
