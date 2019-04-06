@@ -22,9 +22,15 @@ const styles = theme => ({
         paddingBottom: theme.spacing.unit * 2,
     },
     dropzone: {
-        marginLeft: theme.spacing.unit * 6,
-        marginRight: theme.spacing.unit * 6,
+        display: 'flex',
+        justifyContent: 'center',
         marginBottom: theme.spacing.unit * 2,
+    },
+    dropzoneBox: {
+        width: 100,
+        height: 100,
+        border: '2px dashed black',
+        borderRadius: 4,
     },
     chip: {
         margin: theme.spacing.unit,
@@ -146,7 +152,13 @@ class BulkActivate extends Component {
                         onDrop={(file) => this.onDrop(file)}
                         accept=".csv"
                         multiple={false}
-                    />
+                    >
+                        {({getRootProps, getInputProps}) => (
+                            <div {...getRootProps()} className={classes.dropzoneBox}>
+                                <input {...getInputProps()} />
+                            </div>
+                        )}
+                    </Dropzone>
                 </div>
                 <DialogContentText id="alert-dialog-description">
                     {
