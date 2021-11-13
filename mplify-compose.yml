@@ -1,16 +1,18 @@
 version: "3.3"
 
 services:
-  #  api:
-  #    image: tihlde/mplify-api:latest
-  #    networks:
-  #      net:
-  #        aliases:
-  #          - api
-  #    environment:
-  #      DB_PASSWORD:
-  #      DB_USER:
-  #      DB_NAME:
+  api:
+    image: tihlde/mplify-api:latest
+    networks:
+      net:
+        aliases:
+          - api
+    environment:
+      DB_PASSWORD: root_pw
+      DB_USER: root
+      DB_NAME: salt_linjeforening
+      DB_HOST: localhost
+      DB_PORT: 3306
 
   web:
     image: tihlde/mplify-web:latest
