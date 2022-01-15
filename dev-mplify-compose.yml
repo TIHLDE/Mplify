@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  db:
+    image: mariadb:10.7
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: dev
+      MARIADB_USER: user
+      MARIADB_PASSWORD: user
+    expose:
+      - "3306"
+    networks:
+      net:
+        aliases:
+          - db
+    volumes:
+      - "./database/:/docker-entrypoint-initdb.d/"
+
+  api:
+    build:
+      context: ./server
+    networks:
+      net:
+        aliases:
+          - api
+    expose:
+      - "8082"
+    environment:
+      DB_PASSWORD: user
+      DB_USER: user
+      DB_NAME: dev
+      DB_HOST: db
+      DB_PORT: 3306
+    depends_on:
+      - db
+
+  web:
+    build:
+      context: ./client
+    networks:
+      net: {}
+    ports:
+    - 80:80
+    - 443:443
+    environment:
+      NODE_ENV: production
+      API_HOST: api
+      API_PORT: 8082
+    depends_on:
+      - api
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      net: {}
+    depends_on:
+      - db
+
+networks:
+  net:
+    external: false

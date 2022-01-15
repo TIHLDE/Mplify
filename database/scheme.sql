@@ -26,7 +26,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `login`
 --
 
-CREATE TABLE `login` (
+CREATE TABLE IF NOT EXISTS `login` (
   `username` varchar(30) NOT NULL,
   `hash` blob NOT NULL,
   `salt` blob NOT NULL
@@ -38,7 +38,7 @@ CREATE TABLE `login` (
 -- Table structure for table `study_programme`
 --
 
-CREATE TABLE `study_programme` (
+CREATE TABLE IF NOT EXISTS `study_programme` (
   `study_programme_id` int(11) NOT NULL,
   `programme_code` varchar(45) NOT NULL,
   `name` varchar(60) NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE `study_programme` (
 -- Table structure for table `terms_of_service`
 --
 
-CREATE TABLE `terms_of_service` (
+CREATE TABLE IF NOT EXISTS `terms_of_service` (
   `id` int(11) NOT NULL,
   `text` mediumtext DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -63,7 +63,7 @@ CREATE TABLE `terms_of_service` (
 -- Table structure for table `user`
 --
 
-CREATE TABLE `user` (
+CREATE TABLE IF NOT EXISTS `user` (
   `user_id` int(11) NOT NULL,
   `first_name` varchar(45) NOT NULL,
   `last_name` varchar(45) NOT NULL,
@@ -86,25 +86,25 @@ CREATE TABLE `user` (
 --
 -- Indexes for table `login`
 --
-ALTER TABLE `login`
+ALTER TABLE IF EXISTS `login`
   ADD PRIMARY KEY (`username`);
 
 --
 -- Indexes for table `study_programme`
 --
-ALTER TABLE `study_programme`
+ALTER TABLE IF EXISTS `study_programme`
   ADD PRIMARY KEY (`study_programme_id`);
 
 --
 -- Indexes for table `terms_of_service`
 --
-ALTER TABLE `terms_of_service`
+ALTER TABLE IF EXISTS `terms_of_service`
   ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `user`
 --
-ALTER TABLE `user`
+ALTER TABLE IF EXISTS `user`
   ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `vipps_transaction_id` (`vipps_transaction_id`),
   ADD KEY `fk_user_study_programme_idx` (`study_programme_id`);
@@ -116,7 +116,7 @@ ALTER TABLE `user`
 --
 -- AUTO_INCREMENT for table `user`
 --
-ALTER TABLE `user`
+ALTER TABLE IF EXISTS `user`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2247;
 --
 -- Constraints for dumped tables
@@ -125,7 +125,7 @@ ALTER TABLE `user`
 --
 -- Constraints for table `user`
 --
-ALTER TABLE `user`
+ALTER TABLE IF EXISTS `user`
   ADD CONSTRAINT `fk_user_study_programme` FOREIGN KEY (`study_programme_id`) REFERENCES `study_programme` (`study_programme_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
