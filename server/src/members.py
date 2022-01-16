@@ -15,18 +15,25 @@ from auth import requires_auth
 from app import get_environ_sfe
 
 
+DOMAIN = ''
 EMAIL_PASSWORD = ''
 EMAIL_USER = ''
 EMAIL_HOST = ''
+EMAIL_PORT = 25
+EMAIL_USE_TLS = True
 loop = None
 SEMESTER_SLUTT = {"month": 6, "day": 15}
 
 
 def init():
-    global EMAIL_PASSWORD, EMAIL_USER, EMAIL_HOST
+    global DOMAIN, EMAIL_PASSWORD, EMAIL_USER, EMAIL_HOST, EMAIL_PORT, EMAIL_USE_TLS
+    DOMAIN = get_environ_sfe("DOMAIN")
     EMAIL_PASSWORD = get_environ_sfe("EMAIL_PASSWORD")
     EMAIL_USER = get_environ_sfe("EMAIL_USER")
     EMAIL_HOST = get_environ_sfe("EMAIL_HOST")
+    EMAIL_PORT = get_environ_sfe("EMAIL_PORT")
+    if get_environ_sfe("EMAIL_USE_TLS") == "false":
+        EMAIL_USE_TLS = False
 
 
 async def check_vipps_id(request):
@@ -183,7 +190,7 @@ async def register_member(request):
             print("Member: '{}' has been added to the database.".format(first_name + ' ' + last_name))
             student_username = student_email.split('@')[0]
 
-            link = 'http://medlem.studentalt.no/#/confirm/{0}_{1}'.format(email_verification_code, student_username)
+            link = '{0}/#/confirm/{1}_{2}'.format(DOMAIN, email_verification_code, student_username)
             email_content = 'Hei!\nDu har mottatt denne meldingen fordi det blir forsøkt å registrere seg som SALT medlem med denne epostadressen.\n' \
                             'Om dette ikke er tilfelle, vennligst se bort ifra denne eposten.\n\n' \
                             'For å bekrefte brukeren din, klikk på følgende lenke:\n' \
@@ -788,9 +795,10 @@ def send_email(recipient, subject, body, sender='no-reply@tihlde.org'):
     msg.attach(MIMEText(body, 'plain', 'utf-8'))
     text = msg.as_string()
     try:
-        smtp_obj = smtplib.SMTP(EMAIL_HOST, port=587)
+        smtp_obj = smtplib.SMTP(host=EMAIL_HOST, port=EMAIL_PORT)
         smtp_obj.ehlo()
-        smtp_obj.starttls()
+        if EMAIL_USE_TLS:
+            smtp_obj.starttls()
         smtp_obj.login(user=EMAIL_USER, password=EMAIL_PASSWORD)
 
         smtp_obj.sendmail(sender, recipient, text)

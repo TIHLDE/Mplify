@@ -1,6 +1,20 @@
 version: "3.9"
 
 services:
+  mail:
+    image: mailhog/mailhog
+    environment:
+      MH_AUTH_FILE: "/auth"
+    volumes:
+      - "./mail/auth:/auth:ro"
+    networks:
+      email:
+        aliases:
+          - mail
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
   db:
     image: mariadb:10.7
     restart: always
@@ -12,7 +26,7 @@ services:
     expose:
       - "3306"
     networks:
-      net:
+      database:
         aliases:
           - db
     volumes:
@@ -22,25 +36,35 @@ services:
     build:
       context: ./server
     networks:
-      net:
+      email: {}
+      database: {}
+      backend: {}
+      frontend:
         aliases:
           - api
     expose:
       - "8082"
     environment:
+      DOMAIN: https://localhost
       DB_PASSWORD: user
       DB_USER: user
       DB_NAME: dev
       DB_HOST: db
       DB_PORT: 3306
+      EMAIL_PASSWORD: dev
+      EMAIL_USER: dev
+      EMAIL_HOST: mail
+      EMAIL_PORT: 1025
+      EMAIL_USE_TLS: "false"
     depends_on:
       - db
+      - mail
 
   web:
     build:
       context: ./client
     networks:
-      net: {}
+      frontend: {}
     ports:
     - 80:80
     - 443:443
@@ -57,10 +81,16 @@ services:
     ports:
       - 8080:8080
     networks:
-      net: {}
+      database: {}
     depends_on:
       - db
 
 networks:
-  net:
+  frontend:
+    external: false
+  backend:
+    external: false
+  database:
+    external: false
+  email:
     external: false
