@@ -57,7 +57,7 @@ async def login(request):
             return bad_creds_response()
 
         password_hash = hash_str(post_passwd, r['salt'], ITERATIONS)
-        if password_hash == r['hash']:
+        if str(password_hash).replace("\\", "") == str(r['hash']):
             token = create_session(post_usr)
             return web.Response(status=200,
                                 text=json.dumps({

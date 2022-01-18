@@ -8,6 +8,7 @@
 -- PHP Version: 5.6.40-0+deb8u1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+-- SET GLOBAL SQL_MODE = 'NO_BACKSLASH_ESCAPES';
 SET time_zone = "+00:00";
 
 
