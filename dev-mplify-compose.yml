@@ -45,6 +45,9 @@ services:
     expose:
       - "8082"
     environment:
+      PYTHONPATH: src
+      WEB_IP: 0.0.0.0
+      WEB_PORT: 8082
       DOMAIN: https://localhost
       DB_PASSWORD: user
       DB_USER: user
