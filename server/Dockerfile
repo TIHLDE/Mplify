@@ -1,14 +1,17 @@
-FROM python:3.6-alpine
+FROM python:3.9-alpine
 
-WORKDIR /opt/api
+WORKDIR /usr/src/app
+COPY requirements.txt requirements.txt
 
 # these packages are for PyMySQL, which aiomysql depends on
-RUN apk --no-cache add libffi-dev openssl-dev gcc musl-dev
+RUN apk --no-cache add libffi-dev openssl-dev gcc musl-dev && \
+    pip3 install --upgrade pip && \
+    pip3 install --no-cache -r requirements.txt --src /lib && \
+    apk del openssl-dev gcc musl-dev && \
+    addgroup --gid 1001 --system app && \
+    adduser -H -s /bin/false -D -u 1001 -S -G app app
 
-COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt --src /lib
-
-RUN apk del openssl-dev gcc musl-dev
+USER app
 
 COPY src .
 
