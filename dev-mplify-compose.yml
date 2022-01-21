@@ -44,10 +44,13 @@ services:
           - api
     expose:
       - "8082"
+    # ports:
+    #   - "8082:8082"
     environment:
       WEB_IP: 0.0.0.0
       WEB_PORT: 8082
       DOMAIN: https://localhost
+      # DOMAIN: https://localhost:8082
       DB_PASSWORD: user
       DB_USER: user
       DB_NAME: dev
@@ -71,7 +74,7 @@ services:
     - 80:80
     - 443:443
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       API_HOST: api
       API_PORT: 8082
     depends_on:

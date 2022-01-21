@@ -8,8 +8,8 @@ const styles = theme => ({
         textAlign: "center"
     },
     paper: {
-        paddingTop: theme.spacing.unit * 2,
-        paddingBottom: theme.spacing.unit * 2,
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
         maxWidth: 600,
         marginLeft: "auto",
         marginRight: "auto",
@@ -25,7 +25,9 @@ class ConfirmEmailPage extends Component {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
+
+	console.log(this?.props?.match?.params?.code)
         UserApi.confirmEmail(this.props.match.params.code)
             .then(response => {
                 if (response.ok) {

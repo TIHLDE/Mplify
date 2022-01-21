@@ -11,8 +11,8 @@ const styles = theme => ({
         textAlign: "center"
     },
     paper: {
-        paddingTop: theme.spacing.unit * 2,
-        paddingBottom: theme.spacing.unit * 2,
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
         maxWidth: 600,
         marginLeft: "auto",
         marginRight: "auto",

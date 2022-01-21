@@ -82,8 +82,8 @@ if __name__ == "__main__":
     )
 
     # Configure CORS on all routes.
-    # for route in list(app.router.routes()):
-    #     cors.add(route)
+    for route in list(app.router.routes()):
+        cors.add(route)
 
     WEB_IP = get_environ_sfe("WEB_IP", default="0.0.0.0")
     WEB_PORT = get_environ_sfe("WEB_PORT", default=80)

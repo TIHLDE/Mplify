@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import BOARD from '../../‫Images/SALT_board.png';
+import BOARD from '../../Images/SALT_board.png';
 
 class MemberBoard extends Component{
 

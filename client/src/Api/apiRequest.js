@@ -1,4 +1,3 @@
-// const BASE_URL = (window.location.hostname === 'localhost' ? 'http://localhost' : '') + '/api/';
 const BASE_URL = '/api/'
 
 export default function apiRequest(resourceUrl = '', method = 'GET', payload = null, customHeaders = null) {

@@ -8,8 +8,8 @@ const styles = theme => ({
         textAlign: "center"
     },
     paper: {
-        paddingTop: theme.spacing.unit * 2,
-        paddingBottom: theme.spacing.unit * 2,
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
     },
     textArea: {
         resize: "none"
@@ -32,7 +32,7 @@ class ExportEmailList extends Component {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         if (this.props.newsletter) {
             this.buttonName = 'Eksporter Nyhetsbrevliste';
             this.dialogTitle = 'Epostliste for nyhetsbrev';

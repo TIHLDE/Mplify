@@ -1,5 +1,5 @@
 import {Paper} from '@material-ui/core';
-import {createMuiTheme, MuiThemeProvider, withStyles} from '@material-ui/core/styles';
+import {createTheme, MuiThemeProvider, withStyles} from '@material-ui/core/styles';
 import React, {Component} from 'react';
 import {HashRouter as Router, Redirect, Route} from "react-router-dom";
 import './App.css';
@@ -8,7 +8,7 @@ import AwaitingConfirmationPage from './Components/AwaitingConfirmationPage/Awai
 import ConfirmEmailPage from './Components/ConfirmEmailPage/ConfirmEmailPage';
 import LoginPage from './Components/LoginPage/LoginPage';
 import RegistrationPage from './Components/RegistrationPage/RegistrationPage';
-import LOGO from './‫Images/SALT.png';
+import LOGO from './Images/SALT.png';
 import MembershipCertificatePage from "./Components/MembershipCertificatePage/MembershipCertificatePage";
 
 const styles = theme => ({
@@ -16,8 +16,8 @@ const styles = theme => ({
     textAlign: "center"
   },
   paper: {
-    paddingTop: theme.spacing.unit * 2,
-    marginBottom: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
     marginLeft: "auto",
     marginRight: "auto",
     textAlign: "center",
@@ -25,7 +25,7 @@ const styles = theme => ({
   }
 });
 
-const theme = createMuiTheme({
+const theme = createTheme({
   palette: {
     primary: { main: '#2e7d32' },
     secondary: { main: '#b71c1c' },
@@ -50,20 +50,13 @@ const authController = {
   }
 };
 
-const RedirectToMembershipCertificate = () => (
-  <Redirect to='/membership-certificate' />
-);
+const PrivateRoute = ({ children }) => {
+  if (!authController.isAuthenticated) {
+    return <Redirect to={{ pathname: "/login"}} />
+  }
 
-const PrivateRoute = ({ component: Component, onLogout, ...rest }) => (
-  <Route
-    {...rest}
-    render={
-      props => authController.isAuthenticated
-        ? (<Component {...props} onLogout={onLogout} />)
-        : (<Redirect to={{ pathname: "/login", state: { from: props.location } }} />)
-    }
-  />
-);
+  return children
+};
 
 const ConfirmEmail = ({ match }) => (
   <ConfirmEmailPage match={match} />
@@ -76,7 +69,7 @@ class App extends Component {
     this.state = {};
   }
 
-  componentWillMount() {
+  componentDidMount() {
     authController.authenticate();
   }
 
@@ -90,7 +83,6 @@ class App extends Component {
 
   render() {
     const { classes } = this.props;
-
     return (
       <div className="App">
         <MuiThemeProvider theme={theme}>
@@ -98,15 +90,20 @@ class App extends Component {
             <img onClick={this.handleImageClick} src={LOGO} height="128px" alt="" />
           </Paper>
           <Router>
-            <div>
-              <Route path="/" exact component={RedirectToMembershipCertificate} />
-              <Route path="/membership-certificate" exact component={MembershipCertificatePage} />
-              <Route path="/registration" exact component={RegistrationPage} />
-              <Route path="/awaiting-confirmation" exact component={AwaitingConfirmationPage} />
-              <Route path="/confirm/:code" exact component={ConfirmEmail} />
-              <PrivateRoute path="/admin" exact component={AdminPage} onLogout={this.handleLogout.bind(this)} />
-              <Route path='/login' render={(props) => (<LoginPage onLogIn={this.handleLogIn.bind(this)} {...props} />)} />
-            </div>
+              <Route path="/" exact render={() => <Redirect to='/membership-certificate' />} />
+              <Route path="/membership-certificate" exact component={() => <MembershipCertificatePage/>} />
+              <Route path="/registration" exact component={(props) => <RegistrationPage {...props}/>} />
+              <Route path="/awaiting-confirmation" exact component={() => <AwaitingConfirmationPage/>} />
+
+              <Route path="/confirm/:code" exact component={(props) => <ConfirmEmailPage{...props}/>} />
+
+              <Route path='/admin' exact component={() =>
+                <PrivateRoute>
+                  <AdminPage onLogout={this.handleLogout.bind(this)} />
+                </PrivateRoute>
+              } />
+
+              <Route path='/login' component={() => <LoginPage onLogIn={this.handleLogIn.bind(this)} />} />
           </Router>
         </MuiThemeProvider>
       </div>

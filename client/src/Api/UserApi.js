@@ -28,6 +28,7 @@ class UserApi {
 
     static confirmEmail(confirmationCode) {
         const url = 'confirm_email/' + confirmationCode;
+        // const url = 'http://localhost:8082/confirm_email/' + confirmationCode;
         return apiRequest(url);
     }
 

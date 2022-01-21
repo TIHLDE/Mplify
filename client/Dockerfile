@@ -1,6 +1,11 @@
-FROM node:11-alpine AS builder
-# ENV NPM_CONFIG_LOGLEVEL info
-COPY . .
+FROM node:16-alpine AS builder
+
+ENV NPM_CONFIG_LOGLEVEL info
+
+COPY ./package.json ./package.json
+COPY ./public ./public
+COPY ./src ./src
+
 RUN npm install && npm run build
 
 FROM caddy:alpine

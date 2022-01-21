@@ -9,8 +9,8 @@ const styles = theme => ({
         textAlign: "center"
     },
     paper: {
-        paddingTop: theme.spacing.unit * 2,
-        paddingBottom: theme.spacing.unit * 2,
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
     },
     formControl: {
         textAlign: "left",
@@ -47,7 +47,7 @@ class EditUser extends Component {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         const u = this.props.userToEdit;
         this.setState({
             userId: u.user_id,

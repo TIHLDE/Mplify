@@ -15,8 +15,8 @@ const styles = theme => ({
         textAlign: "center"
     },
     paper: {
-        paddingTop: theme.spacing.unit * 2,
-        paddingBottom: theme.spacing.unit * 2,
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
     },
     buttonContainer: {
         display: "flex"
@@ -25,7 +25,7 @@ const styles = theme => ({
         display: "inline-flex"
     },
     chip: {
-        margin: theme.spacing.unit,
+        margin: theme.spacing()
     },
     noWrap: {
         whiteSpace: "nowrap",
@@ -151,7 +151,7 @@ class UserDataTable extends Component {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         UserApi.getStudyProgrammes()
             .then(response => response.json())
             .then(result => {
@@ -280,7 +280,7 @@ class UserDataTable extends Component {
 
         const editButton = <Tooltip title="Rediger"><IconButton className={classes.button} color="primary" onClick={this.handleEditClick.bind(this, m)}><Edit /></IconButton></Tooltip>;
         const deleteButton = <Tooltip title="Slett"><IconButton className={classes.button} color="secondary" onClick={this.handleDeleteDialogOpen.bind(this, m)}><Delete /></IconButton></Tooltip>;
-        const resendVerificationButton = m.verified_student_email ? '' : <Tooltip title="Send ny bekreftelse"><IconButton className={classes.button} color="primary" onClick={this.handleResendVerificationDialogOpen.bind(this, m)}><Email/></IconButton></Tooltip>;
+        const resendVerificationButton = m.verified_student_email ? '' : <Tooltip title="Send ny bekreftelse"><IconButton className={classes.button} color="primary" onClick={this.handleResendVerificationDialogOpen.bind(this, m)}><Email /></IconButton></Tooltip>;
         const actions = <div className={classes.buttonContainer}>{editButton}{deleteButton}{resendVerificationButton}</div>;
 
         const verifiedStudentEmail = m.verified_student_email ? 'Ja' : 'Nei';

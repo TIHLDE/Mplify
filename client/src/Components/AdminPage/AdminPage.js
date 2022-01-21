@@ -14,8 +14,8 @@ const styles = theme => ({
         textAlign: "center"
     },
     paper: {
-        paddingTop: theme.spacing.unit * 2,
-        paddingBottom: theme.spacing.unit * 2,
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
     }
 });
 
@@ -31,7 +31,7 @@ class AdminPage extends Component {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         const token = sessionStorage.getItem('token');
         if (token) {
             UserApi.checkValidToken(token)

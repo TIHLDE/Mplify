@@ -18,13 +18,13 @@ const styles = theme => ({
         textAlign: "center"
     },
     paper: {
-        paddingTop: theme.spacing.unit * 2,
-        paddingBottom: theme.spacing.unit * 2,
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
     },
     dropzone: {
         display: 'flex',
         justifyContent: 'center',
-        marginBottom: theme.spacing.unit * 2,
+        marginBottom: theme.spacing(2),
     },
     dropzoneBox: {
         width: 100,

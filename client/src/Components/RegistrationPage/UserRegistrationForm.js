@@ -10,8 +10,8 @@ const styles = theme => ({
         textAlign: "center"
     },
     paper: {
-        paddingTop: theme.spacing.unit * 2,
-        paddingBottom: theme.spacing.unit * 2,
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
     },
     formControl: {
         textAlign: "left",
@@ -19,7 +19,7 @@ const styles = theme => ({
         minWidth: 200
     },
     selectEmpty: {
-        marginTop: theme.spacing.unit * 2
+        marginTop: theme.spacing(2)
     }
 });
 
@@ -44,7 +44,7 @@ class UserRegistrationForm extends Component {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.populateStudyProgrammeEntries();
         this.populateYearOfAdmissionYears();
 

@@ -9,14 +9,14 @@ const styles = theme => ({
         textAlign: "center"
     },
     paper: {
-        paddingTop: theme.spacing.unit * 2,
-        paddingBottom: theme.spacing.unit * 2,
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2),
     },
     textArea: {
         resize: "none"
     },
     progress: {
-        margin: theme.spacing.unit * 2
+        margin: theme.spacing(2)
     }
 });
 
@@ -34,7 +34,7 @@ class UpdateTermsOfService extends Component {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         UserApi.getTermsOfService()
             .then(response => response.json())
             .then(result => {
