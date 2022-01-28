@@ -1,24 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
-from models.login import Login, LoginCreate
-from models.common import Message
 from database import get_session
+from models.common import Message
+from models.login import Login, LoginCreate
 from utils.hash import check_hash
 
-
-router = APIRouter(
-    prefix="/login",
-    tags=["login"]
-)
+router = APIRouter(prefix="/login", tags=["login"])
 
 
 @router.post("/", response_model=Message)
 async def login(
-    *,
-    session: Session = Depends(get_session),
-    login: LoginCreate
-):
+    *, session: Session = Depends(get_session), login: LoginCreate
+) -> Message | HTTPException:
 
     statement = select(Login).where(Login.username == login.username)
     results = session.exec(statement)

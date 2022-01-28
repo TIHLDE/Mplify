@@ -1,17 +1,14 @@
 # import pytest
-from models.user import User
-
 from fastapi.testclient import TestClient
 from sqlmodel import Session
+
+from models.user import User
 
 # from tests.test_main import client_fixture, session_fixture
 
 
 def test_create_user(client: TestClient):
-    response = client.post(
-        "/user/",
-        json={"name": "Deadpond", "age": 22}
-    )
+    response = client.post("/user/", json={"name": "Deadpond", "age": 22})
     data = response.json()
 
     assert response.status_code == 200
@@ -30,10 +27,7 @@ def test_create_user_invalid(client: TestClient):
     # age has an invalid type
     response = client.post(
         "/user/",
-        json={
-            "name": "Deadpond",
-            "age": "nisse"
-        },
+        json={"name": "Deadpond", "age": "nisse"},
     )
     assert response.status_code == 422
 

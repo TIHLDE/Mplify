@@ -12,10 +12,7 @@ def test_login(session: Session, client: TestClient):
     session.add(user)
     session.commit()
 
-    response = client.post(
-        "/login/",
-        json={"username": "nisse", "password": "pølse"}
-    )
+    response = client.post("/login/", json={"username": "nisse", "password": "pølse"})
     data = response.json()
 
     assert response.status_code == 200

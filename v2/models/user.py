@@ -1,5 +1,5 @@
-
 from typing import Optional
+
 from sqlmodel import Field, SQLModel
 
 
@@ -16,7 +16,7 @@ class UserCreate(UserBase):
     pass
 
 
-class UserUpdate(UserBase):
+class UserUpdate(SQLModel):
     name: Optional[str] = None
     age: Optional[int] = None
 

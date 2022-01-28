@@ -1,12 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from database import create_db_and_tables
-
-from api.user.user import router as userRouter
 from api.user.login import router as loginRouter
 from api.user.register import router as registerRouter
-
+from api.user.user import router as userRouter
+from database import create_db_and_tables
 
 app = FastAPI(
     title="Mplify.v2",

@@ -3,8 +3,7 @@ from fastapi.testclient import TestClient
 
 def test_register(client: TestClient):
     response = client.post(
-        "/register/",
-        json={"username": "nisse", "password": "pølse"}
+        "/register/", json={"username": "nisse", "password": "pølse"}
     )
     data = response.json()
 
