@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "v2"
+version = "0.1.0"
+description = "Mplify"
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.73.0"
+uvicorn = "^0.17.0"
+sqlmodel = "^0.0.6"
+requests = "^2.27.1"
+pytest = "^6.2.5"
+aiosqlite = "^0.17.0"
+bcrypt = "^3.2.0"
+mypy = "^0.931"
+isort = "^5.10.1"
+autoflake = "^1.4"
+flake8 = "^4.0.1"
+
+[tool.poetry.dev-dependencies]
+black = "^21.12b0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

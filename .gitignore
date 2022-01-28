@@ -2,8 +2,12 @@
 npm-debug.log
 
 server/src/__pycache__/
+__pycache__
 
 \.vscode/
+.pytest_cache
+
+database.db
 
 Mplify\.iml
 genpw.py
