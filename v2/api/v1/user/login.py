@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
-from database import get_session
+from core.database import get_session
 from models.common import Message
-from models.login import Login, LoginCreate
+from models.login import Login
+from models.admin import Admin
 from utils.hash import check_hash
 
 router = APIRouter(prefix="/login", tags=["login"])
@@ -11,10 +12,10 @@ router = APIRouter(prefix="/login", tags=["login"])
 
 @router.post("/", response_model=Message)
 async def login(
-    *, session: Session = Depends(get_session), login: LoginCreate
+    *, session: Session = Depends(get_session), login: Login
 ) -> Message | HTTPException:
 
-    statement = select(Login).where(Login.username == login.username)
+    statement = select(Admin).where(Admin.username == login.username)
     results = session.exec(statement)
     user = results.first()
 
@@ -24,4 +25,4 @@ async def login(
     if not check_hash(login.password, user.hash):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    return {"message": "ok"}
+    return Message(message="ok")

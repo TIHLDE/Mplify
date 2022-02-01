@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select
 
-from database import get_session
+from core.database import get_session
 from models.common import Message
 from models.user import User, UserCreate, UserRead, UserUpdate
 
@@ -38,7 +38,7 @@ async def create_user(
 @router.get("/{user_id}", response_model=UserRead)
 async def read_user(
     *, session: Session = Depends(get_session), user_id: int
-) -> UserRead:
+) -> UserRead | HTTPException:
     user = session.get(User, user_id)
 
     if not user:
@@ -50,7 +50,7 @@ async def read_user(
 @router.patch("/{user_id}", response_model=UserRead)
 async def update_user(
     *, session: Session = Depends(get_session), user_id: int, user: UserUpdate
-) -> UserRead:
+) -> UserRead | HTTPException:
     db_user = session.get(User, user_id)
 
     if not db_user:
@@ -70,7 +70,7 @@ async def update_user(
 @router.delete("/{user_id}", response_model=Message)
 async def delete_user(
     *, session: Session = Depends(get_session), user_id: int
-) -> Message:
+) -> Message | HTTPException:
     user = session.get(User, user_id)
 
     if not user:
@@ -79,4 +79,4 @@ async def delete_user(
     session.delete(user)
     session.commit()
 
-    return {"message": "ok"}
+    return Message(message="ok")

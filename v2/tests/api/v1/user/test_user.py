@@ -1,10 +1,7 @@
-# import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from models.user import User
-
-# from tests.test_main import client_fixture, session_fixture
 
 
 def test_create_user(client: TestClient):
