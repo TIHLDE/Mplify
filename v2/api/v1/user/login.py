@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
 from core.database import get_session
+from models.admin import Admin
 from models.common import Message
 from models.login import Login
-from models.admin import Admin
 from utils.hash import check_hash
 
 router = APIRouter(prefix="/login", tags=["login"])

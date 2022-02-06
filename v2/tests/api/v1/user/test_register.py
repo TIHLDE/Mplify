@@ -1,5 +1,4 @@
 from fastapi.testclient import TestClient
-
 from sqlmodel import Session
 
 # from models.admin import Admin
@@ -8,7 +7,8 @@ from sqlmodel import Session
 
 def test_register(client: TestClient):
     response = client.post(
-        "/register/", json={"username": "nisse", "password": "pølse", "email": "nisse@pølse.com"}
+        "/register/",
+        json={"username": "nisse", "password": "pølse", "email": "nisse@pølse.com"},
     )
     data = response.json()
 
@@ -18,7 +18,8 @@ def test_register(client: TestClient):
 
 def test_register_exist(session: Session, client: TestClient):
     response1 = client.post(
-        "/register/", json={"username": "nisse", "password": "pølse", "email": "nisse@pølse.com"}
+        "/register/",
+        json={"username": "nisse", "password": "pølse", "email": "nisse@pølse.com"},
     )
     data = response1.json()
 
@@ -32,7 +33,8 @@ def test_register_exist(session: Session, client: TestClient):
     # session.refresh(admin)
 
     response2 = client.post(
-        "/register/", json={"username": "nisse", "password": "pølse", "email": "nisse@pølse.com"}
+        "/register/",
+        json={"username": "nisse", "password": "pølse", "email": "nisse@pølse.com"},
     )
     # data = response.json()
 

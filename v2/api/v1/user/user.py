@@ -6,8 +6,14 @@ from sqlmodel import Session, select
 from core.database import get_session
 from models.common import Message
 from models.user import User, UserCreate, UserRead, UserUpdate
+from utils.oauth import get_current_active_user
 
 router = APIRouter(prefix="/user", tags=["user"])
+
+
+@router.get("/me/", response_model=User)
+async def read_user_me(current_user: User = Depends(get_current_active_user)) -> User:
+    return current_user
 
 
 @router.get("/", response_model=List[UserRead])

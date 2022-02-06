@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
 from core.database import get_session
-from models.common import Message
 from models.admin import Admin, AdminCreate
+from models.common import Message
 from models.register import Register
-from utils.hash import generate_hash
+from utils.oauth import get_password_hash
 
 router = APIRouter(prefix="/register", tags=["register"])
 
@@ -21,8 +21,12 @@ async def register(
     if admin:
         raise HTTPException(status_code=409, detail="Admin already exist")
 
-    hash = generate_hash(register.password)
-    new_admin = AdminCreate(username=register.username, hash=hash, email=register.email)
+    hashed_password = get_password_hash(register.password)
+    new_admin = AdminCreate(
+        username=register.username,
+        hashed_password=hashed_password,
+        email=register.email,
+    )
 
     db_admin = Admin.from_orm(new_admin)
 

@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from core.database import create_db_and_tables
-
-from api.v1.user.login import router as loginRouter
+# from api.v1.user.login import router as loginRouter
 from api.v1.user.register import router as registerRouter
+from api.v1.user.token import router as tokenRouter
 from api.v1.user.user import router as userRouter
+from core.database import create_db_and_tables
 
 app = FastAPI(
     title="Mplify.v2",
@@ -29,7 +29,8 @@ app.add_middleware(
 )
 
 app.include_router(userRouter)
-app.include_router(loginRouter)
+app.include_router(tokenRouter)
+# app.include_router(loginRouter)
 app.include_router(registerRouter)
 
 

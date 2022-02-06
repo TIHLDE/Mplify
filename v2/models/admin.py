@@ -5,7 +5,7 @@ from sqlmodel import Field, SQLModel
 
 class AdminBase(SQLModel):
     username: str = Field(index=True)
-    hash: str
+    hashed_password: str
     email: str
 
 
@@ -19,7 +19,7 @@ class AdminCreate(AdminBase):
 
 class AdminUpdate(SQLModel):
     username: Optional[str]
-    hash: Optional[str]
+    hashed_password: Optional[str]
     email: Optional[str]
 
 
