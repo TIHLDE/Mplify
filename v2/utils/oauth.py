@@ -1,5 +1,5 @@
-from typing import Dict
 from datetime import datetime, timedelta
+from typing import Dict
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -9,6 +9,7 @@ from sqlmodel import Session, select
 
 from core.database import get_session
 from core.settings import ALGORITHM, SECRET_KEY, TOKEN_URL
+from models.admin import Admin, AdminInDB
 from models.token import TokenData
 from models.user import User, UserInDB
 
@@ -31,19 +32,35 @@ def get_user(session: Session, username: str) -> User | None:
 
     if user:
         return user
+
+    return None
+
+
+def get_admin(session: Session, username: str) -> Admin | None:
+    statement = select(Admin).where(Admin.username == username)
+    results = session.exec(statement)
+    admin = results.first()
+
+    if admin:
+        return admin
+
     return None
 
 
 def authenticate_user(
     session: Session, username: str, password: str
-) -> UserInDB | bool:
-    user = get_user(session, username)
-    if not user:
-        return False
-    if not verify_password(password, user.hashed_password):
+) -> UserInDB | AdminInDB | bool:
+
+    user_or_admin = get_user(session, username)
+    if not user_or_admin:
+        user_or_admin = get_admin(session, username)
+        if not user_or_admin:
+            return False
+
+    if not verify_password(password, user_or_admin.hashed_password):
         return False
 
-    return user
+    return user_or_admin
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> Dict:
@@ -94,3 +111,40 @@ async def get_current_active_user(
         raise HTTPException(status_code=400, detail="Inactive user")
 
     return current_user
+
+
+async def get_current_admin(
+    session: Session = Depends(get_session), token: str = Depends(oauth2_scheme)
+) -> HTTPException | AdminInDB:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+
+        if username is None:
+            raise credentials_exception
+
+        token_data = TokenData(username=username)
+    except JWTError:
+        raise credentials_exception
+
+    user = get_admin(session, username=token_data.username)
+
+    if user is None:
+        raise credentials_exception
+
+    return user
+
+
+async def get_current_active_admin(
+    current_admin: Admin = Depends(get_current_admin),
+) -> HTTPException | AdminInDB:
+    if current_admin.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+
+    return current_admin

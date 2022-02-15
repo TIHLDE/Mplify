@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# from api.v1.user.login import router as loginRouter
-from api.v1.user.register import router as registerRouter
-from api.v1.user.token import router as tokenRouter
-from api.v1.user.user import router as userRouter
+from api.v1.admin.endpoints import router as adminRouter
+from api.v1.token.token import router as tokenRouter
+from api.v1.user.endpoints import router as userRouter
+
 from core.database import create_db_and_tables
 
 app = FastAPI(
@@ -18,6 +18,9 @@ origins = [
     "http://localhost",
     "http://localhost:8080",
     "https://localhost:8080",
+    # "www.example.com"
+    # "http://example.com"
+    # "https://example.com"
 ]
 
 app.add_middleware(
@@ -29,9 +32,8 @@ app.add_middleware(
 )
 
 app.include_router(userRouter)
+app.include_router(adminRouter)
 app.include_router(tokenRouter)
-# app.include_router(loginRouter)
-app.include_router(registerRouter)
 
 
 @app.on_event("startup")

@@ -1,88 +1,30 @@
-from typing import List
+from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlmodel import Session, select
-
+from api.v1.utils.user import api_user
 from core.database import get_session
-from models.common import Message
-from models.user import User, UserCreate, UserRead, UserUpdate
+from models.user import User, UserUpdate
 from utils.oauth import get_current_active_user
 
-router = APIRouter(prefix="/user", tags=["user"])
+router = APIRouter(prefix="/me", tags=["me"])
 
 
-@router.get("/me/", response_model=User)
+@router.get("/", response_model=User)
 async def read_user_me(current_user: User = Depends(get_current_active_user)) -> User:
     return current_user
 
 
-@router.get("/", response_model=List[UserRead])
-async def read_users(
+@router.patch("/", response_model=User)
+async def update_user_me(
     *,
+    current_user: User = Depends(get_current_active_user),
     session: Session = Depends(get_session),
-    offset: int = 0,
-    limit: int = Query(default=100, lte=100),
-) -> List[UserRead]:
-    users = session.exec(select(User).offset(offset).limit(limit)).all()
-    return users
+    user: UserUpdate
+) -> User | HTTPException:
 
-
-@router.post("/", response_model=UserRead)
-async def create_user(
-    *, session: Session = Depends(get_session), user: UserCreate
-) -> UserRead:
-
-    db_user = User.from_orm(user)
-
-    session.add(db_user)
-    session.commit()
-    session.refresh(db_user)
-
-    return db_user
-
-
-@router.get("/{user_id}", response_model=UserRead)
-async def read_user(
-    *, session: Session = Depends(get_session), user_id: int
-) -> UserRead | HTTPException:
-    user = session.get(User, user_id)
-
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    return user
-
-
-@router.patch("/{user_id}", response_model=UserRead)
-async def update_user(
-    *, session: Session = Depends(get_session), user_id: int, user: UserUpdate
-) -> UserRead | HTTPException:
-    db_user = session.get(User, user_id)
+    db_user = api_user.update(session, current_user.id, user)
 
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    user_data = user.dict(exclude_unset=True)
-    for key, value in user_data.items():
-        setattr(db_user, key, value)
-
-    session.add(db_user)
-    session.commit()
-    session.refresh(db_user)
-
     return db_user
-
-
-@router.delete("/{user_id}", response_model=Message)
-async def delete_user(
-    *, session: Session = Depends(get_session), user_id: int
-) -> Message | HTTPException:
-    user = session.get(User, user_id)
-
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    session.delete(user)
-    session.commit()
-
-    return Message(message="ok")

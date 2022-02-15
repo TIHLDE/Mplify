@@ -7,7 +7,8 @@ from sqlmodel.pool import StaticPool
 
 from core.database import get_session
 from main import app
-from tests.utils.user import authentication_token_from_email
+from tests.utils.user import (authentication_token_from_email,
+                              authentication_token_from_email_admin)
 
 
 @pytest.fixture(name="session")
@@ -36,5 +37,13 @@ def client_fixture(session: Session):
 @pytest.fixture(name="normal_user_token_headers")
 def normal_user_token_headers(client: TestClient, session: Session) -> Dict[str, str]:
     return authentication_token_from_email(
+        client=client, email="nisse@pølse.localhost", session=session
+    )
+
+
+# @pytest.fixture(scope="module")
+@pytest.fixture(name="admin_token_headers")
+def admin_token_headers(client: TestClient, session: Session) -> Dict[str, str]:
+    return authentication_token_from_email_admin(
         client=client, email="nisse@pølse.localhost", session=session
     )

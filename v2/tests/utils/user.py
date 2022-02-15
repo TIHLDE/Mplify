@@ -5,7 +5,8 @@ from typing import Dict
 from fastapi.testclient import TestClient
 from sqlmodel import Session, select
 
-from models.user import User, UserCreate, UserUpdate
+from models.admin import Admin, AdminUpdate
+from models.user import User, UserUpdate
 from utils.oauth import get_password_hash
 
 
@@ -28,10 +29,6 @@ def user_authentication_headers(
 def authentication_token_from_email(
     *, client: TestClient, email: str, session: Session
 ) -> Dict[str, str]:
-    """
-    Return a valid token for the user with given email.
-    If the user doesn't exist it is created first.
-    """
     password = random_lower_string()
     hashed_password = get_password_hash(password)
 
@@ -41,7 +38,7 @@ def authentication_token_from_email(
     username = "nisse"
 
     if not user:
-        user_in_create = UserCreate(
+        user_in_create = User(
             username=username,
             first_name="pølse",
             last_name="tomatsuppe",
@@ -57,6 +54,41 @@ def authentication_token_from_email(
     else:
         user_in_update = UserUpdate(hashed_password=hashed_password)
         user_db = User.from_orm(user_in_update)
+
+        session.add(user_db)
+        session.commit()
+        session.refresh(user_db)
+
+    return user_authentication_headers(
+        client=client, username=username, password=password
+    )
+
+
+def authentication_token_from_email_admin(
+    *, client: TestClient, email: str, session: Session
+) -> Dict[str, str]:
+    password = random_lower_string()
+    hashed_password = get_password_hash(password)
+
+    statement = select(Admin).where(Admin.email == email)
+    results = session.exec(statement)
+    user = results.first()
+    username = "nisse"
+
+    if not user:
+        user_in_create = Admin(
+            username=username,
+            email=email,
+            hashed_password=hashed_password,
+        )
+        user_db = Admin.from_orm(user_in_create)
+
+        session.add(user_db)
+        session.commit()
+        session.refresh(user_db)
+    else:
+        user_in_update = AdminUpdate(hashed_password=hashed_password)
+        user_db = Admin.from_orm(user_in_update)
 
         session.add(user_db)
         session.commit()
